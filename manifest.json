@@ -1,0 +1,18 @@
+{
+  "name": "إدارة قسم الإنتاج الجنوبي",
+  "short_name": "الإنتاج الجنوبي",
+  "description": "المنظومة المؤسسية الموحدة لإدارة الموارد البشرية والوثائق والتبليغات والمحطات",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#006a6a",
+  "theme_color": "#006a6a",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23006a6a'/><text x='50' y='65' font-size='42' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'>ق.ج</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

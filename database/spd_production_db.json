@@ -1,0 +1,1851 @@
+{
+  "systemSettings": {
+    "appName": "إدارة قسم الإنتاج الجنوبي",
+    "organizationName": "وزارة النفط - شركة نفط البصرة - هيأة تشغيل الرميلة - قسم الإنتاج الجنوبي",
+    "organizationHierarchy": [
+      "وزارة النفط",
+      "شركة نفط البصرة",
+      "هيأة تشغيل الرميلة",
+      "قسم الإنتاج الجنوبي"
+    ],
+    "timezone": "Asia/Baghdad",
+    "maintenanceMode": false,
+    "shiftSettings": {
+      "startTime": "07:30",
+      "shiftDurationHours": 24,
+      "referenceDate": "2026-01-01T07:30:00Z",
+      "referenceShift": "A",
+      "shifts": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "autoRotate": true,
+      "lastModifiedAt": "2026-01-01T08:00:00Z",
+      "lastModifiedBy": "مدير القسم"
+    },
+    "featureFlags": {
+      "technicalStatus": true,
+      "vehicleTracking": true,
+      "careerCalculator": true,
+      "recycleBin": true,
+      "documentDMS": true,
+      "administrativeRequests": true,
+      "whatsappSharing": true,
+      "pwaInstallation": true
+    },
+    "smtp": {
+      "user": "southprod.rumaila@gmail.com",
+      "pass": "jqurgxpqkncfzeol",
+      "host": "smtp.gmail.com",
+      "port": "465"
+    },
+    "authProvider": "GMAIL_SMTP",
+    "firebase": {
+      "projectId": "south-production-dept",
+      "authDomain": "south-production-dept.firebaseapp.com",
+      "status": "READY"
+    }
+  },
+  "departments": [
+    {
+      "id": "dept-south-prod",
+      "name": "إدارة قسم الإنتاج الجنوبي",
+      "code": "SPD-01",
+      "logoText": "ق ج",
+      "description": "المنصة الرسمية لإدارة الموارد البشرية والوثائق والتبليغات والمحطات التابعة لقسم الإنتاج الجنوبي.",
+      "managerId": null,
+      "status": "ACTIVE",
+      "createdAt": "2026-01-01T08:00:00Z"
+    },
+    {
+      "id": "dept-north-prod",
+      "name": "إدارة قسم الإنتاج الشمالي",
+      "code": "NPD-02",
+      "logoText": "ق ش",
+      "description": "قسم الإنتاج الشمالي (مستقل منطقياً متاح لإدارة المؤسس).",
+      "managerId": null,
+      "status": "ACTIVE",
+      "createdAt": "2026-02-01T08:00:00Z"
+    }
+  ],
+  "employeeMasterRecords": [
+    {
+      "employeeId": "EMP-0000",
+      "fullName": "المؤسس العام للمنظومة",
+      "departmentId": "dept-south-prod",
+      "sectionId": null,
+      "unitId": null,
+      "stationId": null,
+      "phone": "07700000000",
+      "emailPersonal": "hussein123119@gmail.com",
+      "emailOfficial": "southprod.rumaila@gmail.com",
+      "jobTitle": "المؤسس والمدير العام للنظام",
+      "motherName": "-",
+      "passportNumber": "-",
+      "unifiedCardNumber": "-",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-001",
+      "fullName": "م. أحمد عبد الحسين البصري",
+      "departmentId": "dept-south-prod",
+      "sectionId": null,
+      "unitId": null,
+      "stationId": null,
+      "phone": "07701234567",
+      "emailPersonal": "ahmed.mgr@rumaila.iq",
+      "emailOfficial": "ahmed.mgr@rumaila.iq",
+      "jobTitle": "مدير قسم الإنتاج الجنوبي",
+      "motherName": "فاطمة كاظم",
+      "passportNumber": "A12345678",
+      "unifiedCardNumber": "198012345678",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-002",
+      "fullName": "م. حيدر جاسم الكناني",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-1",
+      "unitId": null,
+      "stationId": null,
+      "phone": "07702345678",
+      "emailPersonal": "sec1@rumaila.iq",
+      "emailOfficial": "sec1@rumaila.iq",
+      "jobTitle": "مسؤول الشعبة الأولى",
+      "motherName": "زينب حسن",
+      "passportNumber": "A23456789",
+      "unifiedCardNumber": "198523456789",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-003",
+      "fullName": "م. علي الركابي التميمي",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-2",
+      "unitId": null,
+      "stationId": null,
+      "phone": "07703456789",
+      "emailPersonal": "sec2@rumaila.iq",
+      "emailOfficial": "sec2@rumaila.iq",
+      "jobTitle": "مسؤول الشعبة الثانية",
+      "motherName": "مريم علي",
+      "passportNumber": "A34567890",
+      "unifiedCardNumber": "198834567890",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-004",
+      "fullName": "عمار جبار الساعدي",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-1",
+      "unitId": null,
+      "stationId": "st-101",
+      "phone": "07704567890",
+      "emailPersonal": "ammar.emp@rumaila.iq",
+      "emailOfficial": "ammar.emp@rumaila.iq",
+      "jobTitle": "مشغل محطة إنتاجية أقدم",
+      "motherName": "سعاد ناصر",
+      "passportNumber": "A45678901",
+      "unifiedCardNumber": "199045678901",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-005",
+      "fullName": "مهند فاضل العلي",
+      "departmentId": "dept-south-prod",
+      "sectionId": null,
+      "unitId": "unit-1",
+      "stationId": null,
+      "phone": "07705678901",
+      "emailPersonal": "mohanad.tech@rumaila.iq",
+      "emailOfficial": "mohanad.tech@rumaila.iq",
+      "jobTitle": "مسؤول الوحدة الفنية",
+      "motherName": "خديجة مهدي",
+      "passportNumber": "A56789012",
+      "unifiedCardNumber": "198756789012",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-006",
+      "fullName": "مصطفى كاظم الموسوي",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-1",
+      "unitId": null,
+      "stationId": "st-102",
+      "phone": "07706789012",
+      "emailPersonal": "mustafa.ops@rumaila.iq",
+      "emailOfficial": "mustafa.ops@rumaila.iq",
+      "jobTitle": "مشغل محطة الرميلة الجنوبية",
+      "motherName": "رجاء حسين",
+      "passportNumber": "A67890123",
+      "unifiedCardNumber": "199267890123",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-007",
+      "fullName": "كرار جواد التميمي",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-3",
+      "unitId": null,
+      "stationId": "st-301",
+      "phone": "07707890123",
+      "emailPersonal": "karrar.lab@rumaila.iq",
+      "emailOfficial": "karrar.lab@rumaila.iq",
+      "jobTitle": "فني مختبر كيميائي أقدم",
+      "motherName": "هدى عبد الرضا",
+      "passportNumber": "A78901234",
+      "unifiedCardNumber": "199378901234",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-008",
+      "fullName": "حسين علي الخفاجي",
+      "departmentId": "dept-south-prod",
+      "sectionId": "sec-4",
+      "unitId": null,
+      "stationId": "st-401",
+      "phone": "07708901234",
+      "emailPersonal": "hussein.mtr@rumaila.iq",
+      "emailOfficial": "hussein.mtr@rumaila.iq",
+      "jobTitle": "مهندس عدادات ومعايرة",
+      "motherName": "سليمة راضي",
+      "passportNumber": "A89012345",
+      "unifiedCardNumber": "199189012345",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-009",
+      "fullName": "سجاد باقر الحميد",
+      "departmentId": "dept-south-prod",
+      "sectionId": null,
+      "unitId": "unit-2",
+      "stationId": null,
+      "phone": "07709012345",
+      "emailPersonal": "sajjad.train@rumaila.iq",
+      "emailOfficial": "sajjad.train@rumaila.iq",
+      "jobTitle": "مسؤول وحدة التدريب والتطوير",
+      "motherName": "بتول حميد",
+      "passportNumber": "A90123456",
+      "unifiedCardNumber": "198990123456",
+      "dynamicValues": {},
+      "transferHistory": []
+    },
+    {
+      "employeeId": "EMP-2024-010",
+      "fullName": "أحمد رياض العبادي",
+      "departmentId": "dept-south-prod",
+      "sectionId": null,
+      "unitId": "unit-3",
+      "stationId": null,
+      "phone": "07700123456",
+      "emailPersonal": "ahmed.hse@rumaila.iq",
+      "emailOfficial": "ahmed.hse@rumaila.iq",
+      "jobTitle": "مسؤول وحدة الضمان الصحي والسلامة",
+      "motherName": "أميرة جاسم",
+      "passportNumber": "A01234567",
+      "unifiedCardNumber": "198601234567",
+      "dynamicValues": {},
+      "transferHistory": []
+    }
+  ],
+  "dynamicEmployeeFields": [
+    {
+      "id": "field-1",
+      "name": "رقم جواز السلامة (HSE Passport)",
+      "key": "safetyPassportNo",
+      "type": "text",
+      "category": "official_documents",
+      "isRequired": false,
+      "scope": "GLOBAL",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": "field-2",
+      "name": "تاريخ انتهاء الفحص الطبي",
+      "key": "medicalCheckExpiry",
+      "type": "date",
+      "category": "official_documents",
+      "isRequired": false,
+      "scope": "GLOBAL",
+      "isActive": true,
+      "order": 2
+    },
+    {
+      "id": "field-3",
+      "name": "رقم كتاب التكليف / التنسيب",
+      "key": "assignmentLetterNo",
+      "type": "text",
+      "category": "administrative",
+      "isRequired": false,
+      "scope": "SECTION",
+      "isActive": false,
+      "order": 3
+    },
+    {
+      "id": "field-4",
+      "name": "الدورات التدريبية المعتمدة",
+      "key": "certifiedTrainingCourses",
+      "type": "textarea",
+      "category": "career",
+      "isRequired": false,
+      "scope": "GLOBAL",
+      "isActive": true,
+      "order": 4
+    },
+    {
+      "id": "field-5",
+      "name": "ملاحظات التقييم الميداني للشعبة",
+      "key": "sectionEvaluationNotes",
+      "type": "textarea",
+      "category": "section_specific",
+      "isRequired": false,
+      "scope": "SECTION",
+      "isActive": false,
+      "order": 5
+    }
+  ],
+  "sections": [
+    {
+      "id": "sec-1",
+      "departmentId": "dept-south-prod",
+      "name": "الشعبة الأولى",
+      "managerId": null,
+      "description": "تضم محطات الإنتاج الرئيسية (المركزية، الجنوبية، الرطكة) ومعالجة الخام والغاز المصاحب.",
+      "status": "ACTIVE",
+      "totalCapacity": "360,000 برميل/يوم",
+      "location": "موقع الرميلة الشمالي / الموقع المركزي"
+    },
+    {
+      "id": "sec-2",
+      "departmentId": "dept-south-prod",
+      "name": "الشعبة الثانية",
+      "managerId": null,
+      "description": "تضم محطات ومشرفي الشامية والقرينات وضخ النفط الخام المستمر.",
+      "status": "ACTIVE",
+      "totalCapacity": "575,000 برميل/يوم",
+      "location": "موقع غرب القرنة / الشامية"
+    },
+    {
+      "id": "sec-3",
+      "departmentId": "dept-south-prod",
+      "name": "شعبة المختبرات",
+      "managerId": null,
+      "description": "إدارة الفحوصات الكيميائية وجودة النفط والغاز ونسب الماء والأملاح والمعادن.",
+      "status": "ACTIVE",
+      "totalCapacity": "120 فحص يومي",
+      "location": "المجمع المختبري المركزي"
+    },
+    {
+      "id": "sec-4",
+      "departmentId": "dept-south-prod",
+      "name": "شعبة العدادات",
+      "managerId": null,
+      "description": "معايرة وفحص عدادات القياس الحجمي والكتلي ومنظومات العزل التلقائي.",
+      "status": "ACTIVE",
+      "totalCapacity": "معايرة 24 منظومة قياس",
+      "location": "مركز المعايرة والتصدير"
+    }
+  ],
+  "stations": [
+    {
+      "id": "st-101",
+      "sectionId": "sec-1",
+      "departmentId": "dept-south-prod",
+      "name": "المحطة المركزية",
+      "code": "ST-CTR",
+      "managerId": "user-emp1",
+      "capacity": "150,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-01-15"
+    },
+    {
+      "id": "st-102",
+      "sectionId": "sec-1",
+      "departmentId": "dept-south-prod",
+      "name": "المحطة الجنوبية",
+      "code": "ST-STH",
+      "managerId": null,
+      "capacity": "120,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-02-01"
+    },
+    {
+      "id": "st-103",
+      "sectionId": "sec-1",
+      "departmentId": "dept-south-prod",
+      "name": "محطة الرطكة",
+      "code": "ST-RTK",
+      "managerId": null,
+      "capacity": "90,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-01-20"
+    },
+    {
+      "id": "st-201",
+      "sectionId": "sec-2",
+      "departmentId": "dept-south-prod",
+      "name": "محطة الشامية",
+      "code": "ST-SHM",
+      "managerId": null,
+      "capacity": "110,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-01-28"
+    },
+    {
+      "id": "st-202",
+      "sectionId": "sec-2",
+      "departmentId": "dept-south-prod",
+      "name": "محطة القرينات",
+      "code": "ST-QRN",
+      "managerId": null,
+      "capacity": "85,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-02-04"
+    },
+    {
+      "id": "st-203",
+      "sectionId": "sec-2",
+      "departmentId": "dept-south-prod",
+      "name": "محطة مجمع مشرف شامية",
+      "code": "ST-MSH-SHM",
+      "managerId": null,
+      "capacity": "200,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-02-10"
+    },
+    {
+      "id": "st-204",
+      "sectionId": "sec-2",
+      "departmentId": "dept-south-prod",
+      "name": "محطة مجمع مشرف قرينات",
+      "code": "ST-MSH-QRN",
+      "managerId": null,
+      "capacity": "180,000 برميل/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-01-18"
+    },
+    {
+      "id": "st-301",
+      "sectionId": "sec-3",
+      "departmentId": "dept-south-prod",
+      "name": "مختبر الفحص الكيميائي والمياه المصاحبة",
+      "code": "LAB-CHM",
+      "managerId": null,
+      "capacity": "60 فحص كيميائي/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-02-08"
+    },
+    {
+      "id": "st-302",
+      "sectionId": "sec-3",
+      "departmentId": "dept-south-prod",
+      "name": "مختبر فحص جودة الغاز ونقطة الندى",
+      "code": "LAB-GAS",
+      "managerId": null,
+      "capacity": "30 عينة غاز/يوم",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-02-11"
+    },
+    {
+      "id": "st-401",
+      "sectionId": "sec-4",
+      "departmentId": "dept-south-prod",
+      "name": "محطة معايرة العدادات المركزية (Prover Loop)",
+      "code": "ST-MTR-CTR",
+      "managerId": null,
+      "capacity": "معايرة دقيقة مستمرة",
+      "status": "OPERATIONAL",
+      "lastMaintenance": "2026-01-30"
+    }
+  ],
+  "units": [
+    {
+      "id": "unit-1",
+      "departmentId": "dept-south-prod",
+      "name": "الفنية",
+      "managerId": null,
+      "description": "الدعم الفني، الصيانة الوقائية والطارئة، والدراسات الهندسية المباشرة بإدارة القسم.",
+      "status": "ACTIVE",
+      "projectsCount": 5,
+      "activeStaff": 12
+    },
+    {
+      "id": "unit-2",
+      "departmentId": "dept-south-prod",
+      "name": "التدريب والتطوير",
+      "managerId": null,
+      "description": "إعداد الورش التدريبية، برامج التأهيل الفني، ومتابعة كفاءة التشغيل والسلامة للكوادر.",
+      "status": "ACTIVE",
+      "projectsCount": 3,
+      "activeStaff": 6
+    },
+    {
+      "id": "unit-3",
+      "departmentId": "dept-south-prod",
+      "name": "الضمان الصحي",
+      "managerId": null,
+      "description": "متابعة المعاملات الصحية، تصاريح السلامة المهنية، والامتثال للوائح حماية البيئة.",
+      "status": "ACTIVE",
+      "projectsCount": 4,
+      "activeStaff": 8
+    }
+  ],
+  "technicalStatusReports": [],
+  "vehicles": [
+    {
+      "id": "veh-101",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "تويوتا لاندكروزر",
+      "ownershipType": "GOVERNMENT",
+      "sideNumber": "101",
+      "vehicleNumber": "44521 - بصرة / حكومي",
+      "affiliationType": "DEPT_MGMT",
+      "sectionId": null,
+      "sectionName": "إدارة القسم",
+      "stationId": null,
+      "stationName": null,
+      "driverName": "فاضل حامد العلي",
+      "driverPhone": "07701122334",
+      "operationalState": "OPERATIONAL",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "veh-102",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "نيسان باترول",
+      "ownershipType": "RENTAL",
+      "sideNumber": null,
+      "vehicleNumber": "88319 - بصرة / فحص مؤقت",
+      "affiliationType": "SECTION_MGMT",
+      "sectionId": "sec-1",
+      "sectionName": "الشعبة الأولى",
+      "stationId": null,
+      "stationName": null,
+      "driverName": "جاسم هادي الكناني",
+      "driverPhone": "07702233445",
+      "operationalState": "OPERATIONAL",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-12T08:00:00Z"
+    },
+    {
+      "id": "veh-103",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "تويوتا هايلوكس",
+      "ownershipType": "GOVERNMENT",
+      "sideNumber": "105",
+      "vehicleNumber": "12490 - بصرة / حكومي",
+      "affiliationType": "STATION",
+      "sectionId": "sec-1",
+      "sectionName": "الشعبة الأولى",
+      "stationId": "st-101",
+      "stationName": "المحطة المركزية",
+      "shiftDrivers": {
+        "shiftA": {
+          "driverId": "drv-a1",
+          "driverName": "أحمد محمد الربيعي",
+          "phone": "07703334455"
+        },
+        "shiftB": {
+          "driverId": "drv-b1",
+          "driverName": "علي حسن التميمي",
+          "phone": "07704445566"
+        },
+        "shiftC": {
+          "driverId": "drv-c1",
+          "driverName": "محمود كريم الساعدي",
+          "phone": "07705556677"
+        },
+        "shiftD": null
+      },
+      "operationalState": "OPERATIONAL",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-15T08:00:00Z"
+    },
+    {
+      "id": "veh-104",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "ميتسوبيشي L200",
+      "ownershipType": "GOVERNMENT",
+      "sideNumber": "108",
+      "vehicleNumber": "67890 - بصرة / حكومي",
+      "affiliationType": "STATION",
+      "sectionId": "sec-2",
+      "sectionName": "الشعبة الثانية",
+      "stationId": "st-104",
+      "stationName": "محطة الشامية",
+      "shiftDrivers": {
+        "shiftA": {
+          "driverId": "drv-a2",
+          "driverName": "حيدر صادق الوائلي",
+          "phone": "07706667788"
+        },
+        "shiftB": {
+          "driverId": "drv-b2",
+          "driverName": "عباس ناصر الخفاجي",
+          "phone": "07707778899"
+        },
+        "shiftC": null,
+        "shiftD": null
+      },
+      "operationalState": "OPERATIONAL",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-18T08:00:00Z"
+    },
+    {
+      "id": "veh-105",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "شاحنة مرسيدس صهريج",
+      "ownershipType": "GOVERNMENT",
+      "sideNumber": "201",
+      "vehicleNumber": "33412 - بصرة / حكومي",
+      "affiliationType": "DEPT_MGMT",
+      "sectionId": null,
+      "sectionName": "إدارة القسم",
+      "stationId": null,
+      "stationName": null,
+      "driverName": "عمر فاضل الجبوري",
+      "driverPhone": "07708889900",
+      "operationalState": "IN_REPAIR",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-20T08:00:00Z"
+    },
+    {
+      "id": "veh-106",
+      "departmentId": "dept-south-prod",
+      "vehicleType": "حافلة تويوتا كوستر",
+      "ownershipType": "RENTAL",
+      "sideNumber": null,
+      "vehicleNumber": "99201 - بصرة / أجور",
+      "affiliationType": "SECTION_MGMT",
+      "sectionId": "sec-3",
+      "sectionName": "شعبة المختبرات",
+      "stationId": null,
+      "stationName": null,
+      "driverName": "سلمان داود البياتي",
+      "driverPhone": "07709990011",
+      "operationalState": "STOPPED",
+      "movementState": "AVAILABLE",
+      "createdAt": "2026-01-22T08:00:00Z"
+    }
+  ],
+  "vehicleMovements": [],
+  "recycleBin": [
+    {
+      "id": "rb-001",
+      "departmentId": "dept-south-prod",
+      "itemType": "DOCUMENT",
+      "itemTitle": "مسودة تقرير الضغوط لشهر كانون الأول",
+      "deletedAt": "2026-02-10T14:20:00Z",
+      "deletedById": "user-dept-mgr",
+      "deletedByName": "م. أحمد عبد الحسين",
+      "data": {
+        "id": "doc-old-1",
+        "title": "مسودة تقرير الضغوط القديم",
+        "category": "WORD"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "user-founder",
+      "departmentId": "dept-south-prod",
+      "email": "founder@local.spd",
+      "password": "pbkdf2$10000$175dceaac196e85f1f3662c5e3996441$55a4deedb404a42ebbc2052c43393288438855cca370b34107d6a5812eaaa4fd6b07d2acb0e318ceae8dd75b93236bc980efcf38bc404609c7ce227bb5fda9e5",
+      "employeeId": "EMP-0000",
+      "fullName": "المؤسس العام للمنظومة",
+      "jobTitle": "المؤسس والمدير العام للنظام",
+      "phone": "07700000000",
+      "role": "SUPER_ADMIN",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": null,
+      "unitId": null,
+      "stationId": null,
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-09-04T22:50:28.304Z"
+    },
+    {
+      "id": "user-dept-mgr",
+      "departmentId": "dept-south-prod",
+      "email": "ahmed.mgr@rumaila.iq",
+      "password": "123456",
+      "employeeId": "EMP-2024-001",
+      "fullName": "م. أحمد عبد الحسين",
+      "jobTitle": "مدير قسم الإنتاج الجنوبي",
+      "phone": "07701234567",
+      "role": "DEPT_MANAGER",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": null,
+      "unitId": null,
+      "stationId": null,
+      "createdAt": "2026-01-01T08:00:00Z"
+    },
+    {
+      "id": "user-sec1-mgr",
+      "departmentId": "dept-south-prod",
+      "email": "sec1@rumaila.iq",
+      "password": "123456",
+      "employeeId": "EMP-2024-002",
+      "fullName": "م. حيدر جاسم",
+      "jobTitle": "مسؤول الشعبة الأولى",
+      "phone": "07702345678",
+      "role": "SECTION_MANAGER",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": "sec-1",
+      "unitId": null,
+      "stationId": null,
+      "createdAt": "2026-01-02T08:00:00Z"
+    },
+    {
+      "id": "user-sec2-mgr",
+      "departmentId": "dept-south-prod",
+      "email": "sec2@rumaila.iq",
+      "password": "123456",
+      "employeeId": "EMP-2024-003",
+      "fullName": "م. علي الركابي",
+      "jobTitle": "مسؤول الشعبة الثانية",
+      "phone": "07703456789",
+      "role": "SECTION_MANAGER",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": "sec-2",
+      "unitId": null,
+      "stationId": null,
+      "createdAt": "2026-01-03T08:00:00Z"
+    },
+    {
+      "id": "user-emp1",
+      "departmentId": "dept-south-prod",
+      "email": "ammar.emp@rumaila.iq",
+      "password": "123456",
+      "employeeId": "EMP-2024-004",
+      "fullName": "عمار الساعدي",
+      "jobTitle": "مشغل محطة إنتاجية أقدم",
+      "phone": "07704567890",
+      "role": "EMPLOYEE",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": "sec-1",
+      "unitId": null,
+      "stationId": "st-101",
+      "createdAt": "2026-01-04T08:00:00Z"
+    },
+    {
+      "id": "user-unit1-mgr",
+      "departmentId": "dept-south-prod",
+      "email": "mohanad.tech@rumaila.iq",
+      "password": "123456",
+      "employeeId": "EMP-2024-005",
+      "fullName": "مهند فاضل العلي",
+      "jobTitle": "مسؤول الوحدة الفنية",
+      "phone": "07705678901",
+      "role": "UNIT_MANAGER",
+      "status": "APPROVED",
+      "profileCompleted": true,
+      "sectionId": null,
+      "unitId": "unit-1",
+      "stationId": null,
+      "createdAt": "2026-01-05T08:00:00Z"
+    }
+  ],
+  "employeeDocuments": [],
+  "announcements": [
+    {
+      "id": "anc-01",
+      "departmentId": "dept-south-prod",
+      "targetType": "ALL_DEPARTMENT",
+      "targetId": null,
+      "title": "تحديث بيانات الكوادر والمستمسكات الرسمية للعام 2026",
+      "content": "يرجى من كافة منتسبي قسم الإنتاج الجنوبي بالشعب والوحدات والمحطات التابعة الإسراع بتحديث مستمسكاتهم الرسمية وبياناتهم الشخصية عبر المنصة فوراً لتجنب إيقاف المعاملات الإدارية.",
+      "importance": "URGENT",
+      "status": "PUBLISHED",
+      "isPinned": true,
+      "attachmentName": "تعليمات_تحديث_البيانات_2026.pdf",
+      "publishDate": "2026-02-01T08:00:00Z",
+      "expiryDate": "2026-03-30T23:59:59Z",
+      "createdBy": "user-dept-mgr"
+    },
+    {
+      "id": "anc-02",
+      "departmentId": "dept-south-prod",
+      "targetType": "SECTION",
+      "targetId": "sec-1",
+      "title": "خطة الصيانة الدورية الشاملة لمحطة المركزية",
+      "content": "نلفت عناية كوادر الشعبة الأولى إلى البدء بجدول الصيانة الدورية الشامل للمحطة المركزية ابتداءً من الأسبوع القادم، يرجى التنسيق مع الوحدة الفنية.",
+      "importance": "HIGH",
+      "status": "PUBLISHED",
+      "isPinned": false,
+      "attachmentName": "جدول_الصيانة_الشامل.pdf",
+      "publishDate": "2026-02-05T09:00:00Z",
+      "expiryDate": "2026-02-28T23:59:59Z",
+      "createdBy": "user-sec1-mgr"
+    }
+  ],
+  "officialNotifications": [
+    {
+      "id": "notif-01",
+      "departmentId": "dept-south-prod",
+      "number": "ت-2026/089",
+      "title": "توجيه إداري بخصوص نظام الدوام الخفري في المحطات الإنتاجية",
+      "body": "استناداً لموافقة السيد مدير القسم، يُلزم جميع المشغلين والكوادر الفنية بالالتزام التام بجدول الخفر المحدد وعدم المغادرة إلا بعد التسليم الأصولي لسجل التشغيل وقراءات الضغط والعدادات.",
+      "priority": "HIGH",
+      "sender": "إدارة القسم - الموارد البشرية",
+      "recipient": "جميع شعب ومحطات قسم الإنتاج الجنوبي",
+      "status": "PUBLISHED",
+      "createdAt": "2026-02-08T11:00:00Z",
+      "attachment": "جدول_الدوام_الخفري_2026.pdf"
+    },
+    {
+      "id": "notif-02",
+      "departmentId": "dept-south-prod",
+      "number": "ت-2026/092",
+      "title": "ورشة السلامة والصحة المهنية لعام 2026 (معدات الوقاية PPE)",
+      "body": "تقيم وحدة التدريب والتطوير ورشة عمل تخصصية في معدات الحماية الشخصية وإجراءات الإخلاء الآمن لجميع مسؤولي ومشغلي المحطات يوم الثلاثاء القادم.",
+      "priority": "NORMAL",
+      "sender": "وحدة التدريب والتطوير والسلامة",
+      "recipient": "مسؤولو المحطات والشعب الفنية",
+      "status": "PUBLISHED",
+      "createdAt": "2026-02-11T09:30:00Z",
+      "attachment": "دعوة_حضور_ورشة_السلامة.pdf"
+    }
+  ],
+  "sectionNotifications": [
+    {
+      "id": "sec-notif-01",
+      "sectionId": "sec-1",
+      "departmentId": "dept-south-prod",
+      "targetStationId": "ALL",
+      "targetStationName": "كافة محطات الشعبة",
+      "title": "تأكيد الالتزام بإجراءات السلامة وفحص صمامات العزل",
+      "content": "إلى كافة مسؤولي المحطات ومشغلي النوبات في الشعبة الأولى: يرجى إجراء فحص شامل لصمامات العزل والمشاعل قبل نهاية الأسبوع وتوثيق الموقف الفني في سجل المحطة.",
+      "priority": "URGENT",
+      "status": "PUBLISHED",
+      "publishDate": "2026-02-15T08:30:00Z",
+      "createdBy": "user-sec1-mgr",
+      "createdByName": "م. حيدر جاسم"
+    },
+    {
+      "id": "sec-notif-02",
+      "sectionId": "sec-1",
+      "departmentId": "dept-south-prod",
+      "targetStationId": "st-01",
+      "targetStationName": "محطة الرميلة الشمالية",
+      "title": "جدول معايرة عدادات التدفق وضغط العازلات",
+      "content": "إلى مسؤول محطة الرميلة الشمالية: يرجى التنسيق مع الوحدة الفنية لإجراء المعايرة الموقعية لمقاييس الضغط وتدفق النفط الخام يوم الثلاثاء القادم.",
+      "priority": "HIGH",
+      "status": "PUBLISHED",
+      "publishDate": "2026-02-16T10:00:00Z",
+      "createdBy": "user-sec1-mgr",
+      "createdByName": "م. حيدر جاسم"
+    },
+    {
+      "id": "sec-notif-03",
+      "sectionId": "sec-2",
+      "departmentId": "dept-south-prod",
+      "targetStationId": "ALL",
+      "targetStationName": "كافة محطات الشعبة",
+      "title": "إلزامية ارتداء معدات الوقاية الشخصية PPE أثناء مناوبات الخفر",
+      "content": "توجيه رسمي لكافة محطات الشعبة الثانية: يمنع منعاً باتاً التواجد في المنطقة التشغيلية بدون معدات الوقاية الكاملة وسيتم إجراء جولات تفتيشية مفاجئة.",
+      "priority": "URGENT",
+      "status": "PUBLISHED",
+      "publishDate": "2026-02-14T09:00:00Z",
+      "createdBy": "user-dept-mgr",
+      "createdByName": "م. أحمد عبد الحسين"
+    }
+  ],
+  "requestTypes": [
+    {
+      "id": "reqType-01",
+      "title": "تحديث بيانات البطاقة الموحدة",
+      "description": "تقديم نسخة حديثة من البطاقة الوطنية الموحدة مع رقمها الرسمي",
+      "fields": [
+        {
+          "name": "unifiedCardNumber",
+          "label": "رقم البطاقة الموحدة الجديد (12 رقماً)",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "notes",
+          "label": "سبب التحديث / ملاحظات إضافية",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "reqType-02",
+      "title": "إضافة شهادة دراسية أو مؤهل فني",
+      "description": "تقديم وثيقة التخرج أو الأمر الجامعي أو شهادة التخصص المهني",
+      "fields": [
+        {
+          "name": "degree",
+          "label": "الشهادة الجديدة (دبلوم عالي / ماجستير / دكتوراه)",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "specialization",
+          "label": "التخصص العلمي الدقيق",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "graduationYear",
+          "label": "سنة التخرج",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "reqType-03",
+      "title": "طلب إجازة رسمية (اعتيادية / مرضية / خفر)",
+      "description": "تقديم طلب إجازة رسمي لاعتماده أصولياً من مسؤول الشعبة ومدير القسم",
+      "fields": [
+        {
+          "name": "leaveType",
+          "label": "نوع الإجازة (اعتيادية، مرضية، تعويضية، إجازة خفر)",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "startDate",
+          "label": "تاريخ بدء الإجازة",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "endDate",
+          "label": "تاريخ انتهاء الإجازة",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "label": "السبب والمبررات",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "reqType-04",
+      "title": "تصريح عمل / نقل معدات ومواد بين المحطات",
+      "description": "إصدار تصريح رسمي لنقل قطع غيار، صمامات، أو كيماويات فحص بين المواقع",
+      "fields": [
+        {
+          "name": "materialDescription",
+          "label": "بيان المواد والمعدات المنقولة",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "label": "الكمية والعدد",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "sourceLocation",
+          "label": "موقع الانطلاق / المحطة المصدر",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "destinationLocation",
+          "label": "الموقع المستلم / المحطة الوجهة",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "reqType-05",
+      "title": "طلب تخصيص سيارة لمهمة موقعية",
+      "description": "حجز مركبة من مرآب القسم لإجراء جولة فنية أو نقل فريق عمل",
+      "fields": [
+        {
+          "name": "missionDestination",
+          "label": "الوجهة المحددة",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "missionDate",
+          "label": "تاريخ ووقت المهمة",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "passengerCount",
+          "label": "عدد الركاب وأسماء الفريق",
+          "type": "text",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "requests": [],
+  "dataChangeLogs": [],
+  "documents": [
+    {
+      "id": "doc-001",
+      "departmentId": "dept-south-prod",
+      "title": "تقرير الإنتاج اليومي والضغوط التشغيلية - المحطة المركزية",
+      "category": "WORD",
+      "sectionId": "sec-1",
+      "stationId": "st-101",
+      "unitId": null,
+      "status": "PUBLISHED",
+      "privacy": "PUBLIC",
+      "version": "1.2",
+      "createdBy": "user-emp1",
+      "createdByName": "عمار الساعدي",
+      "createdAt": "2026-02-10T14:00:00Z",
+      "updatedAt": "2026-02-12T08:30:00Z",
+      "content": "<h1>تقرير الإنتاج اليومي - المحطة المركزية</h1><p>معدل معدات الضخ المستمرة: <strong>148,500 برميل/يوم</strong></p><p>الضغوط التشغيلية في عازلات المرحلة الأولى: <strong>32.5 Bar</strong></p><p>مستوى الغاز المصاحب المستلم لوحدة الكبس: <strong>45 MMSCFD</strong></p><p>الحالة الفنية العامة: ممتازة ولا توجد تسريبات أو اختناقات في الخطوط.</p>"
+    },
+    {
+      "id": "doc-002",
+      "departmentId": "dept-south-prod",
+      "title": "جدول القراءات الكيميائية لفحوصات الخام والمياه المصاحبة",
+      "category": "EXCEL",
+      "sectionId": "sec-3",
+      "stationId": "st-301",
+      "unitId": null,
+      "status": "PUBLISHED",
+      "privacy": "PUBLIC",
+      "version": "2.0",
+      "createdBy": "user-dept-mgr",
+      "createdByName": "م. أحمد عبد الحسين",
+      "createdAt": "2026-02-01T10:00:00Z",
+      "updatedAt": "2026-02-09T11:20:00Z",
+      "gridData": [
+        [
+          "المحطة الإنتاجية",
+          "نسبة الماء والترسبات (BS&W %)",
+          "الكثافة النوعية API",
+          "نسبة الكبريت S%",
+          "محتوى الأملاح PTB",
+          "الحالة المطابقة"
+        ],
+        [
+          "المحطة المركزية",
+          "0.15%",
+          "31.2",
+          "1.8%",
+          "12.4",
+          "مطابق للمواصفات"
+        ],
+        [
+          "المحطة الجنوبية",
+          "0.18%",
+          "30.8",
+          "1.9%",
+          "14.1",
+          "مطابق للمواصفات"
+        ],
+        [
+          "محطة الرطكة",
+          "0.22%",
+          "29.5",
+          "2.1%",
+          "18.0",
+          "ضمن الحدود المقبولة"
+        ],
+        [
+          "محطة الشامية",
+          "0.12%",
+          "32.1",
+          "1.7%",
+          "10.8",
+          "ممتاز ومطابق"
+        ],
+        [
+          "محطة القرينات",
+          "0.20%",
+          "30.5",
+          "2.0%",
+          "16.5",
+          "مطابق للمواصفات"
+        ],
+        [
+          "مشرف شامية",
+          "0.14%",
+          "31.8",
+          "1.8%",
+          "11.9",
+          "مطابق للمواصفات"
+        ]
+      ]
+    },
+    {
+      "id": "doc-003",
+      "departmentId": "dept-south-prod",
+      "title": "كتاب رسمي: خطة الصيانة السنوية للتوربينات والمضخات الرئيسية",
+      "category": "WORD",
+      "sectionId": null,
+      "stationId": null,
+      "unitId": "unit-1",
+      "status": "PUBLISHED",
+      "privacy": "PUBLIC",
+      "version": "1.0",
+      "createdBy": "user-unit1-lead",
+      "createdByName": "مهند فاضل",
+      "createdAt": "2026-02-11T12:00:00Z",
+      "updatedAt": "2026-02-11T12:00:00Z",
+      "content": "<h2>إلى / السيد مدير قسم الإنتاج الجنوبي المحترم</h2><p><strong>الموضوع: خطة الصيانة الوقائية السنوية 2026</strong></p><p>نرفق طياً الجدول الفني لأعمال الفحص الدوري للصمامات ومضخات الطرد المركزي في الشعبتين الأولى والثانية مع الموازنة التقديرية لقطع الغيار المطلوبة.</p>"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log-1788648187017-716",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:43:07.017Z"
+    },
+    {
+      "id": "log-1788647971114-545",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:39:31.114Z"
+    },
+    {
+      "id": "log-1788647857710-699",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:37:37.710Z"
+    },
+    {
+      "id": "log-1788647622770-97",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:33:42.770Z"
+    },
+    {
+      "id": "log-1788647467497-129",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:31:07.497Z"
+    },
+    {
+      "id": "log-1788646738360-137",
+      "departmentId": "dept-south-prod",
+      "userId": "user-sec1-mgr",
+      "employeeId": "EMP-2024-002",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:18:58.360Z"
+    },
+    {
+      "id": "log-1788646736115-611",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:18:56.115Z"
+    },
+    {
+      "id": "log-1788646697980-75",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T22:18:17.980Z"
+    },
+    {
+      "id": "log-1788646696276-509",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:18:16.276Z"
+    },
+    {
+      "id": "log-1788646695364-536",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:18:15.364Z"
+    },
+    {
+      "id": "log-1788645944548-529",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T22:05:44.548Z"
+    },
+    {
+      "id": "log-1788645324388-973",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:55:24.388Z"
+    },
+    {
+      "id": "log-1788645291259-672",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:54:51.259Z"
+    },
+    {
+      "id": "log-1788644904002-880",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:48:24.002Z"
+    },
+    {
+      "id": "log-1788644373795-147",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:39:33.795Z"
+    },
+    {
+      "id": "log-1788644311907-31",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:38:31.907Z"
+    },
+    {
+      "id": "log-1788644302408-390",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:38:22.408Z"
+    },
+    {
+      "id": "log-1788644299735-970",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:38:19.735Z"
+    },
+    {
+      "id": "log-1788644298639-455",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:38:18.639Z"
+    },
+    {
+      "id": "log-1788644241279-671",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:37:21.279Z"
+    },
+    {
+      "id": "log-1788644226011-21",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:37:06.011Z"
+    },
+    {
+      "id": "log-1788644225009-224",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:37:05.009Z"
+    },
+    {
+      "id": "log-1788644207144-933",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:36:47.144Z"
+    },
+    {
+      "id": "log-1788644205757-82",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:36:45.757Z"
+    },
+    {
+      "id": "log-1788644197903-128",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN_FAILED",
+      "entity": "AUTH",
+      "details": "محاولة دخول بكلمة مرور خاطئة",
+      "ipAddress": "127.0.0.1",
+      "result": "FAILED",
+      "timestamp": "2026-09-05T21:36:37.903Z"
+    },
+    {
+      "id": "log-1788618495628-48",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T14:28:15.628Z"
+    },
+    {
+      "id": "log-1788617567079-935",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T14:12:47.079Z"
+    },
+    {
+      "id": "log-1788617290667-256",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T14:08:10.667Z"
+    },
+    {
+      "id": "log-1788609973119-568",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "DELETE_DYNAMIC_FIELD",
+      "entity": "HR_MANAGEMENT",
+      "details": "تم تعطيل الحقل الديناميكي: [ملاحظات التقييم الميداني للشعبة] من الإضبارة الموحدة.",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T12:06:13.119Z"
+    },
+    {
+      "id": "log-1788609966501-794",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "DELETE_DYNAMIC_FIELD",
+      "entity": "HR_MANAGEMENT",
+      "details": "تم تعطيل الحقل الديناميكي: [رقم كتاب التكليف / التنسيب] من الإضبارة الموحدة.",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T12:06:06.501Z"
+    },
+    {
+      "id": "log-1788609417729-812",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "PRINT_DOCUMENT",
+      "entity": "DOCUMENT",
+      "details": "طباعة وثيقة: [جدول القراءات الكيميائية لفحوصات الخام والمياه المصاحبة]",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T11:56:57.729Z"
+    },
+    {
+      "id": "log-1788609400156-37",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "DOWNLOAD_DOCUMENT",
+      "entity": "DOCUMENT",
+      "details": "تنزيل وثيقة: [جدول القراءات الكيميائية لفحوصات الخام والمياه المصاحبة]",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T11:56:40.156Z"
+    },
+    {
+      "id": "log-1788609372069-701",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "DOWNLOAD_DOCUMENT",
+      "entity": "DOCUMENT",
+      "details": "تنزيل وثيقة: [تقرير الإنتاج اليومي والضغوط التشغيلية - المحطة المركزية]",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T11:56:12.069Z"
+    },
+    {
+      "id": "log-1788609231183-550",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "DOWNLOAD_DOCUMENT",
+      "entity": "DOCUMENT",
+      "details": "تنزيل وثيقة: [تقرير الإنتاج اليومي والضغوط التشغيلية - المحطة المركزية]",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T11:53:51.183Z"
+    },
+    {
+      "id": "log-1788607107671-627",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T11:18:27.671Z"
+    },
+    {
+      "id": "log-1788600955938-796",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T09:35:55.938Z"
+    },
+    {
+      "id": "log-1788597331092-830",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T08:35:31.092Z"
+    },
+    {
+      "id": "log-1788596860540-139",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-05T08:27:40.540Z"
+    },
+    {
+      "id": "log-1788563415033-625",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:10:15.033Z"
+    },
+    {
+      "id": "log-1788563181158-978",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "CUSTOM_DATA_EXPORT",
+      "entity": "HR",
+      "details": "تصدير بيانات الكادر بصيغة [EXCEL] لعدد (11) منتسب",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:06:21.158Z"
+    },
+    {
+      "id": "log-1788563097125-391",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "CUSTOM_DATA_EXPORT",
+      "entity": "HR",
+      "details": "تصدير بيانات الكادر بصيغة [PDF] لعدد (11) منتسب",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:04:57.125Z"
+    },
+    {
+      "id": "log-1788563094937-899",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "CUSTOM_DATA_EXPORT",
+      "entity": "HR",
+      "details": "تصدير بيانات الكادر بصيغة [WORD] لعدد (11) منتسب",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:04:54.937Z"
+    },
+    {
+      "id": "log-1788563071280-619",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "CUSTOM_DATA_EXPORT",
+      "entity": "HR",
+      "details": "تصدير بيانات الكادر بصيغة [EXCEL] لعدد (11) منتسب",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:04:31.280Z"
+    },
+    {
+      "id": "log-1788562906380-883",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T23:01:46.380Z"
+    },
+    {
+      "id": "log-1788562228308-835",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "APPROVE_USER",
+      "entity": "USER_MANAGEMENT",
+      "details": "تمت الموافقة على طلب تسجيل وتفعيل حساب المستخدم: المؤسس العام للمنظومة (EMP-0000)",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T22:50:28.308Z"
+    },
+    {
+      "id": "log-1788560355226-505",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T22:19:15.226Z"
+    },
+    {
+      "id": "log-1788560349638-907",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T22:19:09.638Z"
+    },
+    {
+      "id": "log-1788556930534-824",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T21:22:10.534Z"
+    },
+    {
+      "id": "log-1788556878368-43",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T21:21:18.368Z"
+    },
+    {
+      "id": "log-1788556197556-993",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T21:09:57.556Z"
+    },
+    {
+      "id": "log-1788555011383-171",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T20:50:11.383Z"
+    },
+    {
+      "id": "log-1788554541266-425",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T20:42:21.266Z"
+    },
+    {
+      "id": "log-1788554433740-205",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T20:40:33.741Z"
+    },
+    {
+      "id": "log-1788553336145-936",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T20:22:16.145Z"
+    },
+    {
+      "id": "log-1788540408264-680",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T16:46:48.264Z"
+    },
+    {
+      "id": "log-1788534244483-842",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGOUT",
+      "entity": "AUTH",
+      "details": "تسجيل الخروج من المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T15:04:04.483Z"
+    },
+    {
+      "id": "log-1788513709741-61",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T09:21:49.741Z"
+    },
+    {
+      "id": "log-1788513680628-33",
+      "departmentId": "dept-south-prod",
+      "userId": "user-founder",
+      "employeeId": "EMP-0000",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T09:21:20.628Z"
+    },
+    {
+      "id": "log-1788512919337-394",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح إلى المنصة",
+      "ipAddress": "127.0.0.1",
+      "result": "SUCCESS",
+      "timestamp": "2026-09-04T09:08:39.337Z"
+    },
+    {
+      "id": "log-001",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "LOGIN",
+      "entity": "AUTH",
+      "details": "تسجيل دخول ناجح لمدير القسم",
+      "ipAddress": "192.168.1.10",
+      "result": "SUCCESS",
+      "timestamp": "2026-02-13T08:00:00Z"
+    },
+    {
+      "id": "log-002",
+      "departmentId": "dept-south-prod",
+      "userId": "user-dept-mgr",
+      "employeeId": "EMP-2024-001",
+      "action": "APPROVE_REQUEST",
+      "entity": "REQUESTS",
+      "details": "الموافقة على طلب تعديل البطاقة الموحدة REQ-1001 للموظف عمار الساعدي",
+      "ipAddress": "192.168.1.10",
+      "result": "SUCCESS",
+      "timestamp": "2026-02-13T09:15:00Z"
+    }
+  ],
+  "interviewRequests": []
+}

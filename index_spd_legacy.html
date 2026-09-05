@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة قسم الإنتاج الجنوبي | المنظومة المؤسسية الموحدة</title>
+  <meta name="description" content="منصة إدارة الموارد البشرية والوثائق والتبليغات والهيكل التنظيمي وصلاحيات قسم الإنتاج الجنوبي.">
+  <meta name="theme-color" content="#006a6a">
+  
+  <!-- PWA & Icons Support -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23006a6a'/><text x='50' y='65' font-size='42' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'>ق.ج</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23006a6a'/><text x='50' y='65' font-size='42' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'>ق.ج</text></svg>">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Material Design Cairo & Tajawal Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Enterprise Design System CSS -->
+  <link rel="stylesheet" href="css/style.css?v=83">
+</head>
+<body>
+  <!-- Single Page App Container Root -->
+  <div id="app"></div>
+
+  <!-- Core Scripts & Database Engine -->
+  <script src="js/store.js?v=83"></script>
+  <script src="js/auth.js?v=83"></script>
+  <script src="js/rbac.js?v=83"></script>
+
+  <!-- Export & Printable Tools -->
+  <script src="js/utils/exporter.js?v=83"></script>
+
+  <!-- Enterprise UI Components -->
+  <script src="js/components/sidebar.js?v=83"></script>
+  <script src="js/components/topbar.js?v=83"></script>
+  <script src="js/components/announcement_bar.js?v=83"></script>
+  <script src="js/components/dashboard.js?v=83"></script>
+  <script src="js/components/sections.js?v=83"></script>
+  <script src="js/components/section_workspace.js?v=83"></script>
+  <script src="js/components/units.js?v=83"></script>
+  <script src="js/components/unit_workspace.js?v=83"></script>
+  <script src="js/components/station_workspace.js?v=83"></script>
+  <script src="js/components/technical_status.js?v=83"></script>
+  <script src="js/components/documents.js?v=83"></script>
+  <script src="js/components/announcements.js?v=83"></script>
+  <script src="js/components/notifications.js?v=83"></script>
+  <script src="js/components/employees.js?v=83"></script>
+  <script src="js/components/vehicles.js?v=83"></script>
+  <script src="js/components/promotion_calculator.js?v=83"></script>
+  <script src="js/components/recycle_bin.js?v=83"></script>
+  <script src="js/components/profile.js?v=83"></script>
+  <script src="js/components/audit_logs.js?v=83"></script>
+  <script src="js/components/super_admin.js?v=83"></script>
+  <script src="js/components/user_management.js?v=83"></script>
+  <script src="js/components/dept_management.js?v=83"></script>
+  <script src="js/components/requests.js?v=83"></script>
+
+  <!-- Main Router & App Initialization -->
+  <script src="js/app.js?v=83"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=11').catch(err => console.log('SW registration note:', err));
+      });
+    }
+  </script>
+</body>
+</html>

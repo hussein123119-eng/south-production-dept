@@ -1,0 +1,24 @@
+{
+  "name": "south-production-dept-enterprise",
+  "version": "1.0.0",
+  "description": "منظومة قسم الإنتاج الجنوبي - نظام إدارة العمليات والموارد البشرية والوثائق",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node js/test_bulletproof.js",
+    "backup": "node tools/snapshot_manager.js save"
+  },
+  "keywords": [
+    "south-production",
+    "boc",
+    "oil-and-gas",
+    "rumaila",
+    "enterprise-system"
+  ],
+  "author": "South Production Department",
+  "license": "ISC",
+  "dependencies": {
+    "nodemailer": "^10.0.0"
+  }
+}

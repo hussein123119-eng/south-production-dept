@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+
+# Backups & Database Archives
+backups/
+database/backups/
+*.log
+.system_generated/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Firebase Cache
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
