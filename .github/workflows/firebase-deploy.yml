@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -13,10 +14,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting via Action
         uses: FirebaseExtended/action-hosting-deploy@v0
+        continue-on-error: true
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOUTH_PROD_RUMAILA }}'
           channelId: live
           projectId: south-prod-rumaila
+
+      - name: Direct Deploy via Firebase CLI
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOUTH_PROD_RUMAILA }}
+        run: |
+          echo "$SERVICE_ACCOUNT" > /tmp/sa.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json
+          npx -y firebase-tools@latest deploy --only hosting --project south-prod-rumaila --non-interactive
+          rm -f /tmp/sa.json
