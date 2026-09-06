@@ -733,8 +733,8 @@ class AppController {
                 <input type="text" id="profPhone" class="form-control" placeholder="0770XXXXXXX" required>
               </div>
               <div class="form-group">
-                <label class="form-label">المسمى الوظيفي</label>
-                <input type="text" id="profJobTitle" class="form-control" placeholder="مهندس / مشغل / إداري" required>
+                <label class="form-label">العنوان الوظيفي</label>
+                <input type="text" id="profJobTitle" class="form-control" placeholder="معاون مهندس / مهندس / فني / ملاحظ" required>
               </div>
             </div>
 
@@ -2431,7 +2431,7 @@ class AppController {
   exportEmployeesCSV() {
     const user = window.auth.getCurrentUser();
     const users = window.store.getUsers(user.departmentId).filter(u => u.status === 'APPROVED');
-    const headers = ['الرقم الوظيفي', 'الاسم الكامل', 'المسمى الوظيفي', 'الدور'];
+    const headers = ['الرقم الوظيفي', 'الاسم الكامل', 'العنوان الوظيفي', 'الدور'];
     const rows = users.map(u => [u.employeeId, u.fullName, u.jobTitle, window.rbac.getRoleInfo(u.role).name]);
     window.exporter.exportToExcel('سجل_الموظفين', headers, rows);
   }
@@ -3649,6 +3649,40 @@ class AppController {
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
+  // --- Direct Staff Communication Handlers (واتساب وإيميل المنتسب) ---
+  openDirectWhatsApp(rawPhone, name = '') {
+    if (!rawPhone || !rawPhone.trim() || rawPhone === 'غير مسجل' || rawPhone === '-') {
+      if (typeof this.showToast === 'function') {
+        this.showToast('لا يتوفر رقم هاتف مسجل لهذا المنتسب للمراسلة عبر واتساب', 'warning');
+      } else {
+        alert('لا يتوفر رقم هاتف مسجل لهذا المنتسب للمراسلة عبر واتساب');
+      }
+      return;
+    }
+    let cleaned = rawPhone.replace(/\D/g, '');
+    if (cleaned.startsWith('07')) {
+      cleaned = '964' + cleaned.substring(1);
+    } else if (cleaned.startsWith('7') && cleaned.length === 10) {
+      cleaned = '964' + cleaned;
+    }
+    const defaultMsg = encodeURIComponent(`تحية طيبة زميلنا العزيز ${name ? name : ''}، بخصوص أعمال قسم الإنتاج الجنوبي.`);
+    window.open(`https://wa.me/${cleaned}?text=${defaultMsg}`, '_blank');
+  }
+
+  openDirectEmail(email, name = '') {
+    if (!email || !email.trim() || email === 'غير مسجل' || email === '-') {
+      if (typeof this.showToast === 'function') {
+        this.showToast('لا يتوفر بريد إلكتروني مسجل لهذا المنتسب للمراسلة', 'warning');
+      } else {
+        alert('لا يتوفر بريد إلكتروني مسجل لهذا المنتسب للمراسلة');
+      }
+      return;
+    }
+    const subject = encodeURIComponent(`تواصل رسمي - قسم الإنتاج الجنوبي ${name ? `(${name})` : ''}`);
+    const body = encodeURIComponent(`تحية طيبة زميلنا العزيز ${name || ''}،\n\nنود التواصل معكم بخصوص متطلبات العمل في قسم الإنتاج الجنوبي.\n\nمع التقدير،\nإدارة قسم الإنتاج الجنوبي`);
+    window.location.href = `mailto:${email.trim()}?subject=${subject}&body=${body}`;
+  }
+
   // --- PWA Installation Prompt (القسم 39) ---
   promptPWAInstall() {
     if (window.deferredPWAPrompt) {
@@ -4617,6 +4651,10 @@ class AppController {
               <input type="text" id="deGradYear" class="form-control" value="${targetUser.graduationYear || ''}" placeholder="2010">
             </div>
             <div class="form-group">
+              <label class="form-label">العنوان الوظيفي (التدرج القانوني)</label>
+              <input type="text" id="deJobTitle" class="form-control" value="${targetUser.jobTitle || targetUser.careerTitle || ''}" placeholder="معاون مهندس / مهندس / فني / رئيس مهندسين..." required>
+            </div>
+            <div class="form-group">
               <label class="form-label">الدرجة الوظيفية</label>
               <select id="deJobGrade" class="form-control">
                 <option value="الأولى" ${targetUser.jobGrade === 'الأولى' ? 'selected' : ''}>الدرجة الأولى</option>
@@ -4626,6 +4664,9 @@ class AppController {
                 <option value="الخامسة" ${targetUser.jobGrade === 'الخامسة' ? 'selected' : ''}>الدرجة الخامسة</option>
                 <option value="السادسة" ${targetUser.jobGrade === 'السادسة' ? 'selected' : ''}>الدرجة السادسة</option>
                 <option value="السابعة" ${targetUser.jobGrade === 'السابعة' ? 'selected' : ''}>الدرجة السابعة</option>
+                <option value="الثامنة" ${targetUser.jobGrade === 'الثامنة' ? 'selected' : ''}>الدرجة الثامنة</option>
+                <option value="التاسعة" ${targetUser.jobGrade === 'التاسعة' ? 'selected' : ''}>الدرجة التاسعة</option>
+                <option value="العاشرة" ${targetUser.jobGrade === 'العاشرة' ? 'selected' : ''}>الدرجة العاشرة</option>
               </select>
             </div>
             <div class="form-group">
@@ -4881,6 +4922,8 @@ class AppController {
       sectionId: selSectionId,
       unitId: selUnitId,
       stationId: selStationId,
+      jobTitle: document.getElementById('deJobTitle')?.value.trim() || targetUser.jobTitle || targetUser.careerTitle || 'موظف',
+      careerTitle: document.getElementById('deJobTitle')?.value.trim() || targetUser.careerTitle || targetUser.jobTitle || 'موظف',
       degree: document.getElementById('deDegree')?.value || 'بكالوريوس',
       specialization: document.getElementById('deSpecialization')?.value || '',
       university: document.getElementById('deUniversity')?.value || '',
@@ -5411,7 +5454,7 @@ class AppController {
     }
   }
 
-  // --- Bulk Import Employee IDs from CSV / Excel ---
+  // --- Bulk Import Employee IDs from CSV / Excel & Quick Single Add ---
   handleCSVFileSelected(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -5426,15 +5469,140 @@ class AppController {
     reader.readAsText(file);
   }
 
+  handleInsertSampleCSV(sampleType) {
+    const textarea = document.getElementById('importCSVTextarea');
+    if (!textarea) return;
+
+    if (sampleType === 'minimal') {
+      textarea.value = `الرقم الوظيفي,الاسم الكامل
+EMP-2026-901,كرار حيدر علي
+EMP-2026-902,حسين جاسم محمد
+EMP-2026-903,زينب كاظم جواد
+EMP-2026-904,مصطفى باقر حسن
+EMP-2026-905,مروة عادل عبد الرضا`;
+    } else {
+      textarea.value = `الرقم الوظيفي,الاسم الرباعي واللقب,العنوان الوظيفي,الدرجة,المرحلة,الشهادة,التخصص,الشعبة
+EMP-2026-901,كرار حيدر علي الحسني,رئيس مهندسين أقدم,الثالثة,الأولى,بكالوريوس,هندسة نفط,شعبة العمليات
+EMP-2026-902,حسين جاسم محمد الخفاجي,مشغل محطة إنتاجية أقدم,الرابعة,الثانية,دبلوم فني,تشغيل وسيطرة,شعبة الصيانة
+EMP-2026-903,زينب كاظم جواد العامري,مهندس أقدم,الخامسة,الثالثة,بكالوريوس,هندسة كيمياوية,الشعبة الفنية
+EMP-2026-904,مصطفى باقر حسن التميمي,معاون ملاحظ فني,السابعة,الرابعة,إعدادية صناعة,ميكانيك,شعبة الخدمات السطحية
+EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسابات أقدم,الرابعة,الأولى,بكالوريوس,محاسبة مالية,شعبة الشؤون الإدارية`;
+    }
+
+    if (this.showToast) {
+      this.showToast('📋 تم إدراج نموذج البيانات التجريبية في الصندوق جاهزاً للفحص.', 'info');
+    }
+    this.handleParseImportEmployeeIDs();
+  }
+
+  handleCopyTemplateText(sampleType) {
+    let text = '';
+    if (sampleType === 'minimal') {
+      text = `الرقم الوظيفي,الاسم الكامل\nEMP-2026-901,كرار حيدر علي\nEMP-2026-902,حسين جاسم محمد`;
+    } else {
+      text = `الرقم الوظيفي,الاسم الرباعي واللقب,العنوان الوظيفي,الدرجة,المرحلة,الشهادة,التخصص,الشعبة\nEMP-2026-901,كرار حيدر علي الحسني,رئيس مهندسين أقدم,الثالثة,الأولى,بكالوريوس,هندسة نفط,شعبة العمليات`;
+    }
+
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (this.showToast) this.showToast('📋 تم نسخ صيغة النموذج إلى الحافظة بنجاح!', 'success');
+        else alert('تم النسخ إلى الحافظة!');
+      }).catch(() => {
+        if (this.showToast) this.showToast('تعذر النسخ التلقائي، يمكنك نسخه يدوياً من الشاشة.', 'warning');
+      });
+    } else {
+      if (this.showToast) this.showToast('📋 صيغة النموذج متاحة على الشاشة.', 'info');
+    }
+  }
+
+  handleQuickAddSingleEmployee(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+    if (!actorUser) return;
+
+    const fullNameInput = document.getElementById('quickEmpFullName');
+    const empIdInput = document.getElementById('quickEmpId');
+    const jobTitleInput = document.getElementById('quickEmpJobTitle');
+    const sectionInput = document.getElementById('quickEmpSectionId');
+    const jobGradeInput = document.getElementById('quickEmpJobGrade');
+    const jobStageInput = document.getElementById('quickEmpJobStage');
+    const degreeInput = document.getElementById('quickEmpDegree');
+    const workShiftInput = document.getElementById('quickEmpWorkShift');
+
+    const fullName = (fullNameInput ? fullNameInput.value : '').trim();
+    const empId = (empIdInput ? empIdInput.value : '').trim().toUpperCase();
+    const jobTitle = (jobTitleInput ? jobTitleInput.value : '').trim() || 'موظف';
+    const sectionId = sectionInput ? sectionInput.value : null;
+    const jobGrade = jobGradeInput ? jobGradeInput.value : 'الخامسة';
+    const jobStage = jobStageInput ? jobStageInput.value : 'الأولى';
+    const degree = degreeInput ? degreeInput.value : 'بكالوريوس';
+    const workShift = workShiftInput ? workShiftInput.value : 'صباحي';
+
+    if (!fullName || !empId) {
+      if (this.showToast) {
+        this.showToast('يرجى إدخال كل من الاسم الرباعي والرقم الوظيفي كحد أدنى إلزامي.', 'warning');
+      } else if (typeof alert === 'function') {
+        alert('يرجى إدخال كل من الاسم الرباعي والرقم الوظيفي كحد أدنى إلزامي.');
+      }
+      return;
+    }
+
+    if (empId.length < 3) {
+      if (this.showToast) {
+        this.showToast('الرقم الوظيفي غير صالح (يجب أن يتكون من 3 رموز على الأقل).', 'warning');
+      } else if (typeof alert === 'function') {
+        alert('الرقم الوظيفي غير صالح (يجب أن يتكون من 3 رموز على الأقل).');
+      }
+      return;
+    }
+
+    const record = {
+      employeeId: empId,
+      fullName: fullName,
+      name: fullName,
+      jobTitle: jobTitle,
+      sectionId: sectionId || null,
+      jobGrade: jobGrade,
+      jobStage: jobStage,
+      degree: degree,
+      workShift: workShift,
+      departmentId: actorUser.departmentId || 'dept-south-prod'
+    };
+
+    const res = window.store.addOrUpdateEmployeeMasterRecord(record, actorUser);
+    if (res && res.success !== false) {
+      if (fullNameInput) fullNameInput.value = '';
+      if (empIdInput) empIdInput.value = '';
+      if (jobTitleInput) jobTitleInput.value = '';
+
+      if (this.showToast) {
+        this.showToast(`🎉 تم اعتماد وإضافة الموظف [${fullName} - ${empId}] في السجل الرسمي بنجاح!`, 'success');
+      } else if (typeof alert === 'function') {
+        alert(`🎉 تم اعتماد وإضافة الموظف [${fullName} - ${empId}] في السجل الرسمي بنجاح!`);
+      }
+
+      this.render();
+    } else {
+      const errMsg = (res && res.error) ? res.error : 'تعذر حفظ السجل.';
+      if (this.showToast) {
+        this.showToast(errMsg, 'error');
+      } else if (typeof alert === 'function') {
+        alert(errMsg);
+      }
+    }
+  }
+
   handleParseImportEmployeeIDs() {
     const textarea = document.getElementById('importCSVTextarea');
     if (!textarea || !textarea.value.trim()) {
-      alert('يرجى لصق بيانات CSV أو اختيار ملف أولاً.');
+      if (this.showToast) this.showToast('يرجى لصق بيانات CSV أو اختيار ملف أولاً.', 'warning');
+      else if (typeof alert === 'function') alert('يرجى لصق بيانات CSV أو اختيار ملف أولاً.');
       return;
     }
 
     const rawText = textarea.value.trim();
     const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return;
 
     const approvedList = window.store.getApprovedEmployeeIds();
     const existingSet = new Set(approvedList.map(a => (a.employeeId || '').toUpperCase()));
@@ -5442,22 +5610,82 @@ class AppController {
     const seenInBatch = new Set();
     const parsedRecords = [];
 
-    lines.forEach((line, idx) => {
-      // Split by comma, tab, or semicolon
-      let parts = line.split(/[,\t;]/).map(p => p.trim().replace(/^["']|["']$/g, ''));
-      if (parts.length === 0) return;
+    // Header Detection
+    const firstLineParts = lines[0].split(/[,\t;]/).map(p => p.trim().replace(/^["']|["']$/g, ''));
+    let hasHeader = false;
+    let idCol = 0;
+    let nameCol = 1;
+    let titleCol = -1;
+    let gradeCol = -1;
+    let stageCol = -1;
+    let degreeCol = -1;
+    let specCol = -1;
+    let secCol = -1;
+    let shiftCol = -1;
 
-      const empId = parts[0].toUpperCase();
-      // Skip header if matches "EMPLOYEEID" or "الرقم الوظيفي"
-      if (idx === 0 && (empId.includes('EMPLOYEE') || empId.includes('الرقم') || empId.includes('EMP_ID'))) {
-        return;
+    firstLineParts.forEach((col, idx) => {
+      const c = col.toLowerCase();
+      if (c.includes('رقم') || c.includes('emp') || c.includes('id') || c.includes('code')) {
+        idCol = idx;
+        hasHeader = true;
+      } else if (c.includes('اسم') || c.includes('name') || c.includes('موظف')) {
+        nameCol = idx;
+        hasHeader = true;
+      } else if (c.includes('عنوان') || c.includes('title') || c.includes('منصب')) {
+        titleCol = idx;
+        hasHeader = true;
+      } else if (c.includes('درجة') || c.includes('grade')) {
+        gradeCol = idx;
+        hasHeader = true;
+      } else if (c.includes('مرحلة') || c.includes('stage')) {
+        stageCol = idx;
+        hasHeader = true;
+      } else if (c.includes('شهادة') || c.includes('تحصيل') || c.includes('degree')) {
+        degreeCol = idx;
+        hasHeader = true;
+      } else if (c.includes('تخصص') || c.includes('اختصاص') || c.includes('specialization')) {
+        specCol = idx;
+        hasHeader = true;
+      } else if (c.includes('شعبة') || c.includes('قسم') || c.includes('ارتباط') || c.includes('section')) {
+        secCol = idx;
+        hasHeader = true;
+      } else if (c.includes('وجبة') || c.includes('دوام') || c.includes('shift')) {
+        shiftCol = idx;
+        hasHeader = true;
+      }
+    });
+
+    const dataLines = hasHeader ? lines.slice(1) : lines;
+
+    dataLines.forEach((line, idx) => {
+      let parts = line.split(/[,\t;]/).map(p => p.trim().replace(/^["']|["']$/g, ''));
+      if (parts.length === 0 || (parts.length === 1 && !parts[0])) return;
+
+      let rawEmpId = parts[idCol] || '';
+      let rawFullName = parts[nameCol] || '';
+
+      // Heuristic swap if first is Arabic name and second is ID code
+      if ((/[\u0600-\u06FF]/.test(rawEmpId) || rawEmpId.includes(' ')) && (/^EMP/i.test(rawFullName) || /^\d+$/.test(rawFullName))) {
+        const temp = rawEmpId;
+        rawEmpId = rawFullName;
+        rawFullName = temp;
       }
 
-      const fullName = parts[1] || 'منتسب معتمد';
-      const jobGrade = parts[2] || 'الخامسة';
-      const jobStage = parts[3] || 'الأولى';
-      const degree = parts[4] || 'بكالوريوس';
-      const specialization = parts[5] || 'تشغيل وإنتاج';
+      const empId = rawEmpId.trim().toUpperCase();
+      const fullName = rawFullName.trim() || 'منتسب معتمد';
+      const jobTitle = (titleCol !== -1 && parts[titleCol]) ? parts[titleCol] : (parts.length > 2 && parts[2] && !parts[2].includes('الدرجة') ? parts[2] : 'موظف');
+      const jobGrade = (gradeCol !== -1 && parts[gradeCol]) ? parts[gradeCol] : (parts.length > 3 ? parts[3] : 'الخامسة');
+      const jobStage = (stageCol !== -1 && parts[stageCol]) ? parts[stageCol] : (parts.length > 4 ? parts[4] : 'الأولى');
+      const degree = (degreeCol !== -1 && parts[degreeCol]) ? parts[degreeCol] : (parts.length > 5 ? parts[5] : 'بكالوريوس');
+      const specialization = (specCol !== -1 && parts[specCol]) ? parts[specCol] : (parts.length > 6 ? parts[6] : 'تشغيل وإنتاج');
+      const sectionHint = (secCol !== -1 && parts[secCol]) ? parts[secCol] : (parts.length > 7 ? parts[7] : '');
+      const workShift = (shiftCol !== -1 && parts[shiftCol]) ? parts[shiftCol] : 'صباحي';
+
+      let sectionId = null;
+      if (sectionHint) {
+        const matchedSec = (window.store ? window.store.getSections() : []).find(s => s && (s.name.includes(sectionHint) || sectionHint.includes(s.name)));
+        if (matchedSec) sectionId = matchedSec.id;
+      }
 
       let status = 'VALID_NEW';
       let statusLabel = '🟢 صالح وجديد';
@@ -5465,11 +5693,11 @@ class AppController {
 
       if (!empId || empId.length < 3) {
         status = 'INVALID';
-        statusLabel = '🔴 رقم غير صحيح';
+        statusLabel = '🔴 رقم وظيفي غير صحيح';
         isError = true;
       } else if (seenInBatch.has(empId)) {
         status = 'DUPLICATE_IN_FILE';
-        statusLabel = '⚠️ مكرر بالملف';
+        statusLabel = '⚠️ مكرر في الملف';
         isError = true;
       } else if (existingSet.has(empId)) {
         status = 'ALREADY_EXISTS';
@@ -5481,13 +5709,17 @@ class AppController {
       }
 
       parsedRecords.push({
-        lineIndex: idx + 1,
+        lineIndex: idx + (hasHeader ? 2 : 1),
         employeeId: empId,
         fullName,
+        jobTitle,
+        sectionId,
+        sectionHint: sectionHint || 'إدارة القسم',
         jobGrade,
         jobStage,
         degree,
         specialization,
+        workShift,
         status,
         statusLabel,
         isError
@@ -5507,65 +5739,93 @@ class AppController {
 
     previewContainer.style.display = 'block';
     previewContainer.innerHTML = `
-      <div style="border-top: 2px solid var(--md-sys-color-surface-variant); padding-top: 1.25rem; margin-top: 1rem;">
-        <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin-bottom: 1rem;">
-          📊 نتائج المعاينة والفحص الأولي (${parsedRecords.length} سجل)
-        </h4>
+      <div class="card" style="margin: 0; padding: 1.5rem; background: var(--md-sys-color-surface, rgba(255, 255, 255, 0.9)); border: 1.5px solid rgba(2, 132, 199, 0.25); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);">
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.08));">
+          <div>
+            <h4 style="margin: 0; font-weight: 900; font-size: 1.15rem; color: var(--md-sys-color-primary, #0284c7); display: flex; align-items: center; gap: 0.4rem;">
+              <span>📊</span> نتائج الفحص والمعاينة الذكية (${parsedRecords.length} سجل مقروء)
+            </h4>
+            <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--md-sys-color-outline, #64748b);">
+              تحقق من مطابقة السجلات قبل الاعتماد النهائي في السجل المركزي.
+            </p>
+          </div>
+          <span class="badge badge-primary" style="font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.8rem; border-radius: 999px;">
+            جاهز للاعتماد: ${validCount + existingCount} سجل
+          </span>
+        </div>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.25rem;">
-          <div style="padding: 0.75rem; background: #e6f4ea; border-radius: var(--radius-sm); text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #137333;">${validCount}</div>
-            <div style="font-size: 0.75rem; color: #137333;">سجلات جديدة صالحة</div>
+        <!-- Metric Counters -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="padding: 0.85rem; background: rgba(16, 185, 129, 0.1); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 12px; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 900; color: #059669; font-family: monospace;">${validCount}</div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: #059669;">سجلات جديدة صالحة</div>
           </div>
-          <div style="padding: 0.75rem; background: #fef7e0; border-radius: var(--radius-sm); text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #b06000;">${existingCount}</div>
-            <div style="font-size: 0.75rem; color: #b06000;">موجودة مسبقاً (تحديث)</div>
+          <div style="padding: 0.85rem; background: rgba(2, 132, 199, 0.1); border: 1.5px solid rgba(2, 132, 199, 0.3); border-radius: 12px; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 900; color: #0284c7; font-family: monospace;">${existingCount}</div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: #0284c7;">موجودة مسبقاً (تحديث)</div>
           </div>
-          <div style="padding: 0.75rem; background: #fff3e0; border-radius: var(--radius-sm); text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #e65100;">${duplicateCount}</div>
-            <div style="font-size: 0.75rem; color: #e65100;">مكررة بالملف</div>
+          <div style="padding: 0.85rem; background: rgba(245, 158, 11, 0.1); border: 1.5px solid rgba(245, 158, 11, 0.3); border-radius: 12px; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 900; color: #d97706; font-family: monospace;">${duplicateCount}</div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: #d97706;">مكررة بالملف</div>
           </div>
-          <div style="padding: 0.75rem; background: #fce8e6; border-radius: var(--radius-sm); text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #c5221f;">${invalidCount}</div>
-            <div style="font-size: 0.75rem; color: #c5221f;">أخطاء وصيغ غير صالحة</div>
+          <div style="padding: 0.85rem; background: rgba(239, 68, 68, 0.1); border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 12px; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 900; color: #dc2626; font-family: monospace;">${invalidCount}</div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: #dc2626;">أخطاء بالصيغة</div>
           </div>
         </div>
 
-        <div class="table-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 1.25rem;">
-          <table class="data-table" style="font-size: 0.82rem;">
+        <!-- Preview Table -->
+        <div class="table-container" style="max-height: 320px; overflow-y: auto; margin-bottom: 1.25rem; border: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.08)); border-radius: 12px;">
+          <table class="data-table" style="font-size: 0.82rem; margin: 0;">
             <thead>
               <tr>
-                <th>السطر</th>
-                <th>الرقم الوظيفي</th>
-                <th>الاسم الكامل</th>
-                <th>الدرجة والمرحلة</th>
-                <th>الشهادة والتخصص</th>
-                <th>حالة السجل</th>
+                <th style="width: 50px; text-align: center;">السطر</th>
+                <th style="min-width: 120px;">الرقم الوظيفي</th>
+                <th style="min-width: 160px;">الاسم الكامل</th>
+                <th style="min-width: 130px;">العنوان / جهة الارتباط</th>
+                <th style="min-width: 110px;">الدرجة والمرحلة</th>
+                <th style="min-width: 120px;">الشهادة والتخصص</th>
+                <th style="min-width: 130px; text-align: center;">حالة السجل</th>
               </tr>
             </thead>
             <tbody>
               ${parsedRecords.map(r => `
-                <tr style="${r.isError ? 'background: rgba(217, 48, 37, 0.05);' : ''}">
-                  <td>${r.lineIndex}</td>
-                  <td><code><strong>${r.employeeId}</strong></code></td>
-                  <td>${r.fullName}</td>
+                <tr style="${r.isError ? 'background: rgba(239, 68, 68, 0.05);' : ''}">
+                  <td style="text-align: center; font-weight: 700; color: var(--md-sys-color-outline, #64748b);">${r.lineIndex}</td>
+                  <td><code style="font-weight: 800; color: #0284c7; background: rgba(2,132,199,0.08); padding: 0.15rem 0.45rem; border-radius: 6px;">${r.employeeId}</code></td>
+                  <td style="font-weight: 800; color: var(--md-sys-color-on-surface, currentColor);">${r.fullName}</td>
+                  <td>
+                    <div style="font-weight: 700;">${r.jobTitle}</div>
+                    <div style="font-size: 0.74rem; color: var(--md-sys-color-outline, #64748b);">${r.sectionHint}</div>
+                  </td>
                   <td>${r.jobGrade} / ${r.jobStage}</td>
                   <td>${r.degree} - ${r.specialization}</td>
-                  <td>${r.statusLabel}</td>
+                  <td style="text-align: center;">
+                    <span class="badge ${r.status === 'VALID_NEW' ? 'badge-success' : (r.status === 'ALREADY_EXISTS' ? 'badge-info' : 'badge-danger')}" style="font-weight: 800; font-size: 0.74rem; padding: 0.2rem 0.6rem; border-radius: 999px;">
+                      ${r.statusLabel}
+                    </span>
+                  </td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-          <button class="btn btn-outline" onclick="document.getElementById('importPreviewContainer').style.display='none'">إلغاء</button>
-          <button class="btn btn-success" style="font-weight: 800; padding: 0.6rem 1.5rem;" onclick="window.app.handleExecuteImportEmployeeIDs()" ${validCount + existingCount === 0 ? 'disabled' : ''}>
-            ✅ تأكيد واعتماد استيراد السجلات (${validCount + existingCount} سجل)
+        <!-- Confirm Action Bar -->
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline" style="font-weight: 700;" onclick="document.getElementById('importPreviewContainer').style.display='none'">
+            إلغاء المعاينة
+          </button>
+          <button type="button" class="btn btn-success" style="font-weight: 900; font-size: 0.88rem; padding: 0.65rem 1.6rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); border-radius: 10px; cursor: pointer;" onclick="window.app.handleExecuteImportEmployeeIDs()" ${validCount + existingCount === 0 ? 'disabled' : ''}>
+            ✅ تأكيد واعتماد استيراد السجلات (${validCount + existingCount} سجل) فوراً
           </button>
         </div>
+
       </div>
     `;
+
+    previewContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   handleExecuteImportEmployeeIDs() {
@@ -5575,14 +5835,21 @@ class AppController {
     const validRecords = this.parsedImportBatch.filter(r => !r.isError);
 
     if (validRecords.length === 0) {
-      alert('لا توجد سجلات صالحة للاستيراد.');
+      if (this.showToast) this.showToast('لا توجد سجلات صالحة للاستيراد.', 'warning');
+      else if (typeof alert === 'function') alert('لا توجد سجلات صالحة للاستيراد.');
       return;
     }
 
-    if (confirm(`تأكيد الاستيراد: هل أنت متأكد من إضافة وتحديث ${validRecords.length} رقم وظيفي معتمد في قاعدة بيانات الموارد البشرية؟`)) {
+    const isConfirmed = (typeof confirm === 'function') ? confirm(`تأكيد الاستيراد: هل أنت متأكد من إضافة وتحديث ${validRecords.length} رقم وظيفي معتمد في قاعدة بيانات الموارد البشرية؟`) : true;
+
+    if (isConfirmed) {
       const result = window.store.importApprovedEmployeeIds(validRecords, actorUser);
-      alert(`تم الاستيراد بنجاح! تم حفظ ${result.total} سجل (${result.newCount} رقم وظيفي جديد).`);
-      this.setUserManagementSubTab('users_list');
+      if (this.showToast) {
+        this.showToast(`🎉 تم الاستيراد والاعتماد بنجاح! تم حفظ ${result.total} سجل (${result.newCount} رقم وظيفي جديد).`, 'success');
+      } else if (typeof alert === 'function') {
+        alert(`تم الاستيراد بنجاح! تم حفظ ${result.total} سجل (${result.newCount} رقم وظيفي جديد).`);
+      }
+      this.setUserManagementSubTab('users_roster');
     }
   }
 
@@ -5601,11 +5868,10 @@ class AppController {
   }
 
   filterUnifiedRosterTable() {
-    if (!this.userRegistryState) this.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    if (!this.userRegistryState) this.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', status: 'ALL', role: 'ALL' };
     const searchInput = document.getElementById('unifiedRosterSearchInput');
     const search = (searchInput?.value || '').trim();
     const sectionFilter = document.getElementById('unifiedRosterSectionFilter')?.value || 'ALL';
-    const jobTitleFilter = (document.getElementById('unifiedRosterJobTitleFilter')?.value || 'ALL').trim();
     const statusFilter = document.getElementById('unifiedRosterStatusFilter')?.value || 'ALL';
     const roleFilter = document.getElementById('unifiedRosterRoleFilter')?.value || 'ALL';
 
@@ -5614,7 +5880,7 @@ class AppController {
 
     this.userRegistryState.search = search;
     this.userRegistryState.section = sectionFilter;
-    this.userRegistryState.jobTitle = jobTitleFilter;
+    this.userRegistryState.jobTitle = 'ALL';
     this.userRegistryState.status = statusFilter;
     this.userRegistryState.role = roleFilter;
     this.userRegistryState.page = 1;
@@ -5648,7 +5914,7 @@ class AppController {
     const actorUser = window.auth.getCurrentUser();
     const roster = window.store.getUnifiedEmployeeRoster(actorUser);
     
-    let csv = '\uFEFFالرقم الوظيفي,الاسم الرباعي,المسمى الوظيفي,الدرجة,المرحلة,الشهادة,التخصص,رقم الهاتف,البريد,حالة الحساب,الشعبة\n';
+    let csv = '\uFEFFالرقم الوظيفي,الاسم الرباعي,العنوان الوظيفي,الدرجة,المرحلة,الشهادة,التخصص,رقم الهاتف,البريد,حالة الحساب,الشعبة\n';
     roster.forEach(e => {
       const sec = window.store.getSectionById(e.sectionId);
       const secName = sec ? sec.name : 'إدارة القسم';
@@ -5842,8 +6108,8 @@ class AppController {
         ${activeSubTab === 'tab_career' ? `
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" style="font-size: 0.9rem; font-weight: 800; color: var(--md-sys-color-primary);">المسمى والعنوان الوظيفي:</label>
-              <input type="text" class="form-control" value="${master.jobTitle || 'موظف تشغيل'}" readonly style="background: var(--md-sys-color-surface-variant); font-weight: 800; font-size: 0.95rem; padding: 0.6rem 0.85rem;">
+              <label class="form-label" style="font-size: 0.9rem; font-weight: 800; color: var(--md-sys-color-primary);">العنوان الوظيفي:</label>
+              <input type="text" class="form-control" value="${master.jobTitle || 'موظف'}" readonly style="background: var(--md-sys-color-surface-variant); font-weight: 800; font-size: 0.95rem; padding: 0.6rem 0.85rem;">
             </div>
             <div class="form-group">
               <label class="form-label" style="font-size: 0.9rem; font-weight: 800; color: var(--md-sys-color-primary);">الدرجة والمرحلة الوظيفية:</label>
@@ -6346,8 +6612,8 @@ class AppController {
             <table class="dossier-print-table">
               <tbody>
                 <tr>
-                  <td class="cell-label">المسمى الوظيفي:</td>
-                  <td class="cell-value"><strong>${master.jobTitle || 'موظف تشغيل'}</strong></td>
+                  <td class="cell-label">العنوان الوظيفي:</td>
+                  <td class="cell-value"><strong>${master.jobTitle || 'موظف'}</strong></td>
                   <td class="cell-label">الدرجة والمرحلة:</td>
                   <td class="cell-value"><strong>${(master.jobGrade || 'الخامسة') + ' / ' + (master.jobStage || 'الأولى')}</strong></td>
                 </tr>
@@ -6509,7 +6775,7 @@ class AppController {
 
           <div class="section-header">2. المسار المهني والشهادات الأكاديمية</div>
           <table>
-            <tr><th>المسمى الوظيفي</th><td><b>${master.jobTitle || 'موظف تشغيل'}</b></td><th>الدرجة والمرحلة</th><td><b>${(master.jobGrade || 'الخامسة') + ' / ' + (master.jobStage || 'الأولى')}</b></td></tr>
+            <tr><th>العنوان الوظيفي</th><td><b>${master.jobTitle || 'موظف'}</b></td><th>الدرجة والمرحلة</th><td><b>${(master.jobGrade || 'الخامسة') + ' / ' + (master.jobStage || 'الأولى')}</b></td></tr>
             <tr><th>الشهادة والتخصص</th><td><b>${(master.degree || 'بكالوريوس') + ' - ' + (master.specialization || 'عام')}</b></td><th>الجامعة وسنة التخرج</th><td>${(master.university || 'جامعة البصرة') + ' (' + (master.graduationYear || '2012') + ')'}</td></tr>
             <tr><th>تاريخ التعيين</th><td>${master.hireDate || '2015-01-01'}</td><th>تاريخ الانضمام للقسم</th><td>${master.deptJoinDate || '2018-01-01'}</td></tr>
             <tr><th>كتب الشكر والتقدير</th><td><b>${master.thanksLettersCount || 0} كتاب</b></td><th>العقوبات</th><td>${master.penaltiesCount || 0}</td></tr>
@@ -7005,7 +7271,7 @@ class AppController {
       address: { label: 'محل السكن', getVal: (e) => e.address || e.residence || '-' },
       bloodType: { label: 'فصيلة الدم', getVal: (e) => e.bloodType || '-' },
       maritalStatus: { label: 'الحالة الاجتماعية', getVal: (e) => e.maritalStatus || '-' },
-      jobTitle: { label: 'المسمى الوظيفي', getVal: (e) => e.jobTitle || '-' },
+      jobTitle: { label: 'العنوان الوظيفي', getVal: (e) => e.jobTitle || '-' },
       jobGrade: { label: 'الدرجة والمرحلة', getVal: (e) => (e.jobGrade || 'الخامسة') + ' / ' + (e.jobStage || 'الأولى') },
       degree: { label: 'الشهادة والتخصص', getVal: (e) => (e.degree || 'بكالوريوس') + (e.specialization ? ' - ' + e.specialization : '') },
       university: { label: 'الجامعة وسنة التخرج', getVal: (e) => (e.university || '') + (e.graduationYear ? ' (' + e.graduationYear + ')' : '') },
@@ -7537,20 +7803,35 @@ class AppController {
     }
   }
 
-  // --- Section Specific Notes Modal ---
-  openSectionNotesModal(empId, sectionId) {
+  // --- Section & Unit Specific Notes Modal ---
+  openSectionNotesModal(empId, sectionId, customTitle) {
     const actorUser = window.auth.getCurrentUser();
-    const master = window.store.getEmployeeMasterRecordByEmployeeId(empId);
+    let master = window.store.getEmployeeMasterRecordByEmployeeId(empId);
+    if (!master) {
+      const userObj = window.store.getUserById(empId) || (window.store.getUsers() || []).find(u => u.employeeId === empId || u.id === empId);
+      if (userObj) {
+        master = {
+          employeeId: userObj.employeeId || userObj.id || empId,
+          fullName: userObj.fullName || userObj.name || 'منتسب',
+          sectionNotes: userObj.sectionNotes || userObj.notes || ''
+        };
+      }
+    }
+    if (!master) {
+      alert('لم يتم العثور على سجل المنتسب المحدد.');
+      return;
+    }
 
-    this.showModal(`📝 معلومات وملاحظات خاصة بالشعبة - ${master.fullName}`, `
+    const titleText = customTitle || `📝 معلومات وملاحظات خاصة — ${master.fullName}`;
+    this.showModal(titleText, `
       <form onsubmit="window.app.handleSaveSectionNotes(event, '${master.employeeId}')">
         <div class="form-group">
-          <label class="form-label">الملاحظات، التكليفات الداخلية، أو أرقام كتب الشعبة:</label>
-          <textarea id="secNotesInput" class="form-control" rows="5" placeholder="أدخل الملاحظات الخاصة بعمل الموظف في الشعبة، تكليفه الميداني، أو أرقام المذكرات الداخلية..." required>${master.sectionNotes || ''}</textarea>
+          <label class="form-label">الملاحظات، التكليفات الإدارية/الميدانية، أو أرقام الكتب والمذكرات:</label>
+          <textarea id="secNotesInput" class="form-control" rows="5" placeholder="أدخل الملاحظات الخاصة بعمل المنتسب، تكليفه الميداني، أو أرقام المذكرات الداخلية..." required>${master.sectionNotes || ''}</textarea>
         </div>
 
         <div style="font-size: 0.8rem; color: var(--md-sys-color-outline); margin-bottom: 1rem;">
-          💡 يتم حفظ هذه الملاحظات في الإضبارة الأصلية للموظف مع وسمها بأنها خاصة بالشعبة دون تكرار أو إنشاء سجل مستقل.
+          💡 يتم حفظ هذه الملاحظات في الإضبارة الموحدة للمنتسب وتنعكس مباشرة في جداول الكادر.
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
@@ -7563,6 +7844,11 @@ class AppController {
     `);
   }
 
+  openUnitNotesModal(empId, unitId) {
+    const unit = unitId ? window.store.getUnitById(unitId) : null;
+    this.openSectionNotesModal(empId, unitId, unit ? `📝 ملاحظات كادر ${unit.name} — ${empId}` : null);
+  }
+
   handleSaveSectionNotes(e, empId) {
     e.preventDefault();
     const actorUser = window.auth.getCurrentUser();
@@ -7570,7 +7856,7 @@ class AppController {
 
     const res = window.store.updateEmployeeSectionNotes(empId, notes, actorUser);
     if (res.success) {
-      alert('تم حفظ وتحديث ملاحظات الشعبة بنجاح.');
+      alert('تم حفظ وتحديث الملاحظات بنجاح.');
       this.closeModal();
       this.render();
     } else {
@@ -7604,8 +7890,8 @@ class AppController {
               <input type="text" id="newMasterPhone" class="form-control" placeholder="0770xxxxxxx">
             </div>
             <div class="form-group">
-              <label class="form-label">المسمى الوظيفي:</label>
-              <input type="text" id="newMasterJobTitle" class="form-control" placeholder="مهندس تشغيل، فني صيانة...">
+              <label class="form-label">العنوان الوظيفي:</label>
+              <input type="text" id="newMasterJobTitle" class="form-control" placeholder="معاون مهندس، مهندس، مهندس أقدم، فني، رئيس كيمياويين..." required>
             </div>
             <div class="form-group">
               <label class="form-label">الشهادة والتخصص:</label>
@@ -8836,88 +9122,122 @@ class AppController {
 
     const settings = window.store.getShiftSettings();
     const currentShiftInfo = window.store.getCurrentShiftInfo();
+    const currentStartTime = settings.startTime || '07:30';
 
-    this.showModal('⚙️ ضبط وإدارة مواعيد النوبات التشغيلية', `
-      <form onsubmit="window.app.handleSaveShiftSettings(event)">
-        <div style="padding: 0.85rem 1rem; background: var(--md-sys-color-surface-variant); border-radius: var(--radius-md); margin-bottom: 1.25rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-            <div>
-              <strong style="color: var(--md-sys-color-primary); font-size: 1rem;">
-                🔄 ${currentShiftInfo.shiftName}
+    this.showModal('⚙️ ضبط وإدارة مواعيد وجداول النوبات التشغيلية', `
+      <form onsubmit="window.app.handleSaveShiftSettings(event)" class="shift-modal-container">
+        <!-- Glass Hero Header Banner -->
+        <div class="shift-hero-banner">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.35rem;">🔄</span>
+              <strong style="font-size: 1.1rem; font-weight: 900; letter-spacing: -0.2px;">
+                ${currentShiftInfo.shiftName}
               </strong>
-              <div style="font-size: 0.8rem; color: var(--md-sys-color-outline); margin-top: 2px;">
-                ${currentShiftInfo.period} | آخر تحديث بواسطة: ${settings.lastModifiedBy || 'مدير القسم'}
+            </div>
+            <div style="font-size: 0.82rem; opacity: 0.85; margin-top: 4px; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span>🗓️ ${currentShiftInfo.period}</span>
+              <span>•</span>
+              <span>✍️ آخر تحديث: <strong>${settings.lastModifiedBy || 'مدير القسم'}</strong></span>
+            </div>
+          </div>
+          <div class="shift-hero-badge">
+            <span class="shift-pulse-live-dot"></span>
+            <span>النظام نشط والتسلسل تلقائي</span>
+          </div>
+        </div>
+
+        <!-- 2-Column Glass Grid -->
+        <div class="shift-glass-grid">
+          <!-- Card 1: Time & Cycle -->
+          <div class="shift-glass-card">
+            <div class="shift-card-header">
+              <span>⏰</span>
+              <span>توقيت ودورة النوبة اليومية</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.25rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.85rem;">⏰ وقت بدء النوبة المعتمد:</label>
+              <input type="time" id="shiftStartTimeInput" class="form-control" value="${currentStartTime}" oninput="window.app.updateShiftModalPreview()" onchange="window.app.updateShiftModalPreview()" required style="font-weight: 800; font-size: 1rem; text-align: center;" />
+              
+              <div class="shift-preset-chips-container">
+                <span style="font-size: 0.74rem; font-weight: 700; opacity: 0.8; margin-left: 0.2rem;">توقيتات سريعة:</span>
+                <button type="button" class="shift-preset-chip ${currentStartTime === '06:00' ? 'active' : ''}" data-time="06:00" onclick="window.app.setShiftStartTimePreset('06:00')">06:00 ص</button>
+                <button type="button" class="shift-preset-chip ${currentStartTime === '07:00' ? 'active' : ''}" data-time="07:00" onclick="window.app.setShiftStartTimePreset('07:00')">07:00 ص</button>
+                <button type="button" class="shift-preset-chip ${currentStartTime === '07:30' ? 'active' : ''}" data-time="07:30" onclick="window.app.setShiftStartTimePreset('07:30')">07:30 ص</button>
+                <button type="button" class="shift-preset-chip ${currentStartTime === '08:00' ? 'active' : ''}" data-time="08:00" onclick="window.app.setShiftStartTimePreset('08:00')">08:00 ص</button>
+                <button type="button" class="shift-preset-chip ${currentStartTime === '08:30' ? 'active' : ''}" data-time="08:30" onclick="window.app.setShiftStartTimePreset('08:30')">08:30 ص</button>
               </div>
             </div>
-            <span class="badge badge-success" style="font-size: 0.8rem;">
-              ✅ النظام نشط
-            </span>
-          </div>
-        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">⏰ وقت بدء النوبة اليومية:</label>
-            <input type="time" id="shiftStartTimeInput" class="form-control" value="${settings.startTime || '07:30'}" oninput="window.app.updateShiftModalPreview()" onchange="window.app.updateShiftModalPreview()" required />
-            <div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.35rem;">
-              <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 0.72rem;" onclick="window.app.setShiftStartTimePreset('06:00')">06:00 ص</button>
-              <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 0.72rem;" onclick="window.app.setShiftStartTimePreset('07:00')">07:00 ص</button>
-              <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 0.72rem;" onclick="window.app.setShiftStartTimePreset('07:30')">07:30 ص</button>
-              <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 0.72rem;" onclick="window.app.setShiftStartTimePreset('08:00')">08:00 ص</button>
-              <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 0.72rem;" onclick="window.app.setShiftStartTimePreset('08:30')">08:30 ص</button>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.85rem;">⌛ مدة دورة النوبة (بالساعات):</label>
+              <select id="shiftDurationSelect" class="form-control" onchange="window.app.updateShiftModalPreview()" required style="font-weight: 700;">
+                <option value="24" ${settings.shiftDurationHours == 24 ? 'selected' : ''}>24 ساعة (نوبة يومية كاملة - افتراضي)</option>
+                <option value="12" ${settings.shiftDurationHours == 12 ? 'selected' : ''}>12 ساعة (نوبتان باليوم)</option>
+                <option value="8" ${settings.shiftDurationHours == 8 ? 'selected' : ''}>8 ساعات (ثلاث نوبات باليوم)</option>
+              </select>
+              <small style="color: var(--md-sys-color-outline); font-size: 0.72rem; margin-top: 3px; display: block;">طول الفترة الزمنية لكل وجبة قبل انتقال الراية للنوبة التالية</small>
             </div>
-            <small style="color: var(--md-sys-color-outline); font-size: 0.72rem;">يمكنك كتابة أي وقت أو اختيار توقيت سريع من الأزرار أعلاه</small>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">⌛ مدة دورة النوبة (بالساعات):</label>
-            <select id="shiftDurationSelect" class="form-control" onchange="window.app.updateShiftModalPreview()" required>
-              <option value="24" ${settings.shiftDurationHours == 24 ? 'selected' : ''}>24 ساعة (نوبة يومية كاملة - افتراضي)</option>
-              <option value="12" ${settings.shiftDurationHours == 12 ? 'selected' : ''}>12 ساعة (نوبتان باليوم)</option>
-              <option value="8" ${settings.shiftDurationHours == 8 ? 'selected' : ''}>8 ساعات (ثلاث نوبات باليوم)</option>
-            </select>
-            <small style="color: var(--md-sys-color-outline); font-size: 0.72rem;">طول الفترة الزمنية لكل نوبة قبل التدوير</small>
-          </div>
-        </div>
+          <!-- Card 2: Reference Shift & Base Date -->
+          <div class="shift-glass-card">
+            <div class="shift-card-header">
+              <span>🎯</span>
+              <span>الأساس المرجعي والتسلسل</span>
+            </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">🎯 النوبة المرجعية (نوبة الأساس):</label>
-            <select id="shiftReferenceSelect" class="form-control" onchange="window.app.updateShiftModalPreview()" required>
-              <option value="A" ${settings.referenceShift === 'A' ? 'selected' : ''}>النوبة (A)</option>
-              <option value="B" ${settings.referenceShift === 'B' ? 'selected' : ''}>النوبة (B)</option>
-              <option value="C" ${settings.referenceShift === 'C' ? 'selected' : ''}>النوبة (C)</option>
-              <option value="D" ${settings.referenceShift === 'D' ? 'selected' : ''}>النوبة (D)</option>
-            </select>
-            <small style="color: var(--md-sys-color-outline); font-size: 0.72rem;">النوبة التي كانت عاملة في تاريخ الأساس المرجعي</small>
-          </div>
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.85rem;">🎯 النوبة المرجعية (نوبة الأساس):</label>
+              <select id="shiftReferenceSelect" class="form-control" onchange="window.app.updateShiftModalPreview()" required style="font-weight: 700;">
+                <option value="A" ${settings.referenceShift === 'A' ? 'selected' : ''}>🅰️ النوبة الأولى (A)</option>
+                <option value="B" ${settings.referenceShift === 'B' ? 'selected' : ''}>🅱️ النوبة الثانية (B)</option>
+                <option value="C" ${settings.referenceShift === 'C' ? 'selected' : ''}>🅲 النوبة الثالثة (C)</option>
+                <option value="D" ${settings.referenceShift === 'D' ? 'selected' : ''}>🅳 النوبة الرابعة (D)</option>
+              </select>
+              <small style="color: var(--md-sys-color-outline); font-size: 0.72rem; margin-top: 3px; display: block;">النوبة التي كانت متواجدة بالخدمة في تاريخ الأساس المرجعي</small>
+            </div>
 
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">📅 تاريخ الأساس المرجعي للنظام:</label>
-            <input type="date" id="shiftRefDateInput" class="form-control" value="${settings.referenceDate ? settings.referenceDate.split('T')[0] : '2026-01-01'}" onchange="window.app.updateShiftModalPreview()" required />
-            <small style="color: var(--md-sys-color-outline); font-size: 0.72rem;">التاريخ المعتمد لاحتساب تسلسل وتناوب النوبات</small>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.85rem;">📅 تاريخ الأساس المرجعي للنظام:</label>
+              <input type="date" id="shiftRefDateInput" class="form-control" value="${settings.referenceDate ? settings.referenceDate.split('T')[0] : '2026-01-01'}" onchange="window.app.updateShiftModalPreview()" required style="font-weight: 700;" />
+              <small style="color: var(--md-sys-color-outline); font-size: 0.72rem; margin-top: 3px; display: block;">التاريخ الرياضي المعتمد لاحتساب تسلسل وتناوب النوبات بدقة</small>
+            </div>
           </div>
         </div>
 
         <!-- Live Shift Calculation Preview Box -->
-        <div id="shiftLivePreviewBox" style="padding: 0.75rem 1rem; background: rgba(0, 105, 92, 0.08); border-radius: var(--radius-sm); border: 1px dashed var(--md-sys-color-primary); margin-bottom: 1rem;">
-          <div style="font-size: 0.88rem; color: var(--md-sys-color-primary); font-weight: 700;">
-            🔄 النوبة الحالية بحسب الإعدادات: <strong>${currentShiftInfo.shiftName}</strong>
-          </div>
-          <div style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px;">
-            توقيت بدء النوبة: <strong>${settings.startTime || '07:30'}</strong> (دورة <strong>${settings.shiftDurationHours || 24} ساعة</strong>)
+        <div id="shiftLivePreviewBox" class="shift-live-preview-container">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; font-weight: 800; color: var(--md-sys-color-primary);">
+                <span class="shift-pulse-live-dot"></span>
+                <span>🔄 النوبة التشغيلية المحتسبة حالياً:</span>
+                <span style="font-size: 1.1rem; color: var(--md-sys-color-tertiary, #059669); font-weight: 900;">${currentShiftInfo.shiftName}</span>
+              </div>
+              <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 4px;">
+                ⏱️ توقيت التدوير اليومي: <strong>${currentStartTime}</strong> | دورة العمل: <strong>${settings.shiftDurationHours || 24} ساعة</strong> | المرجع: <strong>النوبة (${settings.referenceShift || 'A'})</strong>
+              </div>
+            </div>
+            <div class="shift-hero-badge" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+              ⚡ معاينة حية وفورية
+            </div>
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label class="form-label">📝 ملاحظات وتعليمات النوبة:</label>
-          <input type="text" id="shiftNotesInput" class="form-control" placeholder="مثال: التدوير يتم تلقائياً عند وقت البدء المحدد لجميع الكوادر الميدانية" value="${settings.notes || ''}" />
+        <!-- Operational Notes -->
+        <div class="shift-glass-card" style="padding: 0.9rem 1.15rem; gap: 0.4rem;">
+          <label class="form-label" style="font-weight: 800; font-size: 0.85rem; margin-bottom: 0.2rem;">📝 توجيهات وملاحظات إدارة النوبات:</label>
+          <input type="text" id="shiftNotesInput" class="form-control" placeholder="مثال: التدوير يتم تلقائياً عند وقت البدء المحدد لجميع الكوادر والمنشآت الميدانية" value="${settings.notes || ''}" style="font-size: 0.86rem;" />
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-primary" style="font-weight: 800;">
-            💾 حفظ واعتماد وقت ومواعيد النوبة
+        <!-- Footer Actions -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.65rem; margin-top: 0.35rem; padding-top: 0.5rem; border-top: 1px solid var(--md-sys-color-surface-variant, #e2e8f0);">
+          <button type="button" class="btn btn-outline" style="border-radius: 10px; padding: 0.55rem 1.25rem; font-weight: 700;" onclick="window.app.closeModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary" style="font-weight: 900; border-radius: 10px; padding: 0.55rem 1.6rem; box-shadow: 0 4px 14px rgba(11, 87, 208, 0.3); display: inline-flex; align-items: center; gap: 0.45rem;">
+            <span>💾</span>
+            <span>حفظ واعتماد إعدادات النوبة</span>
           </button>
         </div>
       </form>
@@ -8938,6 +9258,16 @@ class AppController {
     const refShift = document.getElementById('shiftReferenceSelect')?.value || 'A';
     const refDateStr = document.getElementById('shiftRefDateInput')?.value || '2026-01-01';
 
+    // Synchronize active preset chips
+    document.querySelectorAll('.shift-preset-chip').forEach(chip => {
+      const chipTime = chip.getAttribute('data-time');
+      if (chipTime === startTime) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
     const refDate = new Date(`${refDateStr}T${startTime}:00Z`);
     const now = new Date();
     const msPerShift = durationHours * 60 * 60 * 1000;
@@ -8953,11 +9283,20 @@ class AppController {
     const previewBox = document.getElementById('shiftLivePreviewBox');
     if (previewBox) {
       previewBox.innerHTML = `
-        <div style="font-size: 0.88rem; color: var(--md-sys-color-primary); font-weight: 700;">
-          🔄 النوبة الحالية بحسب الإعدادات: <strong>النوبة (${previewShift})</strong>
-        </div>
-        <div style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px;">
-          توقيت بدء النوبة: <strong>${startTime}</strong> (دورة <strong>${durationHours} ساعة</strong>)
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; font-weight: 800; color: var(--md-sys-color-primary);">
+              <span class="shift-pulse-live-dot"></span>
+              <span>🔄 النوبة التشغيلية المحتسبة حالياً:</span>
+              <span style="font-size: 1.1rem; color: var(--md-sys-color-tertiary, #059669); font-weight: 900;">النوبة (${previewShift})</span>
+            </div>
+            <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 4px;">
+              ⏱️ توقيت التدوير اليومي: <strong>${startTime}</strong> | دورة العمل: <strong>${durationHours} ساعة</strong> | المرجع: <strong>النوبة (${refShift})</strong> في <strong>${refDateStr}</strong>
+            </div>
+          </div>
+          <div class="shift-hero-badge" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            ⚡ معاينة حية وفورية
+          </div>
         </div>
       `;
     }

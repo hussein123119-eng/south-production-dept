@@ -372,7 +372,7 @@ function renderSpecializedStationStaffTab(station, section, stationStaffList) {
             <tr>
               <th>الرقم الوظيفي</th>
               <th>الاسم الكامل</th>
-              <th>المسمى الوظيفي والدرجة</th>
+              <th>العنوان الوظيفي والدرجة</th>
               <th>الشفت / الوجبة</th>
               <th>التحصيل والتخصص</th>
               <th>رقم الهاتف</th>
@@ -560,7 +560,7 @@ function renderStationStaffTab(station, stationStaff) {
             <tr>
               <th>الرقم الوظيفي</th>
               <th>الاسم الكامل</th>
-              <th>المسمى الوظيفي</th>
+              <th>العنوان الوظيفي</th>
               <th>الهاتف</th>
               <th>مستوى الصلاحية</th>
               <th>الحالة</th>

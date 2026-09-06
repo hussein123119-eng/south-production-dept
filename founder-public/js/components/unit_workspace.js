@@ -475,6 +475,14 @@ function renderUnitOverviewTab(unit, unitDocs, unitStaff, user) {
 }
 
 function renderUnitStaffTab(unit, staff) {
+  const actorUser = window.auth.getCurrentUser();
+  const deptId = unit.departmentId || (actorUser ? actorUser.departmentId : 'dept-south-prod');
+  const allMasterRecords = (window.store && typeof window.store.getEmployeeMasterRecords === 'function') 
+    ? window.store.getEmployeeMasterRecords(deptId) 
+    : [];
+  const unitMasterStaff = allMasterRecords.filter(m => m.unitId === unit.id);
+  const effectiveStaff = unitMasterStaff.length > 0 ? unitMasterStaff : (staff || []);
+
   return `
     <div class="card">
       <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
@@ -487,7 +495,7 @@ function renderUnitStaffTab(unit, staff) {
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
           <input type="text" id="unitStaffSearchInput" class="form-control" style="width: 220px; font-size: 0.85rem; padding: 0.38rem 0.85rem;" placeholder="🔍 بحث بالاسم أو الرقم الوظيفي..." oninput="window.app.filterUnitStaffTable()">
           <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" id="unitStaffCountBadge">
-            👥 كادر الوحدة: ${staff.length} موظف
+            👥 كادر الوحدة: ${effectiveStaff.length} موظف
           </span>
           <button class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal({ unitId: '${unit.id}', sectionId: '${unit.sectionId || ''}', scopeType: 'UNIT' })" title="أداة التصدير والطباعة المخصصة لبيانات كادر ${unit.name}" style="padding: 0.35rem 0.85rem; font-size: 0.84rem;">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -500,30 +508,148 @@ function renderUnitStaffTab(unit, staff) {
           </button>
         </div>
       </div>
-      <div class="table-container">
-        <table class="data-table">
+      <div class="table-container" style="overflow-x: auto;">
+        <table class="data-table" style="font-size: 0.88rem;">
           <thead>
             <tr>
-              <th>الرقم الوظيفي</th>
-              <th>الاسم الكامل</th>
-              <th>المسمى الوظيفي</th>
-              <th>التخصص</th>
-              <th>الهاتف</th>
-              <th>الصلاحية</th>
+              <th style="min-width: 200px;">الاسم</th>
+              <th style="min-width: 120px;">الرقم الوظيفي</th>
+              <th style="min-width: 150px;">جهة الارتباط</th>
+              <th style="min-width: 130px;">العنوان الوظيفي</th>
+              <th style="min-width: 120px;">الدور</th>
+              <th style="min-width: 140px;">الهاتف / واتساب</th>
+              <th style="min-width: 190px; text-align: center;">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            ${staff.map(u => `
-              <tr class="unit-staff-row" data-name="${(u.fullName || '').toLowerCase()}" data-empid="${(u.employeeId || '').toLowerCase()}" data-title="${(u.jobTitle || '').toLowerCase()}" data-phone="${(u.phone || '').toLowerCase()}">
-                <td><strong>${u.employeeId}</strong></td>
-                <td>${u.fullName}</td>
-                <td>${u.jobTitle}</td>
-                <td>${u.specialization || 'هندسة وعمليات'}</td>
-                <td>${u.phone || '-'}</td>
-                <td><span class="badge ${window.rbac.getRoleInfo(u.role).badgeClass}">${window.rbac.getRoleInfo(u.role).name}</span></td>
-              </tr>
-            `).join('')}
-            ${staff.length === 0 ? '<tr><td colspan="6" style="text-align: center; padding: 2rem;">لا توجد كوادر مسجلة في هذه الوحدة حالياً.</td></tr>' : ''}
+            ${effectiveStaff.map(emp => {
+              const roleInfo = (window.rbac && typeof window.rbac.getRoleInfo === 'function' && window.rbac.getRoleInfo(emp.role)) 
+                || { name: emp.role || 'منتسب', badgeClass: 'badge-secondary' };
+              const st = emp.stationId ? (window.store && typeof window.store.getStationById === 'function' ? window.store.getStationById(emp.stationId) : null) : null;
+              const empPhone = emp.phone || emp.mobile || '';
+              const empEmail = emp.userEmail || emp.emailPersonal || emp.email || '';
+
+              // Check if employee is shift worker and get shift letter
+              const rawShift = emp.assignedShift || emp.shift || emp.workShift || emp.workSchedule || '';
+              const rawSchedule = String(emp.workShift || emp.workSchedule || '').trim();
+              const isMorning = rawSchedule === 'صباحي' || rawShift === 'صباحي' || String(emp.jobTitle || '').includes('صباحي');
+              const isShiftWorker = !isMorning && (
+                rawSchedule === 'مناوب' || 
+                emp.workShift === 'مناوب' || 
+                (rawShift && rawShift !== 'صباحي' && rawShift !== 'حقلي') ||
+                /[ABCDأبجد]/.test(String(rawShift)) ||
+                String(emp.jobTitle || '').includes('نوبة')
+              );
+
+              let shiftLetter = '';
+              if (isShiftWorker) {
+                const match = String(rawShift + ' ' + (emp.jobTitle || '')).match(/(?:نوبة\s*([ABCDأبجد])|([ABCDأبجد]))/i);
+                if (match) {
+                  const rawChar = (match[1] || match[2] || '').toUpperCase();
+                  if (rawChar === 'A' || rawChar === 'أ') shiftLetter = 'A';
+                  else if (rawChar === 'B' || rawChar === 'ب') shiftLetter = 'B';
+                  else if (rawChar === 'C' || rawChar === 'ج') shiftLetter = 'C';
+                  else if (rawChar === 'D' || rawChar === 'د') shiftLetter = 'D';
+                }
+                if (!shiftLetter && (emp.workShift === 'مناوب' || isShiftWorker)) {
+                  shiftLetter = 'A';
+                }
+              }
+
+              const currentActiveShiftLetter = (window.store && typeof window.store.getCurrentShiftInfo === 'function')
+                ? (window.store.getCurrentShiftInfo().currentShift || '').toUpperCase()
+                : '';
+              const isActiveShift = isShiftWorker && shiftLetter && (shiftLetter === currentActiveShiftLetter);
+
+              return `
+                <tr class="unit-staff-row" 
+                    data-name="${(emp.fullName || '').toLowerCase()}" 
+                    data-empid="${(emp.employeeId || emp.id || '').toLowerCase()}" 
+                    data-title="${(emp.jobTitle || '').toLowerCase()}" 
+                    data-phone="${(emp.phone || '').toLowerCase()}">
+                  
+                  <!-- 1. الاسم -->
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 0;">
+                      <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--md-sys-color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
+                        ${(emp.fullName || 'م').substring(0, 2)}
+                      </div>
+                      <div style="min-width: 0;">
+                        <strong style="font-size: 0.92rem; color: var(--md-sys-color-on-surface); white-space: nowrap; display: block;" title="${emp.fullName}">${emp.fullName}</strong>
+                        <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); white-space: nowrap;">${emp.userEmail || emp.emailPersonal || emp.email || emp.phone || 'كادر الوحدة'}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- 2. الرقم الوظيفي -->
+                  <td style="font-family: monospace; font-weight: 700; white-space: nowrap;">
+                    <code>${emp.employeeId || emp.id || '—'}</code>
+                  </td>
+
+                  <!-- 3. جهة الارتباط -->
+                  <td>
+                    <div style="font-weight: 700; color: var(--md-sys-color-on-surface); white-space: nowrap;">${unit.name}</div>
+                    ${st ? `
+                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem;">
+                        <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span>
+                        ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>` : ''}
+                      </div>
+                    ` : (isShiftWorker && shiftLetter ? `
+                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap;">
+                        <span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>
+                      </div>
+                    ` : '')}
+                  </td>
+
+                  <!-- 4. العنوان الوظيفي -->
+                  <td>
+                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف'}">
+                      ${emp.jobTitle || 'موظف'}
+                    </span>
+                  </td>
+
+                  <!-- 5. الدور -->
+                  <td>
+                    <span class="badge ${roleInfo.badgeClass || 'badge-secondary'}" style="font-size: 0.78rem; max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${roleInfo.name || emp.role}">
+                      ${roleInfo.name || emp.role || 'منتسب'}
+                    </span>
+                  </td>
+
+                  <!-- 6. الهاتف / واتساب -->
+                  <td>
+                    ${empPhone ? `
+                      <div style="direction: ltr; text-align: right; font-family: monospace; font-weight: 700; color: var(--md-sys-color-on-surface); font-size: 0.86rem; letter-spacing: 0.5px;">
+                        ${empPhone}
+                      </div>
+                    ` : '<span style="color: var(--md-sys-color-outline); font-size: 0.78rem;">غير مسجل</span>'}
+                  </td>
+
+                  <!-- 7. الإجراءات (الإضبارة والمراسلة) -->
+                  <td style="text-align: center; white-space: nowrap;">
+                    <div style="display: flex; gap: 0.4rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                      <button class="btn-action-view" onclick="window.app.openMasterDossierModal('${emp.employeeId || emp.id}')" title="معاينة الإضبارة الموحدة" style="padding: 0.3rem 0.65rem;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span>معاينة الإضبارة</span>
+                      </button>
+                      <button class="btn-circle-email btn-action-email" onclick="window.app.openDirectEmail('${empEmail}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="مراسلة عبر البريد الإلكتروني (${empEmail || 'غير مسجل'})">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                          <path d="M22 7l-10 7L2 7"></path>
+                        </svg>
+                      </button>
+                      <button class="btn-circle-whatsapp btn-action-whatsapp" onclick="window.app.openDirectWhatsApp('${empPhone}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="تواصل عبر واتساب (${empPhone || 'غير مسجل'})">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="#ffffff">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+            ${effectiveStaff.length === 0 ? '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--md-sys-color-outline);">لا توجد كوادر مسجلة في هذه الوحدة حالياً.</td></tr>' : ''}
           </tbody>
         </table>
       </div>

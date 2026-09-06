@@ -2759,10 +2759,30 @@ class StoreManager {
     return { success: true, master, transferEntry };
   }
 
-  // --- Update Section-Specific Notes (ملاحظات ومعلومات خاصة بالشعبة) ---
+  // --- Update Section/Unit-Specific Notes (ملاحظات ومعلومات خاصة بالشعبة أو الوحدة) ---
   updateEmployeeSectionNotes(empId, sectionNotes, actorUser) {
-    const master = this.getEmployeeMasterRecordByEmployeeId(empId);
-    if (!master) return { success: false, error: 'سجل الموظف غير موجود.' };
+    let master = this.getEmployeeMasterRecordByEmployeeId(empId);
+    if (!master) {
+      const userObj = (this.getUsers() || []).find(u => u.employeeId === empId || u.id === empId);
+      if (userObj) {
+        master = {
+          employeeId: userObj.employeeId || userObj.id || empId,
+          fullName: userObj.fullName || userObj.name || 'منتسب',
+          jobTitle: userObj.jobTitle || 'موظف',
+          role: userObj.role || 'EMPLOYEE',
+          sectionId: userObj.sectionId || null,
+          unitId: userObj.unitId || null,
+          stationId: userObj.stationId || null,
+          sectionNotes: sectionNotes,
+          departmentId: userObj.departmentId || 'dept-south-prod',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        this.addOrUpdateEmployeeMasterRecord(master, actorUser);
+        return { success: true, master };
+      }
+      return { success: false, error: 'سجل الموظف غير موجود.' };
+    }
 
     master.sectionNotes = sectionNotes;
     master.updatedAt = new Date().toISOString();
@@ -2775,7 +2795,7 @@ class StoreManager {
         actorUser.employeeId,
         'UPDATE_SECTION_NOTES',
         'SECTION_MANAGEMENT',
-        `تم تحديث الملاحظات والمعلومات الخاصة بالشعبة للموظف: ${master.fullName} (${empId})`
+        `تم تحديث الملاحظات والمعلومات الخاصة بالمستفيد: ${master.fullName} (${empId})`
       );
     }
 
@@ -3275,46 +3295,78 @@ class StoreManager {
   importApprovedEmployeeIds(records, actorUser) {
     const db = this.getDb();
     if (!db.approvedEmployeeIds) db.approvedEmployeeIds = [];
+    if (!db.employeeMasterRecords) db.employeeMasterRecords = this.getEmployeeMasterRecords();
 
     let importedCount = 0;
     records.forEach(rec => {
       const cleanId = (rec.employeeId || '').trim().toUpperCase();
       if (!cleanId) return;
 
-      const existingIdx = db.approvedEmployeeIds.findIndex(a => a.employeeId === cleanId);
-      const newRecord = {
+      const masterIdx = db.employeeMasterRecords.findIndex(r => (r.employeeId || '').trim().toUpperCase() === cleanId);
+      const appIdx = db.approvedEmployeeIds.findIndex(a => (a.employeeId || a.id || '').trim().toUpperCase() === cleanId);
+
+      const recordData = {
         employeeId: cleanId,
         fullName: rec.fullName || 'منتسب معتمد',
-        departmentId: actorUser.departmentId || 'dept-south-prod',
+        name: rec.fullName || 'منتسب معتمد',
+        jobTitle: rec.jobTitle || 'موظف',
+        departmentId: actorUser ? (actorUser.departmentId || 'dept-south-prod') : 'dept-south-prod',
         sectionId: rec.sectionId || null,
+        unitId: rec.unitId || null,
+        stationId: rec.stationId || null,
         jobGrade: rec.jobGrade || 'الخامسة',
         jobStage: rec.jobStage || 'الأولى',
         degree: rec.degree || 'بكالوريوس',
         specialization: rec.specialization || 'تشغيل وإنتاج',
         workShift: rec.workShift || 'صباحي',
-        createdAt: new Date().toISOString()
+        updatedAt: new Date().toISOString()
       };
 
-      if (existingIdx !== -1) {
-        // Update existing
-        db.approvedEmployeeIds[existingIdx] = { ...db.approvedEmployeeIds[existingIdx], ...newRecord };
+      if (masterIdx !== -1) {
+        db.employeeMasterRecords[masterIdx] = { ...db.employeeMasterRecords[masterIdx], ...recordData };
       } else {
-        // Insert new
-        db.approvedEmployeeIds.push(newRecord);
+        recordData.createdAt = new Date().toISOString();
+        recordData.dynamicValues = {};
+        recordData.transferHistory = [];
+        db.employeeMasterRecords.push(recordData);
         importedCount++;
+      }
+
+      if (appIdx !== -1) {
+        db.approvedEmployeeIds[appIdx] = { ...db.approvedEmployeeIds[appIdx], ...recordData, id: cleanId };
+      } else {
+        db.approvedEmployeeIds.push({ ...recordData, id: cleanId });
+      }
+
+      // Also sync with registered user account if already created
+      if (db.users && Array.isArray(db.users)) {
+        const userIdx = db.users.findIndex(u => (u.employeeId || '').trim().toUpperCase() === cleanId);
+        if (userIdx !== -1) {
+          db.users[userIdx] = {
+            ...db.users[userIdx],
+            fullName: recordData.fullName,
+            jobTitle: recordData.jobTitle,
+            sectionId: recordData.sectionId || db.users[userIdx].sectionId,
+            unitId: recordData.unitId || db.users[userIdx].unitId,
+            stationId: recordData.stationId || db.users[userIdx].stationId,
+            updatedAt: new Date().toISOString()
+          };
+        }
       }
     });
 
     this.saveDb(db);
 
-    this.logActivity(
-      actorUser.departmentId,
-      actorUser.id,
-      actorUser.employeeId,
-      'IMPORT_EMPLOYEE_IDS',
-      'HR_MANAGEMENT',
-      `تم استيراد واعتماد ${records.length} رقم وظيفي (${importedCount} سجل جديد) من ملف البيانات.`
-    );
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'IMPORT_EMPLOYEE_IDS',
+        'HR_MANAGEMENT',
+        `تم استيراد واعتماد ${records.length} رقم وظيفي (${importedCount} سجل جديد) في السجل المركزي المعتمد.`
+      );
+    }
 
     return { success: true, total: records.length, newCount: importedCount };
   }

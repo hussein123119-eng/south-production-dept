@@ -71,3 +71,5 @@ console.log('Test SM has FILES_VIEW:', window.rbac.hasPermission(testUser, 'FILE
 console.log('Test SM has FILES_DELETE (not granted):', window.rbac.hasPermission(testUser, 'FILES_DELETE'));
 console.log('Test SM has FILES_EXPORT (custom granted):', window.rbac.hasPermission(testUser, 'FILES_EXPORT'));
 console.log('Test SM has FILES_ARCHIVE (not granted):', window.rbac.hasPermission(testUser, 'FILES_ARCHIVE'));
+process.exit(0);
+

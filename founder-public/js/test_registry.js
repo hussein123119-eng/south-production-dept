@@ -41,7 +41,9 @@ for (const s of scripts) {
 window.auth.login('ahmed.mgr@rumaila.iq', 'M1a2g3r4#2026', 'EMP-2024-001');
 const html = window.renderUserManagementView();
 
-const headers = ['الاسم', 'الرقم الوظيفي', 'جهة الارتباط', 'المسمى الوظيفي', 'الدور', 'الصلاحيات', 'الإضبارة'];
+const headers = ['الاسم', 'الرقم الوظيفي', 'جهة الارتباط', 'العنوان الوظيفي', 'الدور', 'الصلاحيات', 'الإضبارة'];
 headers.forEach(h => {
   console.log(`Header "${h}" present:`, html.includes(`>${h}<`));
 });
+process.exit(0);
+

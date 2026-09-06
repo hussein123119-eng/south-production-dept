@@ -16,15 +16,9 @@ function renderUserManagementView() {
   const groups = window.rbac.getPermissionGroups();
   const dynamicFields = window.store.getDynamicEmployeeFields(actorUser.departmentId);
 
-  // Extract unique job titles for dynamic filter
-  const uniqueJobTitles = Array.from(new Set(unifiedRoster.map(e => e.jobTitle).filter(Boolean)));
-
   // Statistics calculation
   const totalEmployees = unifiedRoster.length;
-  const activeUsers = unifiedRoster.filter(e => e.accountStatus === 'ACTIVE').length;
   const pendingApprovals = unifiedRoster.filter(e => e.accountStatus === 'PENDING').length;
-  const noAccountCount = unifiedRoster.filter(e => e.accountStatus === 'NO_ACCOUNT').length;
-  const suspendedCount = unifiedRoster.filter(e => e.accountStatus === 'SUSPENDED' || e.accountStatus === 'DISABLED').length;
 
   return `
     <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
@@ -76,83 +70,6 @@ function renderUserManagementView() {
       </div>
     </div>
 
-    <!-- Quick Metrics Chips (Compact, Sleek & Highly Vivid) -->
-    <div class="user-quick-stats-grid">
-      <div class="user-stat-chip chip-primary" onclick="window.app.setUserManagementSubTab('users_roster')" title="عرض إجمالي سجل المستخدمين">
-        <div class="chip-content">
-          <span class="chip-number">${totalEmployees}</span>
-          <span class="chip-title">إجمالي السجل</span>
-        </div>
-        <div class="chip-icon-box">
-          <span class="chip-pulse-dot dot-primary"></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
-      </div>
-
-      <div class="user-stat-chip chip-success" onclick="window.app.setUserManagementSubTab('users_roster')" title="عرض حسابات المستخدمين النشطة">
-        <div class="chip-content">
-          <span class="chip-number">${activeUsers}</span>
-          <span class="chip-title">حسابات نشطة</span>
-        </div>
-        <div class="chip-icon-box">
-          <span class="chip-pulse-dot dot-success"></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <polyline points="9 12 11 14 15 10"></polyline>
-          </svg>
-        </div>
-      </div>
-
-      <div class="user-stat-chip chip-warning" onclick="window.app.setUserManagementSubTab('pending_approvals')" title="عرض طلبات القبول بانتظار الاعتماد">
-        <div class="chip-content">
-          <span class="chip-number">${pendingApprovals}</span>
-          <span class="chip-title">بانتظار الاعتماد</span>
-        </div>
-        <div class="chip-icon-box">
-          <span class="chip-pulse-dot dot-warning"></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-      </div>
-
-      <div class="user-stat-chip chip-slate" onclick="window.app.setUserManagementSubTab('users_roster')" title="عرض الموظفين بدون حساب مستخدم">
-        <div class="chip-content">
-          <span class="chip-number">${noAccountCount}</span>
-          <span class="chip-title">بدون حساب</span>
-        </div>
-        <div class="chip-icon-box">
-          <span class="chip-pulse-dot dot-slate"></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <line x1="17" y1="8" x2="23" y2="14"></line>
-            <line x1="23" y1="8" x2="17" y2="14"></line>
-          </svg>
-        </div>
-      </div>
-
-      <div class="user-stat-chip chip-danger" onclick="window.app.setUserManagementSubTab('users_roster')" title="عرض الحسابات المجمدة أو المعطلة">
-        <div class="chip-content">
-          <span class="chip-number">${suspendedCount}</span>
-          <span class="chip-title">مجمدة أو معطلة</span>
-        </div>
-        <div class="chip-icon-box">
-          <span class="chip-pulse-dot dot-danger"></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-          </svg>
-        </div>
-      </div>
-    </div>
-
     <!-- Navigation Tabs -->
     <div class="tabs-header" style="margin-bottom: 1.5rem;">
       <button class="tab-btn ${activeTab === 'users_roster' || activeTab === 'master_roster' ? 'active' : ''}" onclick="window.app.setUserManagementSubTab('users_roster')">
@@ -175,7 +92,7 @@ function renderUserManagementView() {
     </div>
 
     <!-- Tab Contents -->
-    ${activeTab === 'users_roster' || activeTab === 'master_roster' ? renderUserRegistryTab(unifiedRoster, actorUser, sections, units, stations, uniqueJobTitles) : ''}
+    ${activeTab === 'users_roster' || activeTab === 'master_roster' ? renderUserRegistryTab(unifiedRoster, actorUser, sections, units, stations) : ''}
     ${activeTab === 'pending_approvals' ? renderPendingApprovalsTab(unifiedRoster, actorUser) : ''}
     ${activeTab === 'permission_matrix' ? renderPermissionMatrixTab(unifiedRoster.filter(r => r.hasAccount), actorUser, groups, sections, units, stations) : ''}
     ${activeTab === 'import_ids' ? renderImportEmployeeIDsTab(actorUser) : ''}
@@ -185,9 +102,9 @@ function renderUserManagementView() {
 
 // ==========================================================================
 // 1. تبويب سجل المستخدمين (User Registry Tab)
-// الهيكل: المستخدم | الرقم الوظيفي | جهة الارتباط | المسمى الوظيفي | حالة الحساب | الدور | إجراءات / الصلاحيات | الإضبارة
+// الهيكل: المستخدم | الرقم الوظيفي | جهة الارتباط | العنوان الوظيفي | حالة الحساب | الدور | إجراءات / الصلاحيات | الإضبارة
 // ==========================================================================
-function renderUserRegistryTab(roster, actorUser, sections, units, stations, uniqueJobTitles) {
+function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
   const rolesList = [
     { key: 'DEPT_MANAGER', name: 'مدير قسم' },
     { key: 'DEPUTY_DEPT_MANAGER', name: 'وكيل مدير قسم' },
@@ -215,13 +132,13 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
   if (typeof window !== 'undefined') {
     if (!window.app) window.app = {};
     if (!window.app.userRegistryState) {
-      window.app.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+      window.app.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', status: 'ALL', role: 'ALL' };
     }
   }
 
   const state = (typeof window !== 'undefined' && window.app && window.app.userRegistryState)
     ? window.app.userRegistryState
-    : { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    : { page: 1, pageSize: 25, search: '', section: 'ALL', status: 'ALL', role: 'ALL' };
 
   const q = (state.search || '').toLowerCase().trim();
   const filtered = roster.filter(emp => {
@@ -229,14 +146,15 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
       if (state.section === 'NONE' && emp.sectionId) return false;
       if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
     }
-    if (state.jobTitle !== 'ALL' && (emp.jobTitle || '').toLowerCase().trim() !== state.jobTitle.toLowerCase().trim()) return false;
     if (state.status !== 'ALL' && emp.accountStatus !== state.status) return false;
     if (state.role !== 'ALL' && (emp.role || 'EMPLOYEE') !== state.role) return false;
     if (q) {
       const name = (emp.fullName || emp.name || '').toLowerCase();
       const empid = (emp.employeeId || '').toLowerCase();
       const email = (emp.userEmail || emp.emailPersonal || '').toLowerCase();
-      if (!name.includes(q) && !empid.includes(q) && !email.includes(q)) return false;
+      const title = (emp.jobTitle || '').toLowerCase();
+      const secName = (emp.sectionName || (secMap[emp.sectionId] ? secMap[emp.sectionId].name : '')).toLowerCase();
+      if (!name.includes(q) && !empid.includes(q) && !email.includes(q) && !title.includes(q) && !secName.includes(q)) return false;
     }
     return true;
   });
@@ -255,13 +173,13 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
       <!-- Search & Filters Toolbar -->
       <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center;">
         
-        <!-- Search Input -->
-        <div style="flex: 2; min-width: 220px;">
-          <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${state.search || ''}" placeholder="🔍 بحث باسم المستخدم أو الرقم الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
+        <!-- Search Input (شريط البحث الذكي بالاسم والرقم والعنوان الوظيفي) -->
+        <div style="flex: 2.5; min-width: 240px;">
+          <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${state.search || ''}" placeholder="🔍 بحث بالاسم، الرقم الوظيفي، أو العنوان الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
         </div>
 
         <!-- Filter 1: Linked Scope / Section -->
-        <div style="flex: 1; min-width: 140px;">
+        <div style="flex: 1.2; min-width: 150px;">
           <select id="unifiedRosterSectionFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
             <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
             <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون شعبة --</option>
@@ -269,15 +187,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
           </select>
         </div>
 
-        <!-- Filter 2: Job Title (المسمى الوظيفي) -->
-        <div style="flex: 1; min-width: 130px;">
-          <select id="unifiedRosterJobTitleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL" ${state.jobTitle === 'ALL' ? 'selected' : ''}>كافة المسميات الوظيفية</option>
-            ${uniqueJobTitles.map(title => `<option value="${title}" ${state.jobTitle === title ? 'selected' : ''}>${title}</option>`).join('')}
-          </select>
-        </div>
-
-        <!-- Filter 3: Account Status (حالة الحساب) -->
+        <!-- Filter 2: Account Status (حالة الحساب) -->
         <div style="flex: 1; min-width: 130px;">
           <select id="unifiedRosterStatusFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
             <option value="ALL" ${state.status === 'ALL' ? 'selected' : ''}>كافة حالات الحساب</option>
@@ -290,7 +200,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
           </select>
         </div>
 
-        <!-- Filter 4: Role (الدور) -->
+        <!-- Filter 3: Role (الدور) -->
         <div style="flex: 1; min-width: 130px;">
           <select id="unifiedRosterRoleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
             <option value="ALL" ${state.role === 'ALL' ? 'selected' : ''}>كافة الأدوار</option>
@@ -307,7 +217,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
               <th style="min-width: 220px;">الاسم</th>
               <th style="min-width: 120px;">الرقم الوظيفي</th>
               <th style="min-width: 160px;">جهة الارتباط</th>
-              <th style="min-width: 130px;">المسمى الوظيفي</th>
+              <th style="min-width: 130px;">العنوان الوظيفي</th>
               <th style="min-width: 120px;">الدور</th>
               <th style="min-width: 120px; text-align: center;">الصلاحيات</th>
               <th style="min-width: 120px; text-align: center;">الإضبارة</th>
@@ -342,6 +252,11 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
                 else if (shiftLetter === 'د') shiftLetter = 'D';
               }
 
+              const currentActiveShiftLetter = (window.store && typeof window.store.getCurrentShiftInfo === 'function')
+                ? (window.store.getCurrentShiftInfo().currentShift || '').toUpperCase()
+                : '';
+              const isActiveShift = isShiftWorker && shiftLetter && (shiftLetter === currentActiveShiftLetter);
+
               return `
                 <tr class="unified-roster-row" 
                     data-name="${(emp.fullName || '').toLowerCase()}" 
@@ -375,20 +290,20 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
                     <div style="font-weight: 700; color: var(--md-sys-color-on-surface); white-space: nowrap;">${scopeText}</div>
                     ${st ? `
                       <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem;">
-                        <span>📍 الموقع: <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span></span>
-                        ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter}" title="نوبة الموظف: ${shiftLetter}">${shiftLetter}</span>` : ''}
+                        <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span>
+                        ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>` : ''}
                       </div>
                     ` : (isShiftWorker && shiftLetter ? `
                       <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap;">
-                        <span class="roster-shift-pill shift-${shiftLetter}" title="نوبة الموظف: ${shiftLetter}">${shiftLetter}</span>
+                        <span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>
                       </div>
                     ` : '')}
                   </td>
 
-                  <!-- 4. المسمى الوظيفي -->
+                  <!-- 4. العنوان الوظيفي -->
                   <td>
-                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف تشغيل'}">
-                      ${emp.jobTitle || 'موظف تشغيل'}
+                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف'}">
+                      ${emp.jobTitle || 'موظف'}
                     </span>
                   </td>
 
@@ -429,30 +344,50 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
         </table>
       </div>
 
-      <!-- High-Performance Pagination Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--md-sys-color-surface-variant);">
-        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--md-sys-color-outline);">
-          <span class="badge badge-info" style="font-size: 0.76rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 999px;">
-            ⚡ عرض ${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx} من أصل ${filtered.length} موظف
-          </span>
-          <span style="font-size: 0.78rem;">(إجمالي السجل: ${roster.length})</span>
+      <!-- High-Performance Unified Pagination Bar (تصميم كريستالي جذاب وعملي ومفعل) -->
+      <div class="pagination-bar-container">
+        <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+          <div class="pagination-info-badge">
+            <span>📊</span>
+            <span>عرض <strong>${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx}</strong> من إجمالي <strong>${filtered.length}</strong> سجل</span>
+          </div>
+          ${filtered.length !== roster.length ? `<span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-weight: 600;">(إجمالي السجل العام: ${roster.length})</span>` : ''}
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-          <label style="font-size: 0.8rem; margin: 0; color: var(--md-sys-color-outline);">عرض بالصفحة:</label>
-          <select class="form-control" style="width: 85px; font-size: 0.8rem; padding: 0.2rem 0.5rem;" onchange="window.app.setUserRegistryPageSize(this.value)">
-            <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
-            <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
-            <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
-            <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>الكل</option>
-          </select>
+        <div class="pagination-controls-wrapper">
+          <div class="pagination-size-group">
+            <span>عرض بالصفحة:</span>
+            <select class="pagination-size-select" onchange="window.app.setUserRegistryPageSize(this.value)">
+              <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
+              <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
+              <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
+              <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>عرض الكل</option>
+            </select>
+          </div>
 
-          <div style="display: flex; gap: 0.25rem; align-items: center;">
-            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">«</button>
-            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">‹</button>
-            <span style="font-size: 0.82rem; font-weight: 700; padding: 0 0.4rem; color: var(--md-sys-color-primary);">${currentPage} / ${totalPages}</span>
-            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">›</button>
-            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">»</button>
+          <div class="pagination-nav-cluster">
+            <button class="pagination-action-btn" onclick="window.app.setUserRegistryPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">
+              <span>«</span>
+              <span style="font-size: 0.76rem;">الأولى</span>
+            </button>
+            <button class="pagination-action-btn" onclick="window.app.setUserRegistryPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">
+              <span>‹</span>
+              <span style="font-size: 0.76rem;">السابق</span>
+            </button>
+            <div class="pagination-page-indicator-pill" title="الصفحة الحالية من إجمالي الصفحات">
+              <span style="font-size: 0.75rem; opacity: 0.9;">صفحة</span>
+              <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${currentPage}</span>
+              <span style="font-size: 0.75rem; opacity: 0.85;">من</span>
+              <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${totalPages}</span>
+            </div>
+            <button class="pagination-action-btn" onclick="window.app.setUserRegistryPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">
+              <span style="font-size: 0.76rem;">التالي</span>
+              <span>›</span>
+            </button>
+            <button class="pagination-action-btn" onclick="window.app.setUserRegistryPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">
+              <span style="font-size: 0.76rem;">الأخيرة</span>
+              <span>»</span>
+            </button>
           </div>
         </div>
       </div>
@@ -676,40 +611,341 @@ function getFieldCategoryLabel(cat) {
 }
 
 // ==========================================================================
-// 4. تبويب استيراد سجلات الموظفين (Excel / CSV)
+// 4. تبويب استيراد ومطابقة سجلات الموظفين الرسمية (Master Employee Registry)
 // ==========================================================================
 function renderImportEmployeeIDsTab(actorUser) {
+  const deptId = (actorUser && actorUser.departmentId) ? actorUser.departmentId : 'dept-south-prod';
+  const sections = (window.store && typeof window.store.getSections === 'function') ? window.store.getSections(deptId) : [];
+  const masterRecords = (window.store && typeof window.store.getEmployeeMasterRecords === 'function') ? window.store.getEmployeeMasterRecords(deptId) : [];
+  const totalCount = masterRecords.length;
+
   return `
-    <div class="card">
-      <div style="margin-bottom: 1.25rem;">
-        <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin-bottom: 0.35rem;">
-          📥 استيراد ومطابقة سجلات الموظفين الرسمية
-        </h4>
-        <p style="color: var(--md-sys-color-outline); font-size: 0.85rem;">
-          استيراد وتحديث قائمة الموظفين والأرقام الوظيفية المعتمدة دفعة واحدة مع التحقق التلقائي لمنع التكرار.
-        </p>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; direction: rtl; text-align: right;">
+
+      <!-- 1. Hero Glass Header Banner -->
+      <div class="card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%); border: 1.5px solid rgba(2, 132, 199, 0.25); border-radius: 16px; padding: 1.5rem 1.75rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+        <div style="position: absolute; top: -30px; left: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(2, 132, 199, 0.18) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+        <div style="position: absolute; bottom: -40px; right: 10%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #0284c7 0%, #10b981 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);">
+                📥
+              </div>
+              <h3 style="margin: 0; font-weight: 900; font-size: 1.28rem; color: var(--md-sys-color-primary, #0284c7); letter-spacing: -0.3px;">
+                استيراد ومطابقة سجلات الموظفين الرسمية (Master Employee Registry)
+              </h3>
+            </div>
+            <p style="margin: 0; font-size: 0.86rem; color: var(--md-sys-color-outline, #64748b); font-weight: 600; line-height: 1.6;">
+              المرجع المركزي المعتمد لملاكات قسم الإنتاج الجنوبي — إضافة واعتماد وتحديث بيانات الموظفين لربطها آلياً بالحسابات والإضبارة الرقمية فور تسجيل الدخول.
+            </p>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <div style="padding: 0.5rem 1rem; background: var(--md-sys-color-surface, rgba(255, 255, 255, 0.9)); border: 1px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.2)); border-radius: 999px; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+              <span style="font-size: 0.95rem;">👥</span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--md-sys-color-on-surface, currentColor);">
+                إجمالي السجلات المعتمدة:
+              </span>
+              <span class="badge badge-primary" style="font-size: 0.85rem; font-weight: 900; padding: 0.2rem 0.65rem; border-radius: 999px; background: #0284c7; color: #ffffff;">
+                ${totalCount} موظفاً
+              </span>
+            </div>
+            <div style="padding: 0.5rem 0.9rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 999px; display: flex; align-items: center; gap: 0.4rem;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span style="font-size: 0.78rem; font-weight: 800; color: #059669;">
+                الربط اللحظي الفوري نشط
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style="background: var(--md-sys-color-surface-variant); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; font-size: 0.82rem; line-height: 1.6;">
-        <strong>📌 صيغة الأعمدة المدعومة في الملف:</strong>
-        <code>الرقم الوظيفي, الاسم الرباعي واللقب, الدرجة الوظيفية, المرحلة, الشهادة, التخصص</code>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">اختر ملف CSV من جهازك أو الصق البيانات أدناه:</label>
-        <input type="file" id="importCSVFileInput" accept=".csv, .txt, .tsv" class="form-control" onchange="window.app.handleCSVFileSelected(event)" style="margin-bottom: 0.75rem;">
+      <!-- 2. Supported Columns & Schema Cards Accordion (Collapsible Glass Guide) -->
+      <details class="card" style="margin: 0; padding: 1rem 1.25rem; background: var(--md-sys-color-surface, rgba(255, 255, 255, 0.85)); border: 1.5px solid rgba(2, 132, 199, 0.25); border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: all 0.3s ease;">
+        <summary style="font-weight: 800; font-size: 0.95rem; color: var(--md-sys-color-primary, #0284c7); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; outline: none;">
+          <div style="display: flex; align-items: center; gap: 0.55rem;">
+            <span style="font-size: 1.2rem;">ℹ️</span>
+            <span>دليل وإرشادات صيغ الأعمدة المدعومة في الملفات (اضغط للعرض / الإخفاء)</span>
+          </div>
+          <span class="badge badge-info" style="font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 999px; background: rgba(2, 132, 199, 0.12); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3);">
+            دليل إرشادي توضيحي 📖
+          </span>
+        </summary>
         
-        <textarea id="importCSVTextarea" class="form-control" rows="7" placeholder="الصق بيانات CSV هنا مباشرة..." style="font-family: monospace; font-size: 0.85rem; direction: ltr; text-align: left;"></textarea>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.06));">
+          
+          <!-- Minimal Essential Guide Card -->
+          <div style="padding: 1rem; background: var(--md-sys-color-surface-variant, rgba(248, 250, 252, 0.6)); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem; font-weight: 800; font-size: 0.92rem; color: #059669;">
+                <span style="font-size: 1.1rem;">⚡</span>
+                <span>الحد الأدنى الإلزامي (سريع وبسيط):</span>
+              </div>
+              <span class="badge badge-success" style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 999px; background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">
+                عمودان فقط مطلوبان
+              </span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--md-sys-color-outline, #64748b); margin: 0 0 0.65rem 0; line-height: 1.5;">
+              يكفي إرسال <strong>الرقم الوظيفي</strong> و <strong>الاسم الكامل / الرباعي</strong> فقط، وسيعتمد النظام الموظف مباشرة:
+            </p>
+            <div style="background: var(--md-sys-color-surface, #ffffff); border: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.08)); border-radius: 8px; padding: 0.6rem 0.75rem; font-family: monospace; font-size: 0.8rem; direction: ltr; text-align: left; color: var(--md-sys-color-on-surface, currentColor); line-height: 1.5;">
+              الرقم الوظيفي,الاسم الكامل<br>
+              <span style="color: #0284c7;">EMP-2026-901</span>,كرار حيدر علي<br>
+              <span style="color: #0284c7;">EMP-2026-902</span>,حسين جاسم محمد
+            </div>
+          </div>
+
+          <!-- Full Comprehensive Schema Guide Card -->
+          <div style="padding: 1rem; background: var(--md-sys-color-surface-variant, rgba(248, 250, 252, 0.6)); border: 1.5px solid rgba(2, 132, 199, 0.3); border-radius: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem; font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-primary, #0284c7);">
+                <span style="font-size: 1.1rem;">💎</span>
+                <span>الصيغة الشاملة الموسّعة (اختيارية):</span>
+              </div>
+              <span class="badge badge-primary" style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 999px; background: rgba(2, 132, 199, 0.12); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3);">
+                تفاصيل الإضبارة الكاملة
+              </span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--md-sys-color-outline, #64748b); margin: 0 0 0.65rem 0; line-height: 1.5;">
+              تتيح استيراد كافة التفاصيل الوظيفية وتعبئة الإضبارة دفعة واحدة (العنوان، الدرجة، المرحلة، الشهادة، الشعبة):
+            </p>
+            <div style="background: var(--md-sys-color-surface, #ffffff); border: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.08)); border-radius: 8px; padding: 0.6rem 0.75rem; font-family: monospace; font-size: 0.76rem; direction: ltr; text-align: left; color: var(--md-sys-color-on-surface, currentColor); line-height: 1.5; overflow-x: auto;">
+              الرقم الوظيفي,الاسم الكامل,العنوان الوظيفي,الدرجة,المرحلة,الشهادة,التخصص,الشعبة<br>
+              <span style="color: #0284c7;">EMP-2026-901</span>,كرار حيدر علي,رئيس مهندسين,الثالثة,الأولى,بكالوريوس,هندسة نفط,شعبة العمليات
+            </div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- 3. Dual Workspace: Single Direct Add & Bulk CSV Importer -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.25rem;">
+        
+        <!-- SECTION A: Quick Single-Entry Manual Form -->
+        <div class="card" style="margin: 0; padding: 1.35rem; background: var(--md-sys-color-surface, rgba(255, 255, 255, 0.85)); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.2)); border-radius: 16px; box-shadow: var(--shadow-2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.06));">
+              <div>
+                <h4 style="margin: 0; font-weight: 800; font-size: 1.05rem; color: var(--md-sys-color-primary, #0284c7); display: flex; align-items: center; gap: 0.4rem;">
+                  <span>✍️</span> أداة الإضافة الفردية السريعة (Manual Entry)
+                </h4>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.78rem; color: var(--md-sys-color-outline, #64748b);">
+                  لكتابة اسم موظف ورقمه مباشرة بدون الحاجة لملفات CSV أو جداول.
+                </p>
+              </div>
+              <span class="badge badge-info" style="font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px;">
+                إضافة فورية
+              </span>
+            </div>
+
+            <form id="quickSingleEmployeeForm" onsubmit="window.app.handleQuickAddSingleEmployee(event)">
+              
+              <!-- Required: Full Name + Employee ID -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 800; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    الاسم الرباعي واللقب: <span style="color: #ef4444;">*</span>
+                  </label>
+                  <input type="text" id="quickEmpFullName" class="form-control" placeholder="مثال: حسين كريم جبر الساعدي" required style="font-weight: 700; font-size: 0.85rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 800; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    الرقم الوظيفي: <span style="color: #ef4444;">*</span>
+                  </label>
+                  <input type="text" id="quickEmpId" class="form-control" placeholder="مثال: EMP-2026-880" required style="font-weight: 800; font-size: 0.85rem; font-family: monospace; direction: ltr; text-align: right;">
+                </div>
+              </div>
+
+              <!-- Optional: Job Title + Section -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    العنوان الوظيفي (اختياري):
+                  </label>
+                  <input type="text" id="quickEmpJobTitle" class="form-control" placeholder="مثال: رئيس مهندسين أقدم" style="font-weight: 600; font-size: 0.83rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    جهة الارتباط / الشعبة:
+                  </label>
+                  <select id="quickEmpSectionId" class="form-control" style="font-weight: 600; font-size: 0.83rem;">
+                    <option value="">-- إدارة القسم العامة --</option>
+                    ${sections.map(s => `<option value="${s.id}">شعبة: ${s.name}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+
+              <!-- Optional: Grade + Stage -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    الدرجة الوظيفية:
+                  </label>
+                  <select id="quickEmpJobGrade" class="form-control" style="font-weight: 600; font-size: 0.83rem;">
+                    <option value="الأولى">الدرجة الأولى</option>
+                    <option value="الثانية">الدرجة الثانية</option>
+                    <option value="الثالثة">الدرجة الثالثة</option>
+                    <option value="الرابعة">الدرجة الرابعة</option>
+                    <option value="الخامسة" selected>الدرجة الخامسة</option>
+                    <option value="السادسة">الدرجة السادسة</option>
+                    <option value="السابعة">الدرجة السابعة</option>
+                    <option value="الثامنة">الدرجة الثامنة</option>
+                    <option value="التاسعة">الدرجة التاسعة</option>
+                    <option value="العاشرة">الدرجة العاشرة</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    المرحلة الوظيفية:
+                  </label>
+                  <select id="quickEmpJobStage" class="form-control" style="font-weight: 600; font-size: 0.83rem;">
+                    <option value="الأولى" selected>المرحلة 1</option>
+                    <option value="الثانية">المرحلة 2</option>
+                    <option value="الثالثة">المرحلة 3</option>
+                    <option value="الرابعة">المرحلة 4</option>
+                    <option value="الخامسة">المرحلة 5</option>
+                    <option value="السادسة">المرحلة 6</option>
+                    <option value="السابعة">المرحلة 7</option>
+                    <option value="الثامنة">المرحلة 8</option>
+                    <option value="التاسعة">المرحلة 9</option>
+                    <option value="العاشرة">المرحلة 10</option>
+                    <option value="الحادية عشرة">المرحلة 11</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Optional: Degree + Shift -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.15rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    التحصيل الدراسي / الشهادة:
+                  </label>
+                  <select id="quickEmpDegree" class="form-control" style="font-weight: 600; font-size: 0.83rem;">
+                    <option value="دكتوراه">دكتوراه</option>
+                    <option value="ماجستير">ماجستير</option>
+                    <option value="دبلوم عالي">دبلوم عالي</option>
+                    <option value="بكالوريوس" selected>بكالوريوس</option>
+                    <option value="دبلوم فني">دبلوم فني</option>
+                    <option value="إعدادية">إعدادية</option>
+                    <option value="متوسطة">متوسطة</option>
+                    <option value="ابتدائية">ابتدائية</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-weight: 700; font-size: 0.8rem; color: var(--md-sys-color-on-surface, currentColor);">
+                    نمط الدوام (الوجبة):
+                  </label>
+                  <select id="quickEmpWorkShift" class="form-control" style="font-weight: 600; font-size: 0.83rem;">
+                    <option value="صباحي" selected>دوام صباحي (نهاري)</option>
+                    <option value="وجبة A">شفت - وجبة A</option>
+                    <option value="وجبة B">شفت - وجبة B</option>
+                    <option value="وجبة C">شفت - وجبة C</option>
+                    <option value="وجبة D">شفت - وجبة D</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button type="submit" class="btn btn-primary" style="font-weight: 800; font-size: 0.86rem; padding: 0.6rem 1.4rem; background: linear-gradient(135deg, #0284c7 0%, #10b981 100%); border: none; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3); border-radius: 10px; cursor: pointer;">
+                  💾 اعتماد وإضافة الموظف في السجل فوراً
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <!-- SECTION B: Bulk CSV / Textarea Importer -->
+        <div class="card" style="margin: 0; padding: 1.35rem; background: var(--md-sys-color-surface, rgba(255, 255, 255, 0.85)); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.2)); border-radius: 16px; box-shadow: var(--shadow-2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.06));">
+              <div>
+                <h4 style="margin: 0; font-weight: 800; font-size: 1.05rem; color: #10b981; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>📥</span> الاستيراد الجماعي (CSV / Excel / نص)
+                </h4>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.78rem; color: var(--md-sys-color-outline, #64748b);">
+                  لرفع قوائم الموظفين (من 1 إلى 500+ موظف) دفعة واحدة مع الفحص والمطابقة.
+                </p>
+              </div>
+              <span class="badge badge-success" style="font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px;">
+                استيراد جماعي
+              </span>
+            </div>
+
+            <!-- Upload drop zone -->
+            <div style="margin-bottom: 0.85rem; padding: 0.85rem; border: 2px dashed rgba(2, 132, 199, 0.35); border-radius: 12px; background: rgba(2, 132, 199, 0.03); text-align: center;">
+              <input type="file" id="importCSVFileInput" accept=".csv, .txt, .tsv" style="display: none;" onchange="window.app.handleCSVFileSelected(event)">
+              <div style="cursor: pointer;" onclick="document.getElementById('importCSVFileInput').click()">
+                <div style="font-size: 1.6rem; margin-bottom: 0.25rem;">📂</div>
+                <div style="font-size: 0.84rem; font-weight: 800; color: var(--md-sys-color-primary, #0284c7);">
+                  اضغط هنا لاختيار ملف (CSV / Excel Text) من جهازك
+                </div>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline, #64748b); margin-top: 0.2rem;">
+                  يدعم صيغ .csv, .txt, .tsv بترميز UTF-8
+                </div>
+              </div>
+            </div>
+
+            <!-- Text Area -->
+            <div class="form-group" style="margin-bottom: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8rem; margin: 0; color: var(--md-sys-color-on-surface, currentColor);">
+                  أو الصق محتوى البيانات هنا مباشرة:
+                </label>
+                <button type="button" class="btn btn-text" style="font-size: 0.72rem; color: #ef4444; padding: 0; font-weight: 700;" onclick="document.getElementById('importCSVTextarea').value=''; document.getElementById('importPreviewContainer').style.display='none';">
+                  🗑️ مسح النص
+                </button>
+              </div>
+              <textarea id="importCSVTextarea" class="form-control" rows="6" placeholder="الرقم الوظيفي,الاسم الكامل&#10;EMP-2026-901,كرار حيدر علي&#10;EMP-2026-902,حسين جاسم محمد" style="font-family: monospace; font-size: 0.82rem; direction: ltr; text-align: left; line-height: 1.45;"></textarea>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
+            <button type="button" class="btn btn-outline" style="font-weight: 700; font-size: 0.82rem;" onclick="document.getElementById('importCSVTextarea').value=''; document.getElementById('importPreviewContainer').style.display='none';">
+              إلغاء
+            </button>
+            <button type="button" class="btn btn-primary" style="font-weight: 800; font-size: 0.86rem; padding: 0.6rem 1.4rem; background: linear-gradient(135deg, #0b57d0 0%, #0284c7 100%); border: none; box-shadow: 0 4px 14px rgba(11, 87, 208, 0.3); border-radius: 10px; cursor: pointer;" onclick="window.app.handleParseImportEmployeeIDs()">
+              🔍 فحص ومطابقة ومعاينة السجلات
+            </button>
+          </div>
+        </div>
+
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
-        <button class="btn btn-outline" onclick="document.getElementById('importCSVTextarea').value=''">مسح المدخلات</button>
-        <button class="btn btn-primary" style="font-weight: 800;" onclick="window.app.handleParseImportEmployeeIDs()">
-          🔍 فحص ومطابقة ومعاينة السجلات
-        </button>
+      <!-- 4. Interactive Preview Container (Rendered dynamically on scan) -->
+      <div id="importPreviewContainer" style="display: none;"></div>
+
+      <!-- 5. Interactive FAQ / Clarification Card -->
+      <div class="card" style="margin: 0; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, rgba(2, 132, 199, 0.04) 0%, rgba(245, 158, 11, 0.04) 100%); border: 1.5px solid rgba(2, 132, 199, 0.2); border-radius: 14px;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; font-weight: 800; color: var(--md-sys-color-primary, #0284c7); font-size: 0.95rem;">
+          <span>💡</span> <span>إجابات وتوضيحات هامة حول آلية السجل الرسمي والاستيراد:</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; font-size: 0.82rem; line-height: 1.6; color: var(--md-sys-color-on-surface, currentColor);">
+          <div style="padding: 0.75rem 1rem; background: var(--md-sys-color-surface, rgba(255,255,255,0.7)); border-radius: 10px; border: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.06));">
+            <strong style="color: #059669; display: block; margin-bottom: 0.3rem;">
+              ❓ س: لو رفعت بيانات 500 موظف هنا، هل تتعبأ وتكون جاهزة قبل تسجيل دخولهم؟
+            </strong>
+            <span>
+              <strong>نعم بالتأكيد!</strong> بمجرد اعتماد الاستيراد هنا، تُحفظ كافة بيانات الموظفين (الاسم، العنوان، الدرجة، الشعبة) فوراً في السجل المركزي. وعندما يأتي أي موظف لإنشاء حسابه وإدخال رقمه الوظيفي، يطابق النظام حسابه آلياً ويسحب ملفه وإضباريته كاملة دون الحاجة لإعادة كتابتها.
+            </span>
+          </div>
+          <div style="padding: 0.75rem 1rem; background: var(--md-sys-color-surface, rgba(255,255,255,0.7)); border-radius: 10px; border: 1px solid var(--md-sys-color-outline-variant, rgba(0,0,0,0.06));">
+            <strong style="color: #0284c7; display: block; margin-bottom: 0.3rem;">
+              ❓ س: هل يمكن استخدام الإضافة الفردية أم صندوق النص يكفي للإضافة على مراحل؟
+            </strong>
+            <span>
+              <strong>كلاهما متاح ومثالي!</strong> يمكنك استخدام «أداة الإضافة الفردية السريعة» أعلاه لكتابة اسم شخص ورقمه مباشرة، أو استخدام صندوق النص / CSV لإضافة موظف واحد الآن ثم 100 موظف لاحقاً، فالنظام يدعم الحفظ التراكمي وتحديث السجلات القائمة دون أي فقدان للبيانات.
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div id="importPreviewContainer" style="display: none; margin-top: 1.5rem;"></div>
     </div>
   `;
 }
@@ -947,4 +1183,5 @@ if (typeof window !== 'undefined') {
 
 // Export global helper
 window.renderUserManagementView = renderUserManagementView;
+window.renderImportEmployeeIDsTab = renderImportEmployeeIDsTab;
 

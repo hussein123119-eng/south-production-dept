@@ -238,5 +238,7 @@ console.log('✓ Test 10.5 Passed: Regular employee data privacy & RBAC scoping 
 console.log('\n====================================================');
 console.log('🎉 ALL 10 CAREER TITLE, DUAL-MODE & SEARCH TESTS PASSED 100%!');
 console.log('====================================================');
+process.exit(0);
+
 
 
