@@ -14,6 +14,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Verify Secret Presence
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOUTH_PROD_RUMAILA }}
+        run: |
+          if [ -z "$SA" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT_SOUTH_PROD_RUMAILA secret is missing or empty in repo settings!"
+            exit 1
+          else
+            echo "Service account secret found with length ${#SA}"
+          fi
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
