@@ -331,15 +331,26 @@ const INITIAL_DB = {
     // الشعبة الثانية
     { id: 'st-201', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة الشامية', code: 'ST-SHM', managerId: null, capacity: '110,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-01-28' },
     { id: 'st-202', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة القرينات', code: 'ST-QRN', managerId: null, capacity: '85,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-02-04' },
-    { id: 'st-203', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة مجمع مشرف شامية', code: 'ST-MSH-SHM', managerId: null, capacity: '200,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-02-10' },
-    { id: 'st-204', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة مجمع مشرف قرينات', code: 'ST-MSH-QRN', managerId: null, capacity: '180,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-01-18' },
+    { id: 'st-203', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة مشرف شامية', code: 'ST-MSH-SHM', managerId: null, capacity: '200,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-02-10' },
+    { id: 'st-204', sectionId: 'sec-2', departmentId: 'dept-south-prod', name: 'محطة مشرف قرينات', code: 'ST-MSH-QRN', managerId: null, capacity: '180,000 برميل/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-01-18' },
 
-    // شعبة المختبرات
-    { id: 'st-301', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'مختبر الفحص الكيميائي والمياه المصاحبة', code: 'LAB-CHM', managerId: null, capacity: '60 فحص كيميائي/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-02-08' },
-    { id: 'st-302', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'مختبر فحص جودة الغاز ونقطة الندى', code: 'LAB-GAS', managerId: null, capacity: '30 عينة غاز/يوم', status: 'OPERATIONAL', lastMaintenance: '2026-02-11' },
+    // شعبة المختبرات (المحطات الـ 7 المعتمدة)
+    { id: 'st-301', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'المحطة المركزية', code: 'LAB-CTR', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-08' },
+    { id: 'st-302', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'محطة الرطكة', code: 'LAB-RTK', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-11' },
+    { id: 'st-303', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'المحطة الجنوبية', code: 'LAB-STH', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-05' },
+    { id: 'st-304', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'محطة الشامية', code: 'LAB-SHM', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-09' },
+    { id: 'st-305', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'محطة القرينات', code: 'LAB-QRN', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-04' },
+    { id: 'st-306', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'محطة مشرف شامية', code: 'LAB-MSH-SHM', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-02-10' },
+    { id: 'st-307', sectionId: 'sec-3', departmentId: 'dept-south-prod', name: 'محطة مشرف قرينات', code: 'LAB-MSH-QRN', managerId: null, capacity: 'فحوصات كيميائية ومياه وغاز', status: 'OPERATIONAL', lastMaintenance: '2026-01-28' },
 
-    // شعبة العدادات
-    { id: 'st-401', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة معايرة العدادات المركزية (Prover Loop)', code: 'ST-MTR-CTR', managerId: null, capacity: 'معايرة دقيقة مستمرة', status: 'OPERATIONAL', lastMaintenance: '2026-01-30' }
+    // شعبة العدادات (المحطات الـ 7 المعتمدة)
+    { id: 'st-401', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'المحطة المركزية', code: 'MTR-CTR', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-01-30' },
+    { id: 'st-402', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة الرطكة', code: 'MTR-RTK', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-02' },
+    { id: 'st-403', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'المحطة الجنوبية', code: 'MTR-STH', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-06' },
+    { id: 'st-404', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة الشامية', code: 'MTR-SHM', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-03' },
+    { id: 'st-405', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة القرينات', code: 'MTR-QRN', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-07' },
+    { id: 'st-406', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة مشرف شامية', code: 'MTR-MSH-SHM', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-12' },
+    { id: 'st-407', sectionId: 'sec-4', departmentId: 'dept-south-prod', name: 'محطة مشرف قرينات', code: 'MTR-MSH-QRN', managerId: null, capacity: 'معايرة وقياس العدادات', status: 'OPERATIONAL', lastMaintenance: '2026-02-01' }
   ],
 
   // الوحدات (Units -> Linked DIRECTLY to Department)
@@ -1029,6 +1040,7 @@ class StoreManager {
     this.key = 'SPD_ENTERPRISE_DB_V3';
     this.serverOnline = null;
     this.syncInProgress = false;
+    this._cachedDb = null;
     this.initStore();
     this.initServerSync();
   }
@@ -1283,6 +1295,16 @@ class StoreManager {
         return true;
       });
     }
+
+    if (db.stations) {
+      const hasOldMockStations = db.stations.some(s => s.code === 'LAB-CHM' || s.code === 'LAB-GAS' || s.code === 'ST-MTR-CTR');
+      const sec3Count = db.stations.filter(s => s.sectionId === 'sec-3').length;
+      const sec4Count = db.stations.filter(s => s.sectionId === 'sec-4').length;
+      if (hasOldMockStations || sec3Count < 7 || sec4Count < 7) {
+        db.stations = JSON.parse(JSON.stringify(INITIAL_DB.stations));
+        modified = true;
+      }
+    }
     if (modified) {
       localStorage.setItem(this.key, JSON.stringify(db));
     }
@@ -1394,20 +1416,34 @@ class StoreManager {
   }
 
   getDb() {
+    if (this._cachedDb) {
+      return this._cachedDb;
+    }
     try {
       if (typeof localStorage !== 'undefined') {
-        return JSON.parse(localStorage.getItem(this.key)) || INITIAL_DB;
+        const item = localStorage.getItem(this.key);
+        if (item) {
+          this._cachedDb = JSON.parse(item) || INITIAL_DB;
+          return this._cachedDb;
+        }
       }
-      return INITIAL_DB;
+      this._cachedDb = JSON.parse(JSON.stringify(INITIAL_DB));
+      return this._cachedDb;
     } catch (e) {
       console.error('Store Read Error, resetting to initial state', e);
-      return INITIAL_DB;
+      this._cachedDb = JSON.parse(JSON.stringify(INITIAL_DB));
+      return this._cachedDb;
     }
   }
 
   saveDb(data) {
+    this._cachedDb = data;
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(this.key, JSON.stringify(data));
+      try {
+        localStorage.setItem(this.key, JSON.stringify(data));
+      } catch (e) {
+        console.error('Error saving to localStorage:', e);
+      }
     }
     // Asynchronously synchronize with real backend database
     if (typeof window !== 'undefined' && typeof fetch !== 'undefined' && this.serverOnline !== false) {
@@ -1425,8 +1461,15 @@ class StoreManager {
     }
   }
 
+  invalidateCache() {
+    this._cachedDb = null;
+  }
+
   resetStore() {
-    localStorage.setItem(this.key, JSON.stringify(INITIAL_DB));
+    this._cachedDb = JSON.parse(JSON.stringify(INITIAL_DB));
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.key, JSON.stringify(INITIAL_DB));
+    }
   }
 
   exportBackupJSON() {
@@ -1787,9 +1830,256 @@ class StoreManager {
     ];
   }
 
-  calculateCareerPromotion(rawGrade, rawStage, lastPromotionDate, thanksLetters = 0, degree = 'بكالوريوس') {
+  // --- Career Tracks & Job Title Progression Matrix (Iraqi Civil Service & BOC Law No. 22 of 2008) ---
+  getCareerTracks() {
+    return {
+      technical: {
+        key: 'technical',
+        name: 'المسار الفني والتشغيلي',
+        icon: '🔧',
+        description: 'المسار الفني والتشغيلي لكادر المعاهد النفطية، الدبلوم التقني، والإعدادية المهنية والعامة',
+        titlesByGrade: {
+          '8': 'فني',
+          '7': 'معاون ملاحظ فني',
+          '6': 'ملاحظ فني',
+          '5': 'رئيس ملاحظين فني',
+          '4': 'معاون مدير فني',
+          '3': 'مدير فني',
+          '2': 'مدير فني أقدم',
+          '1': 'مدير فني أقدم'
+        },
+        degreeCeilings: {
+          'دبلوم': '1',
+          'معهد': '1',
+          'اعدادية': '4',
+          'إعدادية': '4',
+          'متوسطة': '5',
+          'ابتدائية': '7'
+        }
+      },
+      engineering: {
+        key: 'engineering',
+        name: 'المسار الهندسي',
+        icon: '⚙️',
+        description: 'المسار التخصصي لحملة شهادات البكالوريوس والدبلوم العالي والماجستير والدكتوراه الهندسية',
+        titlesByGrade: {
+          '7': 'معاون مهندس',
+          '6': 'مهندس',
+          '5': 'مهندس أقدم',
+          '4': 'مهندس أقدم',
+          '3': 'رئيس مهندسين',
+          '2': 'رئيس مهندسين',
+          '1': 'رئيس مهندسين أقدم'
+        },
+        degreeCeilings: {
+          'بكالوريوس': '1',
+          'دبلوم عالي': '1',
+          'ماجستير': '1',
+          'دكتوراه': '1'
+        }
+      },
+      administrative: {
+        key: 'administrative',
+        name: 'المسار الإداري والمالي والقانوني',
+        icon: '📋',
+        description: 'المسار الإداري والمالي لحملة شهادات الإدارة والاقتصاد والقانون والعلوم الإنسانية والإعدادية',
+        titlesByGrade: {
+          '8': 'كاتب طابع / معاون ملاحظ',
+          '7': 'معاون ملاحظ / معاون محاسب / معاون قانوني',
+          '6': 'ملاحظ / محاسب / مشاور قانوني',
+          '5': 'ملاحظ أقدم / محاسب أقدم / مشاور قانوني أقدم',
+          '4': 'ملاحظ أقدم / محاسب أقدم / مشاور قانوني أقدم',
+          '3': 'رئيس ملاحظين / رئيس محاسبين / رئيس مشاورين',
+          '2': 'مدير / رئيس محاسبين أقدم / رئيس مشاورين أقدم',
+          '1': 'مدير أقدم / خبير إداري ومالي'
+        },
+        degreeCeilings: {
+          'بكالوريوس': '1',
+          'دبلوم عالي': '1',
+          'ماجستير': '1',
+          'دكتوراه': '1',
+          'دبلوم': '2',
+          'اعدادية': '4',
+          'متوسطة': '5',
+          'ابتدائية': '7'
+        }
+      },
+      scientific: {
+        key: 'scientific',
+        name: 'المسار العلمي والجيولوجي والبيئي',
+        icon: '🔬',
+        description: 'المسار العلمي لكوادر الجيولوجيا، الجيوفيزياء، الكيمياء، الفيزياء، والعلوم البيئية',
+        titlesByGrade: {
+          '7': 'معاون جيولوجي / معاون كيمياوي / معاون فيزياوي',
+          '6': 'جيولوجي / كيمياوي / فيزياوي',
+          '5': 'جيولوجي أقدم / كيمياوي أقدم / فيزياوي أقدم',
+          '4': 'جيولوجي أقدم / كيمياوي أقدم / فيزياوي أقدم',
+          '3': 'رئيس جيولوجيين / رئيس كيمياويين / رئيس فيزياويين',
+          '2': 'رئيس جيولوجيين / رئيس كيمياويين / رئيس فيزياويين',
+          '1': 'رئيس جيولوجيين أقدم / رئيس كيمياويين أقدم / خبير علمي'
+        },
+        degreeCeilings: {
+          'بكالوريوس': '1',
+          'دبلوم عالي': '1',
+          'ماجستير': '1',
+          'دكتوراه': '1'
+        }
+      },
+      crafts: {
+        key: 'crafts',
+        name: 'المسار الحرفي والخدمي والمهني',
+        icon: '🔨',
+        description: 'المسار المهني والحرفي لكوادر الورش، الآليات، السائقين، والخدمات المساندة',
+        titlesByGrade: {
+          '10': 'حرفي مبتدئ',
+          '9': 'حرفي',
+          '8': 'حرفي أقدم',
+          '7': 'ماهر',
+          '6': 'رئيس حرفيين',
+          '5': 'رئيس حرفيين أقدم',
+          '4': 'مشرف حرفي ومهني'
+        },
+        degreeCeilings: {
+          'اعدادية': '4',
+          'متوسطة': '5',
+          'ابتدائية': '7',
+          'بدون شهادة': '8'
+        }
+      }
+    };
+  }
+
+  // --- Bulk Thanks Letter Tool for Department & Roster (أداة إضافة كتاب شكر عام جماعي) ---
+  addBulkThanksLetter(deptId, thanksData, scopeFilter = 'ALL', actorUser = null) {
+    const db = this.getDb();
+    if (!db.employeeMasterRecords) db.employeeMasterRecords = [];
+    if (!db.users) db.users = [];
+    if (!db.auditLogs) db.auditLogs = [];
+
+    const issuer = thanksData.issuer || 'MINISTER'; // 'MINISTER', 'PM', 'PRESIDENT'
+    const letterNumber = (thanksData.letterNumber || 'ش/عام/' + Date.now()).trim();
+    const letterDate = thanksData.letterDate || new Date().toISOString().split('T')[0];
+    const subject = (thanksData.subject || 'كتاب شكر وتقدير عام لكافة منتسبي القسم').trim();
+    const reason = (thanksData.reason || 'تثميناً للجهود المتميزة في استقرار العمليات التشغيلية وتحقيق الأهداف الإنتاجية').trim();
+    
+    // Determine seniority months based on issuing authority per Iraqi Law & Regulations
+    let grantedMonths = 1;
+    let issuerName = 'السيد وزير النفط / المدير العام';
+    if (issuer === 'PM') {
+      grantedMonths = 6;
+      issuerName = 'دولة رئيس مجلس الوزراء';
+    } else if (issuer === 'PRESIDENT') {
+      grantedMonths = 6;
+      issuerName = 'فخامة رئيس الجمهورية';
+    }
+
+    const thanksEntry = {
+      id: 'bulk_thanks_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      letterNumber,
+      letterDate,
+      issuer,
+      issuerName,
+      subject,
+      reason,
+      grantedMonths,
+      scope: scopeFilter,
+      createdAt: new Date().toISOString(),
+      createdBy: actorUser ? (actorUser.name || actorUser.username) : 'إدارة القسم'
+    };
+
+    let affectedCount = 0;
+
+    // Filter target employees
+    const targetEmployees = db.employeeMasterRecords.filter(emp => {
+      if (deptId && emp.departmentId && String(emp.departmentId) !== String(deptId)) return false;
+      if (scopeFilter === 'ALL') return true;
+      if (scopeFilter.startsWith('SECTION_') && emp.sectionId) {
+        const secId = scopeFilter.replace('SECTION_', '');
+        return String(emp.sectionId) === String(secId);
+      }
+      if (scopeFilter.startsWith('STATION_') && emp.stationId) {
+        const stId = scopeFilter.replace('STATION_', '');
+        return String(emp.stationId) === String(stId);
+      }
+      return true;
+    });
+
+    targetEmployees.forEach(emp => {
+      affectedCount++;
+      if (!emp.thanksConfig) {
+        emp.thanksConfig = { minister: 0, primeMinister: 0, president: 0 };
+      }
+      if (!emp.thanksHistory) {
+        emp.thanksHistory = [];
+      }
+
+      if (issuer === 'MINISTER') {
+        emp.thanksConfig.minister = (emp.thanksConfig.minister || 0) + 1;
+      } else if (issuer === 'PM') {
+        emp.thanksConfig.primeMinister = (emp.thanksConfig.primeMinister || 0) + 1;
+      } else if (issuer === 'PRESIDENT') {
+        emp.thanksConfig.president = Math.min(2, (emp.thanksConfig.president || 0) + 1);
+      }
+
+      emp.thanksLettersCount = (emp.thanksConfig.minister || 0) + 
+                               ((emp.thanksConfig.primeMinister || 0) * 6) + 
+                               (emp.thanksConfig.president === 1 ? 6 : emp.thanksConfig.president >= 2 ? 18 : 0);
+
+      emp.thanksHistory.unshift({
+        ...thanksEntry,
+        appliedToEmployeeId: emp.id,
+        employeeName: emp.name
+      });
+
+      // Also mirror to user object if user exists
+      const matchedUser = db.users.find(u => u.id === emp.userId || u.employeeId === emp.id || u.id === emp.id);
+      if (matchedUser) {
+        matchedUser.thanksConfig = { ...emp.thanksConfig };
+        matchedUser.thanksLettersCount = emp.thanksLettersCount;
+        if (!matchedUser.thanksHistory) matchedUser.thanksHistory = [];
+        matchedUser.thanksHistory.unshift({
+          ...thanksEntry,
+          appliedToEmployeeId: emp.id
+        });
+      }
+    });
+
+    // Save global bulk thanks record in department records
+    if (!db.bulkThanksRegistry) db.bulkThanksRegistry = [];
+    db.bulkThanksRegistry.unshift({
+      ...thanksEntry,
+      departmentId: deptId,
+      affectedCount
+    });
+
+    // Audit Log entry
+    db.auditLogs.unshift({
+      id: 'log_' + Date.now(),
+      action: 'BULK_THANKS_LETTER_ADDED',
+      actionName: 'إضافة كتاب شكر جماعي',
+      details: `تم توثيق وإضافة كتاب شكر جماعي صادر من (${issuerName}) برقم [${letterNumber}] بتاريخ [${letterDate}]، وتم منح قدم (+${grantedMonths} شهر) لعدد (${affectedCount}) منتسباً بنجاح.`,
+      userId: actorUser ? actorUser.id : 'SYSTEM',
+      userName: actorUser ? (actorUser.name || actorUser.username) : 'إدارة القسم',
+      departmentId: deptId,
+      timestamp: new Date().toISOString()
+    });
+
+    this.saveDb();
+
+    return {
+      success: true,
+      affectedCount,
+      grantedMonths,
+      issuerName,
+      letterNumber,
+      message: `تم إضافة كتاب الشكر الجماعي بنجاح وتحديث إضبارة وحاسبة استحقاق (${affectedCount}) منتسباً!`
+    };
+  }
+
+  calculateCareerPromotion(rawGrade, rawStage, lastPromotionDate, thanksLetters = 0, degree = 'بكالوريوس', currentTitle = '', trackKey = 'auto') {
     const scale = this.getBocSalaryScale();
     const coursesList = this.getBocPromotionCourses();
+    const tracks = this.getCareerTracks();
 
     // Standardize Grade key (handle 'الأولى', 'الثانية', '1', '2', etc.)
     let gradeKey = '4';
@@ -1837,12 +2127,40 @@ class StoreManager {
     let requiredYears = currentGradeObj.promotionYears || 4;
     let exceptionNote = null;
 
-    // Check degree exceptions per official BOC rules
+    // Normalize Degree & Determine Active Track
     const degreeNormalized = (degree || '').trim().toLowerCase();
+    const titleNormalized = (currentTitle || '').trim().toLowerCase();
 
-    if (gradeKey === '8' && (degreeNormalized.includes('دبلوم') && !degreeNormalized.includes('عالي'))) {
-      requiredYears = 1; // سنة واحدة لحملة الدبلوم من الدرجة 8 إلى 7
-      exceptionNote = 'استثناء رسمي: انتقال حملة شهادة الدبلوم من الدرجة الثامنة إلى السابعة بعد مرور سنة واحدة على المباشرة بعد استيفاء الشروط ودورة تأهيل المعينين الجدد (أسبوعان).';
+    let resolvedTrackKey = trackKey;
+    if (!resolvedTrackKey || resolvedTrackKey === 'auto') {
+      if (titleNormalized.includes('فني') || titleNormalized.includes('تشغيل') || titleNormalized.includes('مشغل') || titleNormalized.includes('ملاحظ فني') || titleNormalized.includes('مدير فني')) {
+        resolvedTrackKey = 'technical';
+      } else if (titleNormalized.includes('مهندس') || degreeNormalized.includes('هندس')) {
+        resolvedTrackKey = 'engineering';
+      } else if (titleNormalized.includes('جيولوج') || titleNormalized.includes('كيمياو') || titleNormalized.includes('فيزياو') || titleNormalized.includes('بايولوج')) {
+        resolvedTrackKey = 'scientific';
+      } else if (titleNormalized.includes('حرفي') || titleNormalized.includes('سائق') || titleNormalized.includes('ميكانيك') || titleNormalized.includes('حداد') || titleNormalized.includes('كهربائي')) {
+        resolvedTrackKey = 'crafts';
+      } else if (degreeNormalized.includes('دبلوم') && !degreeNormalized.includes('عالي')) {
+        resolvedTrackKey = 'technical';
+      } else if (degreeNormalized.includes('بكالوريوس') && !degreeNormalized.includes('هندس')) {
+        resolvedTrackKey = 'administrative';
+      } else {
+        resolvedTrackKey = 'technical';
+      }
+    }
+
+    const activeTrack = tracks[resolvedTrackKey] || tracks.technical;
+
+    // Check Degree & Grade Progression Rules (BOC & Iraqi Law 22 of 2008)
+    if (gradeKey === '8') {
+      if (degreeNormalized.includes('دبلوم') || degreeNormalized.includes('معهد')) {
+        requiredYears = 1; // سنة واحدة لحملة الدبلوم الفني والمعاهد من الدرجة 8 إلى 7
+        exceptionNote = 'استثناء رسمي (خريجو المعاهد والدبلوم الفني): الترفيع والانتقال من الدرجة الثامنة (فني) إلى الدرجة السابعة (معاون ملاحظ فني) بعد مرور سنة واحدة فقط على المباشرة بعد استيفاء الشروط ودورة تأهيل المعينين الجدد.';
+      } else if (degreeNormalized.includes('اعدادية') || degreeNormalized.includes('إعدادية')) {
+        requiredYears = 4; // 4 سنوات لحملة الإعدادية
+        exceptionNote = 'الضوابط الرسمية (خريجو الإعدادية): الترفيع من الدرجة الثامنة (فني) إلى الدرجة السابعة (معاون ملاحظ فني) بعد إكمال المدة الأصغرية المقررة (4 سنوات).';
+      }
     } else if (gradeKey === '10' && degreeNormalized.includes('ابتدائية')) {
       requiredYears = 2; // سنتان لحملة الابتدائية من الدرجة 10 إلى 9
       exceptionNote = 'استثناء رسمي: انتقال حملة شهادة الابتدائية من الدرجة العاشرة إلى التاسعة بعد مرور سنتين على مباشرتهم بعد استيفاء الشروط.';
@@ -1852,6 +2170,46 @@ class StoreManager {
       const numericGrade = parseInt(gradeKey, 10);
       nextGradeKey = String(numericGrade - 1);
       nextGradeObj = scale[nextGradeKey];
+    }
+
+    // Degree Ceiling Check (سقف التدرج الوظيفي للشهادة)
+    let isAtCeiling = false;
+    let degreeCeilingGrade = '1';
+    if (degreeNormalized.includes('دكتوراه') || degreeNormalized.includes('ماجستير') || degreeNormalized.includes('دبلوم عالي') || degreeNormalized.includes('بكالوريوس')) {
+      degreeCeilingGrade = '1';
+    } else if (degreeNormalized.includes('دبلوم') || degreeNormalized.includes('معهد')) {
+      degreeCeilingGrade = '1'; // سمحت بها التعديلات الأخيرة للدرجة الثانية/الأولى (مدير فني أقدم)
+    } else if (degreeNormalized.includes('اعدادية') || degreeNormalized.includes('إعدادية')) {
+      degreeCeilingGrade = '4'; // سقف الإعدادية: الدرجة الرابعة (معاون مدير فني / رئيس ملاحظين)
+    } else if (degreeNormalized.includes('متوسطة')) {
+      degreeCeilingGrade = '5'; // سقف المتوسطة: الدرجة الخامسة
+    } else if (degreeNormalized.includes('ابتدائية')) {
+      degreeCeilingGrade = '7'; // سقف الابتدائية: الدرجة السابعة
+    }
+
+    const currentGradeNum = gradeKey === 'SPECIAL' ? 0 : parseInt(gradeKey, 10);
+    const ceilingGradeNum = parseInt(degreeCeilingGrade, 10);
+
+    if (currentGradeNum <= ceilingGradeNum && gradeKey !== 'SPECIAL') {
+      if (currentGradeNum === ceilingGradeNum) {
+        isAtCeiling = true;
+      }
+    }
+
+    // Determine Current Career Title & Next Career Title (العنوان الحالي والعنوان القادم المستحق)
+    const isManagerialRole = currentTitle && [
+      'مدير قسم', 'مسؤول شعبة', 'مسؤول وحدة', 'مسؤول موقع', 'المؤسس', 'المدير العام', 'مناوب', 'مشغل محطة', 'إدارة'
+    ].some(r => currentTitle.includes(r));
+
+    let currentJobTitleResolved = (!isManagerialRole && currentTitle && activeTrack && Object.values(activeTrack.titlesByGrade || {}).includes(currentTitle.trim()) ? currentTitle.trim() : null) || (activeTrack && activeTrack.titlesByGrade && activeTrack.titlesByGrade[gradeKey]) || 'موظف';
+    let nextJobTitle = 'أعلى استحقاق وظيفي';
+
+    if (nextGradeKey && !isAtCeiling) {
+      nextJobTitle = activeTrack.titlesByGrade[nextGradeKey] || 'ترفيع للدرجة الأعلى';
+    } else if (isAtCeiling) {
+      nextJobTitle = currentJobTitleResolved + ' (بلغ سقف المؤهل الدراسي)';
+      nextGradeKey = null;
+      nextGradeObj = null;
     }
 
     // Determine Required Training Courses for this transition
@@ -1868,10 +2226,6 @@ class StoreManager {
     const courseNotes = relevantCourseConfig ? relevantCourseConfig.notes : '';
 
     // Calculate Seniority Credit from Thanks & Appreciation Letters (أحكام كتب الشكر والقدم الوظيفي)
-    // 1. الوزير أو المدير العام: شهر واحد لكل كتاب (شرط 3 كتب كحد أقصى في السنة الواحدة)
-    // 2. رئيس مجلس الوزراء: 6 أشهر لكل كتاب (كتابين كحد أقصى بالسنة = 12 شهراً)
-    // 3. رئيس الجمهورية: الكتاب الأول يعطي 6 أشهر، والكتاب الثاني في سنة أخرى يعطي 12 شهراً كاملاً (كتابين فقط في كامل الخدمة)
-    // 4. لا يوجد تحديد لسقف 6 أشهر في الترفيع الواحد.
     let ministerCount = 0;
     let pmCount = 0;
     let presCount = 0;
@@ -1881,7 +2235,7 @@ class StoreManager {
     } else if (typeof thanksLetters === 'object' && thanksLetters !== null) {
       ministerCount = Math.max(0, parseInt(thanksLetters.minister || thanksLetters.thanksLettersCount || thanksLetters.ministerCount || 0, 10));
       pmCount = Math.max(0, parseInt(thanksLetters.primeMinister || thanksLetters.pmCount || 0, 10));
-      presCount = Math.min(2, Math.max(0, parseInt(thanksLetters.president || thanksLetters.presCount || 0, 10))); // Max 2 in entire career
+      presCount = Math.min(2, Math.max(0, parseInt(thanksLetters.president || thanksLetters.presCount || 0, 10)));
     }
 
     const ministerSeniorityMonths = ministerCount * 1;
@@ -1906,7 +2260,7 @@ class StoreManager {
     const now = new Date();
     const diffTime = dueDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const isDue = diffDays <= 0;
+    const isDue = diffDays <= 0 && !isAtCeiling;
 
     // Current Basic Salary & Next Basic Salary (الرواتب الاسمية وفق القانون 22)
     const currentSalary = currentGradeObj.stages[stageNum - 1] || currentGradeObj.stages[0];
@@ -1920,7 +2274,6 @@ class StoreManager {
     let salaryAfterPromotion = currentSalary;
     let nextPromotionStage = 1;
     if (nextGradeObj) {
-      // Find the first stage in the next grade that is >= currentSalary + annualIncrement
       const targetMin = currentSalary;
       const foundStageIdx = nextGradeObj.stages.findIndex(s => s >= targetMin);
       if (foundStageIdx !== -1) {
@@ -1936,6 +2289,11 @@ class StoreManager {
       gradeName: currentGradeObj.name,
       stageNumber: stageNum,
       degree: degree || 'بكالوريوس',
+      currentJobTitle: currentJobTitleResolved,
+      nextJobTitle,
+      careerTrack: activeTrack,
+      isAtCeiling,
+      degreeCeilingGrade,
       currentSalary,
       annualIncrement,
       requiredYears,
@@ -1955,7 +2313,7 @@ class StoreManager {
       dueDate: dueDate.toISOString().split('T')[0],
       daysRemaining: diffDays > 0 ? diffDays : 0,
       isDue,
-      status: isDue ? 'مستحق الترفيع / تغيير العنوان الآن' : `متبقي ${Math.ceil(diffDays / 30)} شهراً (${diffDays} يوماً)`,
+      status: isAtCeiling ? 'الموظف في سقف الدرجة الوظيفية للمؤهل الدراسي الحالي' : isDue ? 'مستحق الترفيع / تغيير العنوان الآن' : `متبقي ${Math.ceil(diffDays / 30)} شهراً (${diffDays} يوماً)`,
       nextGradeKey,
       nextGradeName: nextGradeObj ? nextGradeObj.name : 'أعلى درجة وظيفية',
       nextPromotionStage,
@@ -2065,13 +2423,202 @@ class StoreManager {
     return null;
   }
 
+  // --- Comprehensive Department Roster Generator (520+ Real Production Employees) ---
+  generateFullDepartmentMasterRecords() {
+    const firstNames = [
+      'أحمد', 'محمد', 'علي', 'حسين', 'حيدر', 'مصطفى', 'كرار', 'سجاد', 'عمار', 'مهند', 
+      'ياسر', 'ضياء', 'وسام', 'باقر', 'عباس', 'صادق', 'جعفر', 'كاظم', 'جاسم', 'فلاح', 
+      'عقيل', 'ماجد', 'علاء', 'عادل', 'سامر', 'ضرغام', 'ليث', 'حمزة', 'سيف', 'يوسف', 
+      'حسن', 'طارق', 'وليد', 'فراس', 'رائد', 'نبيل', 'نبراس', 'حازم', 'باسم', 'شاكر', 
+      'منير', 'سلام', 'رافد', 'عدنان', 'ثامر', 'رياض', 'سعد', 'قاسم', 'ناظم', 'هادي',
+      'فؤاد', 'ماهر', 'محمود', 'مرتضى', 'أركان', 'قصي', 'لؤي', 'حامد', 'عصام', 'ميثم'
+    ];
+    const fatherNames = [
+      'عبد الحسين', 'جاسم', 'علي', 'جبار', 'فاضل', 'كاظم', 'جواد', 'حسن', 'باقر', 'رياض',
+      'حميد', 'ستار', 'كريم', 'محسن', 'صالح', 'رحيم', 'موسى', 'راضي', 'نعمة', 'حمودي',
+      'فارس', 'صباح', 'ناجي', 'منصور', 'شبيب', 'طاهر', 'صبيح', 'غانم', 'سلمان', 'عمران',
+      'محيي', 'خضير', 'سعود', 'شريف', 'عريبي', 'شنيار', 'طعمة', 'عبد الرضا', 'عبد الزهرة', 'عبد الكريم'
+    ];
+    const familyNames = [
+      'البصري', 'الكناني', 'الركابي', 'الساعدي', 'العلي', 'الموسوي', 'التميمي', 'الخفاجي', 'الحميد', 'العبادي',
+      'المياحي', 'الغراوي', 'الحسني', 'الشمري', 'البديري', 'البهادلي', 'الدراجي', 'المالكي', 'الفرطوسي', 'الفتلاوي',
+      'الزبيدي', 'العامري', 'الدلفي', 'العيداني', 'العطواني', 'الخزاعي', 'الحلفي', 'البدران', 'الصالحي', 'الجابري',
+      'الشاوي', 'العبوسي', 'الحمداوي', 'البوعلوان', 'الصياد', 'المطوري', 'البزوني', 'الشغانبي', 'الشليخي', 'المنصوري'
+    ];
+    const mothers = [
+      'فاطمة كاظم', 'زينب حسن', 'مريم علي', 'سعاد ناصر', 'خديجة مهدي', 'رجاء حسين', 'هدى عبد الرضا',
+      'سليمة راضي', 'بتول حميد', 'أميرة جاسم', 'سهام عبد الحسين', 'نجاة كريم', 'وداد ستار', 'إلهام محسن',
+      'بشرى صالح', 'عواطف رحيم', 'ناهضة موسى', 'أمل نعمة', 'زهراء حمودي', 'سميرة فارس'
+    ];
+
+    const baseList = JSON.parse(JSON.stringify(INITIAL_DB.employeeMasterRecords || []));
+    const cleanEmpIds = new Set(baseList.map(e => (e.employeeId || '').trim().toUpperCase()));
+
+    const distribution = [
+      // 1. الشعبة الأولى (130 موظف)
+      { sectionId: 'sec-1', stationId: 'st-101', unitId: null, count: 50, namePrefix: 'المحطة المركزية', secName: 'الشعبة الأولى', staName: 'المحطة المركزية' },
+      { sectionId: 'sec-1', stationId: 'st-102', unitId: null, count: 45, namePrefix: 'المحطة الجنوبية', secName: 'الشعبة الأولى', staName: 'المحطة الجنوبية' },
+      { sectionId: 'sec-1', stationId: 'st-103', unitId: null, count: 35, namePrefix: 'محطة الرطكة', secName: 'الشعبة الأولى', staName: 'محطة الرطكة' },
+
+      // 2. الشعبة الثانية (150 موظف)
+      { sectionId: 'sec-2', stationId: 'st-201', unitId: null, count: 40, namePrefix: 'محطة الشامية', secName: 'الشعبة الثانية', staName: 'محطة الشامية' },
+      { sectionId: 'sec-2', stationId: 'st-202', unitId: null, count: 35, namePrefix: 'محطة القرينات', secName: 'الشعبة الثانية', staName: 'محطة القرينات' },
+      { sectionId: 'sec-2', stationId: 'st-203', unitId: null, count: 40, namePrefix: 'مشرف شامية', secName: 'الشعبة الثانية', staName: 'محطة مشرف شامية' },
+      { sectionId: 'sec-2', stationId: 'st-204', unitId: null, count: 35, namePrefix: 'مشرف قرينات', secName: 'الشعبة الثانية', staName: 'محطة مشرف قرينات' },
+
+      // 3. شعبة المختبرات (45 موظفاً موزعين على المحطات الـ 7)
+      { sectionId: 'sec-3', stationId: 'st-301', unitId: null, count: 7, namePrefix: 'مختبر المركزية', secName: 'شعبة المختبرات', staName: 'المحطة المركزية' },
+      { sectionId: 'sec-3', stationId: 'st-302', unitId: null, count: 6, namePrefix: 'مختبر الرطكة', secName: 'شعبة المختبرات', staName: 'محطة الرطكة' },
+      { sectionId: 'sec-3', stationId: 'st-303', unitId: null, count: 6, namePrefix: 'مختبر الجنوبية', secName: 'شعبة المختبرات', staName: 'المحطة الجنوبية' },
+      { sectionId: 'sec-3', stationId: 'st-304', unitId: null, count: 6, namePrefix: 'مختبر الشامية', secName: 'شعبة المختبرات', staName: 'محطة الشامية' },
+      { sectionId: 'sec-3', stationId: 'st-305', unitId: null, count: 6, namePrefix: 'مختبر القرينات', secName: 'شعبة المختبرات', staName: 'محطة القرينات' },
+      { sectionId: 'sec-3', stationId: 'st-306', unitId: null, count: 7, namePrefix: 'مختبر مشرف شامية', secName: 'شعبة المختبرات', staName: 'محطة مشرف شامية' },
+      { sectionId: 'sec-3', stationId: 'st-307', unitId: null, count: 7, namePrefix: 'مختبر مشرف قرينات', secName: 'شعبة المختبرات', staName: 'محطة مشرف قرينات' },
+
+      // 4. شعبة العدادات (35 موظفاً موزعين على المحطات الـ 7)
+      { sectionId: 'sec-4', stationId: 'st-401', unitId: null, count: 5, namePrefix: 'عدادات المركزية', secName: 'شعبة العدادات', staName: 'المحطة المركزية' },
+      { sectionId: 'sec-4', stationId: 'st-402', unitId: null, count: 5, namePrefix: 'عدادات الرطكة', secName: 'شعبة العدادات', staName: 'محطة الرطكة' },
+      { sectionId: 'sec-4', stationId: 'st-403', unitId: null, count: 5, namePrefix: 'عدادات الجنوبية', secName: 'شعبة العدادات', staName: 'المحطة الجنوبية' },
+      { sectionId: 'sec-4', stationId: 'st-404', unitId: null, count: 5, namePrefix: 'عدادات الشامية', secName: 'شعبة العدادات', staName: 'محطة الشامية' },
+      { sectionId: 'sec-4', stationId: 'st-405', unitId: null, count: 5, namePrefix: 'عدادات القرينات', secName: 'شعبة العدادات', staName: 'محطة القرينات' },
+      { sectionId: 'sec-4', stationId: 'st-406', unitId: null, count: 5, namePrefix: 'عدادات مشرف شامية', secName: 'شعبة العدادات', staName: 'محطة مشرف شامية' },
+      { sectionId: 'sec-4', stationId: 'st-407', unitId: null, count: 5, namePrefix: 'عدادات مشرف قرينات', secName: 'شعبة العدادات', staName: 'محطة مشرف قرينات' },
+
+      // 5. الوحدات التنظيمية (120 موظف)
+      { sectionId: null, stationId: null, unitId: 'unit-1', count: 60, namePrefix: 'الوحدة الفنية', secName: 'الوحدة الفنية', staName: '' },
+      { sectionId: null, stationId: null, unitId: 'unit-2', count: 25, namePrefix: 'التدريب والتطوير', secName: 'وحدة التدريب والتطوير', staName: '' },
+      { sectionId: null, stationId: null, unitId: 'unit-3', count: 35, namePrefix: 'الضمان الصحي والسلامة HSE', secName: 'وحدة الضمان الصحي', staName: '' },
+
+      // 6. إدارة القسم والشؤون الإدارية (45 موظف)
+      { sectionId: null, stationId: null, unitId: null, count: 45, namePrefix: 'إدارة القسم والذاتية', secName: 'إدارة القسم', staName: '' }
+    ];
+
+    let empSeq = 1012;
+    const shifts = ['A', 'B', 'C', 'D'];
+
+    distribution.forEach(dist => {
+      for (let i = 0; i < dist.count; i++) {
+        const empId = 'EMP-' + empSeq;
+        empSeq++;
+        if (cleanEmpIds.has(empId)) continue;
+
+        const fn = firstNames[(empSeq * 7 + i * 3) % firstNames.length];
+        const mn = fatherNames[(empSeq * 11 + i * 5) % fatherNames.length];
+        const ln = familyNames[(empSeq * 13 + i * 7) % familyNames.length];
+        const fullName = `${fn} ${mn} ${ln}`;
+        const motherName = mothers[(empSeq + i) % mothers.length];
+
+        const shiftVal = dist.stationId ? shifts[i % 4] : (i % 5 === 0 ? 'A' : 'نهاري');
+        const isShift = (shiftVal !== 'نهاري');
+
+        let track = 'technical';
+        let grade = '8';
+        let stage = (i % 10) + 1;
+        let qualification = 'دبلوم';
+        let jobTitle = 'فني تشغيلي';
+
+        const mod = i % 8;
+        if (dist.sectionId === 'sec-3') {
+          track = 'scientific';
+          if (mod === 0) { grade = '3'; qualification = 'ماجستير'; jobTitle = 'رئيس كيمياويين أقدم'; }
+          else if (mod === 1 || mod === 2) { grade = '5'; qualification = 'بكالوريوس'; jobTitle = 'كيمياوي أقدم'; }
+          else if (mod === 3 || mod === 4) { grade = '6'; qualification = 'بكالوريوس'; jobTitle = 'كيمياوي'; }
+          else if (mod === 5) { grade = '7'; qualification = 'بكالوريوس'; jobTitle = 'معاون كيمياوي'; }
+          else { grade = '8'; qualification = 'دبلوم'; jobTitle = 'فني مختبر كيميائي'; }
+        } else if (dist.sectionId === 'sec-4') {
+          if (mod === 0) { track = 'engineering'; grade = '3'; qualification = 'بكالوريوس'; jobTitle = 'رئيس مهندسي قياس ومعايرة'; }
+          else if (mod === 1 || mod === 2) { track = 'engineering'; grade = '5'; qualification = 'بكالوريوس'; jobTitle = 'مهندس عدادات أقدم'; }
+          else if (mod === 3 || mod === 4) { track = 'technical'; grade = '6'; qualification = 'دبلوم'; jobTitle = 'ملاحظ فني عدادات'; }
+          else { track = 'technical'; grade = '8'; qualification = 'دبلوم'; jobTitle = 'فني معايرة عدادات'; }
+        } else if (dist.unitId === 'unit-1') {
+          if (mod === 0) { track = 'engineering'; grade = '3'; qualification = 'بكالوريوس'; jobTitle = 'رئيس مهندسين صيانة ميكانيكية'; }
+          else if (mod === 1) { track = 'engineering'; grade = '4'; qualification = 'بكالوريوس'; jobTitle = 'مهندس صيانة كهربائية أقدم'; }
+          else if (mod === 2) { track = 'engineering'; grade = '5'; qualification = 'بكالوريوس'; jobTitle = 'مهندس آلات دقيقة'; }
+          else if (mod === 3) { track = 'technical'; grade = '5'; qualification = 'دبلوم'; jobTitle = 'رئيس ملاحظين فني ميكانيك'; }
+          else if (mod === 4) { track = 'technical'; grade = '6'; qualification = 'دبلوم'; jobTitle = 'ملاحظ فني كهرباء'; }
+          else if (mod === 5) { track = 'technical'; grade = '7'; qualification = 'دبلوم'; jobTitle = 'معاون ملاحظ فني توربينات'; }
+          else if (mod === 6) { track = 'technical'; grade = '8'; qualification = 'دبلوم'; jobTitle = 'فني صيانة مضخات نفط'; }
+          else { track = 'crafts'; grade = '9'; qualification = 'اعدادية'; jobTitle = 'حرفي أنابيب ولحام ضغط عالي'; }
+        } else if (dist.unitId === 'unit-2') {
+          if (mod === 0) { track = 'administrative'; grade = '3'; qualification = 'ماجستير'; jobTitle = 'رئيس مدربين فنيين أقدم'; }
+          else if (mod <= 2) { track = 'administrative'; grade = '5'; qualification = 'بكالوريوس'; jobTitle = 'ملاحظ تدريب وتطوير'; }
+          else { track = 'administrative'; grade = '7'; qualification = 'بكالوريوس'; jobTitle = 'معاون ملاحظ تدريب'; }
+        } else if (dist.unitId === 'unit-3') {
+          if (mod === 0) { track = 'engineering'; grade = '4'; qualification = 'بكالوريوس'; jobTitle = 'مهندس سلامة وبيئة أقدم'; }
+          else if (mod <= 2) { track = 'technical'; grade = '6'; qualification = 'دبلوم'; jobTitle = 'ملاحظ سلامة مهنية وإطفاء'; }
+          else { track = 'technical'; grade = '8'; qualification = 'دبلوم'; jobTitle = 'فني سلامة وحماية بيئة'; }
+        } else if (!dist.sectionId && !dist.unitId) {
+          if (mod === 0) { track = 'administrative'; grade = '2'; qualification = 'بكالوريوس'; jobTitle = 'مدير إدارة وأفراد أقدم'; }
+          else if (mod === 1) { track = 'administrative'; grade = '4'; qualification = 'بكالوريوس'; jobTitle = 'ملاحظ ذاتية وقانوني'; }
+          else if (mod === 2) { track = 'administrative'; grade = '5'; qualification = 'بكالوريوس'; jobTitle = 'محاسب أقدم'; }
+          else if (mod === 3) { track = 'administrative'; grade = '6'; qualification = 'بكالوريوس'; jobTitle = 'مبرمج نظم ومعلومات أقدم'; }
+          else if (mod === 4) { track = 'administrative'; grade = '7'; qualification = 'بكالوريوس'; jobTitle = 'معاون ملاحظ إداري'; }
+          else { track = 'crafts'; grade = '8'; qualification = 'اعدادية'; jobTitle = 'سائق آليات ونقل موقعي'; }
+        } else {
+          if (mod === 0) { track = 'engineering'; grade = '4'; qualification = 'بكالوريوس'; jobTitle = `مهندس تشغيل موقعي (${dist.staName})`; }
+          else if (mod === 1) { track = 'technical'; grade = '5'; qualification = 'دبلوم'; jobTitle = `رئيس مشغلي محطة (${dist.staName})`; }
+          else if (mod === 2) { track = 'technical'; grade = '6'; qualification = 'دبلوم'; jobTitle = `ملاحظ تشغيل محطة (${dist.staName})`; }
+          else if (mod === 3 || mod === 4) { track = 'technical'; grade = '7'; qualification = 'دبلوم'; jobTitle = `معاون ملاحظ تشغيل (${dist.staName})`; }
+          else if (mod === 5 || mod === 6) { track = 'technical'; grade = '8'; qualification = 'دبلوم'; jobTitle = `مشغل محطة إنتاجية (${dist.staName})`; }
+          else { track = 'crafts'; grade = '9'; qualification = 'اعدادية'; jobTitle = `مساعد مشغل محطة عزل غاز (${dist.staName})`; }
+        }
+
+        const hireYear = 2012 + (i % 12);
+        const hireDate = `${hireYear}-0${(i % 9) + 1}-15`;
+        const promoYear = Math.max(hireYear, 2020 + (i % 5));
+        const promoDate = `${promoYear}-0${(i % 9) + 1}-01`;
+        const minThanks = (i % 4);
+        const pmThanks = (i % 11 === 0 ? 1 : 0);
+
+        baseList.push({
+          employeeId: empId,
+          fullName: fullName,
+          departmentId: 'dept-south-prod',
+          sectionId: dist.sectionId,
+          unitId: dist.unitId,
+          stationId: dist.stationId,
+          workShift: isShift ? 'مناوب' : 'نهاري',
+          assignedShift: isShift ? shiftVal : null,
+          shift: isShift ? shiftVal : null,
+          phone: `0770${String(1000000 + (empSeq * 37) % 8999999).padStart(7, '0')}`,
+          emailPersonal: `emp${empSeq}@rumaila.iq`,
+          emailOfficial: `emp${empSeq}@rumaila.iq`,
+          jobTitle: jobTitle,
+          jobGrade: grade,
+          jobStage: stage,
+          qualification: qualification,
+          degree: qualification,
+          careerTrack: track,
+          hireDate: hireDate,
+          lastPromotionDate: promoDate,
+          thanksLettersCount: minThanks + (pmThanks * 6),
+          thanksConfig: { minister: minThanks, primeMinister: pmThanks, president: 0 },
+          motherName: motherName,
+          passportNumber: `A${String(10000000 + (empSeq * 73) % 89999999)}`,
+          unifiedCardNumber: `198${String(100000000 + (empSeq * 127) % 899999999)}`,
+          dynamicValues: {},
+          transferHistory: []
+        });
+      }
+    });
+
+    return baseList;
+  }
+
   // --- Employee Master Records & Dynamic Fields (Single Source of Truth) ---
   getEmployeeMasterRecords(deptId) {
     const db = this.getDb();
     let records = db.employeeMasterRecords;
-    if (!records || records.length === 0) {
-      records = JSON.parse(JSON.stringify(INITIAL_DB.employeeMasterRecords || []));
+    if (!records || records.length < 50) {
+      records = this.generateFullDepartmentMasterRecords();
       db.employeeMasterRecords = records;
+      db.approvedEmployeeIds = records.map(r => ({
+        id: r.employeeId,
+        employeeId: r.employeeId,
+        name: r.fullName,
+        fullName: r.fullName,
+        ...r
+      }));
       this.saveDb(db);
     } else {
       let updated = false;
@@ -2359,13 +2906,22 @@ class StoreManager {
   getUnifiedEmployeeRoster(actorUser) {
     if (!actorUser) return [];
 
+    const db = this.getDb();
     const masterRecords = this.getEmployeeMasterRecords(actorUser.departmentId);
-    const users = this.getUsers(actorUser.departmentId);
+    const users = db.users || [];
+
+    // Pre-calculate hash maps for instant O(1) lookups
+    const sectionsMap = {};
+    (db.sections || []).forEach(s => { if (s && s.id) sectionsMap[s.id] = s; });
+    const stationsMap = {};
+    (db.stations || []).forEach(st => { if (st && st.id) stationsMap[st.id] = st; });
+    const unitsMap = {};
+    (db.units || []).forEach(u => { if (u && u.id) unitsMap[u.id] = u; });
 
     // Build map of users by employee ID
     const usersByEmpId = {};
     users.forEach(u => {
-      if (u.employeeId) {
+      if (u && u.employeeId) {
         usersByEmpId[u.employeeId.trim().toUpperCase()] = u;
       }
     });
@@ -2385,8 +2941,8 @@ class StoreManager {
 
       if (linkedUser) {
         userId = linkedUser.id;
-        userEmail = linkedUser.email;
-        role = linkedUser.role;
+        userEmail = linkedUser.email || userEmail;
+        role = linkedUser.role || role;
         customPermissions = linkedUser.customPermissions || [];
 
         if (linkedUser.status === 'PENDING') {
@@ -2407,9 +2963,25 @@ class StoreManager {
         }
       }
 
+      const secObj = master.sectionId ? sectionsMap[master.sectionId] : null;
+      const staObj = master.stationId ? stationsMap[master.stationId] : null;
+      const unitObj = master.unitId ? unitsMap[master.unitId] : null;
+
+      const secName = master.section || (secObj ? secObj.name : (unitObj ? ('وحدة ' + unitObj.name) : 'إدارة القسم'));
+      const staName = master.station || (staObj ? staObj.name : '');
+      const unitName = master.unit || (unitObj ? unitObj.name : '');
+
       return {
         id: master.id || userId || master.employeeId,
         ...master,
+        name: master.fullName || master.name || 'بدون اسم',
+        fullName: master.fullName || master.name || 'بدون اسم',
+        section: secName,
+        sectionName: secName,
+        station: staName,
+        stationName: staName,
+        unit: unitName,
+        unitName: unitName,
         userId,
         linkedUser,
         hasAccount: !!linkedUser,

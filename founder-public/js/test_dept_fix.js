@@ -10,10 +10,13 @@ global.localStorage = {
 };
 global.sessionStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 global.window = global;
+global.location = { hostname: 'localhost', href: 'http://localhost:3000' };
+global.window.location = global.location;
 global.document = {
   documentElement: { setAttribute: () => {}, getAttribute: () => 'light' },
   body: { classList: { toggle: () => {}, remove: () => {}, add: () => {} } },
   getElementById: () => ({ value: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} } }),
+  querySelector: () => null,
   querySelectorAll: () => [],
   addEventListener: () => {}
 };
@@ -38,7 +41,7 @@ for (const s of scripts) {
 console.log('✅ ALL SCRIPTS EVALUATED CLEANLY');
 
 // Test 1: Render for DEPT_MANAGER
-window.auth.login('ahmed.mgr@southprod.iq', 'password123', 'EMP-2024-001');
+window.auth.login('ahmed.mgr@rumaila.iq', 'M1a2g3r4#2026', 'EMP-2024-001');
 const userMgr = window.auth.getCurrentUser();
 console.log('User 1 (Manager):', userMgr.fullName, '| Role:', userMgr.role);
 
@@ -53,7 +56,7 @@ tabs.forEach(t => {
 });
 
 // Test 2: Render for Regular EMPLOYEE
-window.auth.login('emp1@southprod.iq', 'password123', 'EMP-2024-005');
+window.auth.login('ammar.emp@rumaila.iq', 'Emp1#Pass2026', 'EMP-2024-004');
 const userEmp = window.auth.getCurrentUser();
 console.log('User 2 (Employee):', userEmp.fullName, '| Role:', userEmp.role);
 tabs.forEach(t => {

@@ -464,6 +464,7 @@ class AppController {
     } catch (e) {}
   }
 
+  // --- Auth Handlers & Liquid Glassmorphic Login ---
   quickFillLogin(identifier) {
     const idEl = document.getElementById('loginIdentifier') || document.getElementById('loginEmail');
     if (idEl) {
@@ -5586,31 +5587,49 @@ class AppController {
   }
 
   // --- User Registry & Master Dossier Handlers ---
+  setUserRegistryPage(page) {
+    if (!this.userRegistryState) this.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    this.userRegistryState.page = Math.max(1, page);
+    this.render();
+  }
+
+  setUserRegistryPageSize(size) {
+    if (!this.userRegistryState) this.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    this.userRegistryState.pageSize = size;
+    this.userRegistryState.page = 1;
+    this.render();
+  }
+
   filterUnifiedRosterTable() {
-    const search = (document.getElementById('unifiedRosterSearchInput')?.value || '').toLowerCase().trim();
+    if (!this.userRegistryState) this.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    const searchInput = document.getElementById('unifiedRosterSearchInput');
+    const search = (searchInput?.value || '').trim();
     const sectionFilter = document.getElementById('unifiedRosterSectionFilter')?.value || 'ALL';
-    const jobTitleFilter = (document.getElementById('unifiedRosterJobTitleFilter')?.value || 'ALL').toLowerCase().trim();
+    const jobTitleFilter = (document.getElementById('unifiedRosterJobTitleFilter')?.value || 'ALL').trim();
     const statusFilter = document.getElementById('unifiedRosterStatusFilter')?.value || 'ALL';
     const roleFilter = document.getElementById('unifiedRosterRoleFilter')?.value || 'ALL';
 
-    const rows = document.querySelectorAll('.unified-roster-row');
-    rows.forEach(row => {
-      const name = row.getAttribute('data-name') || '';
-      const empid = row.getAttribute('data-empid') || '';
-      const email = row.getAttribute('data-email') || '';
-      const section = row.getAttribute('data-section') || '';
-      const jobtitle = row.getAttribute('data-jobtitle') || '';
-      const status = row.getAttribute('data-status') || '';
-      const role = row.getAttribute('data-role') || '';
+    const cursorStart = searchInput ? searchInput.selectionStart : null;
+    const isFocused = searchInput && (document.activeElement === searchInput);
 
-      const matchSearch = !search || name.includes(search) || empid.includes(search) || email.includes(search);
-      const matchSection = sectionFilter === 'ALL' || section === sectionFilter;
-      const matchJobTitle = jobTitleFilter === 'all' || jobtitle === jobTitleFilter;
-      const matchStatus = statusFilter === 'ALL' || status === statusFilter;
-      const matchRole = roleFilter === 'ALL' || role === roleFilter;
+    this.userRegistryState.search = search;
+    this.userRegistryState.section = sectionFilter;
+    this.userRegistryState.jobTitle = jobTitleFilter;
+    this.userRegistryState.status = statusFilter;
+    this.userRegistryState.role = roleFilter;
+    this.userRegistryState.page = 1;
 
-      row.style.display = (matchSearch && matchSection && matchJobTitle && matchStatus && matchRole) ? '' : 'none';
-    });
+    this.render();
+
+    if (isFocused) {
+      const newInput = document.getElementById('unifiedRosterSearchInput');
+      if (newInput) {
+        newInput.focus();
+        if (cursorStart !== null) {
+          try { newInput.setSelectionRange(cursorStart, cursorStart); } catch (e) {}
+        }
+      }
+    }
   }
 
   filterMatrixTable(query) {
@@ -6605,19 +6624,19 @@ class AppController {
         <div style="flex: 1 1 auto; padding-bottom: 0.5rem;">
         
         <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, var(--md-sys-color-primary), #003366); color: white; border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 8px 24px -4px rgba(0, 51, 102, 0.25);">
-          <h3 style="margin: 0; font-size: 1.3rem; font-weight: 900; color: white;">
+        <div class="custom-export-banner">
+          <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #ffffff;">
             ⚡ أداة استخراج وتصدير وطباعة بيانات الكادر (${modalTitleScope})
           </h3>
-          <p style="margin: 4px 0 0 0; font-size: 0.85rem; opacity: 0.92; line-height: 1.5;">
+          <p style="margin: 4px 0 0 0; font-size: 0.84rem; opacity: 0.92; line-height: 1.5; color: rgba(255, 255, 255, 0.92);">
             تتيح لك هذه الأداة استخراج وتصدير وطباعة بيانات الكادر المصرح لك بالوصول إليهم (${hasGlobal ? 'على مستوى القسم بالكامل' : 'في نطاق الشعبة / الوحدة المعتمدة'})، واختيار الحقول والمعلومات المطلوبة بدقة، وتصديرها بصيغة <strong>Excel</strong> أو <strong>Word</strong> أو <strong>PDF / طباعة رسمية</strong>.
           </p>
         </div>
 
         <!-- الخطوة 1: تحديد نطاق الكادر والارتباط الإداري -->
-        <div style="background: var(--md-sys-color-surface-variant); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; border: 1px solid rgba(11, 87, 208, 0.12);">
+        <div class="custom-export-step-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-            <h5 style="margin: 0; font-weight: 800; font-size: 0.95rem; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem;">
+            <h5 class="custom-export-step-title">
               <span>1️⃣</span> <span>نطاق الكادر المستهدف:</span>
             </h5>
             <span id="customExportTargetCount" class="badge badge-primary" style="font-size: 0.82rem; font-weight: 800;">
@@ -6680,16 +6699,16 @@ class AppController {
         </div>
 
         <!-- الخطوة 2: اختيار وتخصيص الحقول والأعمدة المطلوبة -->
-        <div style="background: #ffffff; border: 1px solid var(--md-sys-color-surface-variant); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+        <div class="custom-export-step-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.5rem;">
-            <h5 style="margin: 0; font-weight: 800; font-size: 0.95rem; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem;">
+            <h5 class="custom-export-step-title">
               <span>2️⃣</span> <span>تحديد وتخصيص الحقول المراد تصديرها:</span>
             </h5>
             <div style="display: flex; gap: 0.4rem;">
-              <button type="button" class="btn btn-sm btn-outline" onclick="window.app.toggleAllCustomExportFields(true)" style="font-size: 0.75rem; padding: 2px 8px;">
+              <button type="button" class="custom-export-pill-btn" onclick="window.app.toggleAllCustomExportFields(true)">
                 تحديد الكل
               </button>
-              <button type="button" class="btn btn-sm btn-outline" onclick="window.app.toggleAllCustomExportFields(false)" style="font-size: 0.75rem; padding: 2px 8px;">
+              <button type="button" class="custom-export-pill-btn" onclick="window.app.toggleAllCustomExportFields(false)">
                 إلغاء التحديد
               </button>
             </div>
@@ -6699,111 +6718,111 @@ class AppController {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
             
             <!-- المجموعة 1: البيانات الشخصية والمدنية -->
-            <div style="background: var(--md-sys-color-surface-variant); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <div style="font-weight: 800; font-size: 0.88rem; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+            <div class="custom-export-group-card">
+              <div class="custom-export-group-header">
                 <span>📋</span> <span>البيانات الأساسية والمدنية:</span>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem;">
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="fullName" checked>
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="fullName" checked>
                   <strong>الاسم الرباعي واللقب</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="employeeId" checked>
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="employeeId" checked>
                   <strong>الرقم الوظيفي</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="motherName">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="motherName">
                   <span>اسم الأم الثلاثي</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="phone" checked>
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="phone" checked>
                   <span>رقم الهاتف الشخصي</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="email">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="email">
                   <span>البريد الإلكتروني</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="address">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="address">
                   <span>محل السكن والمحافظة</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="bloodType">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="bloodType">
                   <span>فصيلة الدم</span>
                 </label>
               </div>
             </div>
 
             <!-- المجموعة 2: المسار الوظيفي والشهادات -->
-            <div style="background: var(--md-sys-color-surface-variant); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <div style="font-weight: 800; font-size: 0.88rem; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+            <div class="custom-export-group-card">
+              <div class="custom-export-group-header">
                 <span>💼</span> <span>المسار الوظيفي والشهادات:</span>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem;">
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="jobTitle" checked>
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="jobTitle" checked>
                   <strong>المسمى والوظيفة الحالية</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="degree" checked>
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="degree" checked>
                   <strong>الشهادة الأكاديمية والتخصص</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="jobGrade">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="jobGrade">
                   <span>الدرجة والمرحلة الوظيفية</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="hireDate">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="hireDate">
                   <span>تاريخ التعيين الرسمي</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="deptJoinDate">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="deptJoinDate">
                   <span>تاريخ المباشرة بالقسم</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="thanksLettersCount">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="thanksLettersCount">
                   <span>عدد كتب الشكر والتقدير</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="penaltiesCount">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="penaltiesCount">
                   <span>العقوبات والإنذارات</span>
                 </label>
               </div>
             </div>
 
             <!-- المجموعة 3: التوزيع الإداري والتشغيلي والدوام -->
-            <div style="background: var(--md-sys-color-surface-variant); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <div style="font-weight: 800; font-size: 0.88rem; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+            <div class="custom-export-group-card">
+              <div class="custom-export-group-header">
                 <span>🏢</span> <span>التشكيل الإداري والمناوبات:</span>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem;">
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="sectionName" checked>
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="sectionName" checked>
                   <strong>الشعبة التابع لها</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="unitName" checked>
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="unitName" checked>
                   <span>الوحدة / المحطة الميدانية</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="workShift" checked>
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="workShift" checked>
                   <strong>نظام الدوام (صباحي/مناوب/حقلي)</strong>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="shiftName">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="shiftName">
                   <span>اسم النوبة (A, B, C, D)</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="fieldShiftDates">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="fieldShiftDates">
                   <span>تواريخ الصعود والنزول الحقلي</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="unifiedCardNumber">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="unifiedCardNumber">
                   <span>رقم البطاقة الموحدة / الهوية</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer;">
-                  <input type="checkbox" class="custom-exp-field" value="safetyPassportNumber">
+                <label class="custom-export-field-item">
+                  <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="safetyPassportNumber">
                   <span>رقم جواز السلامة HSE</span>
                 </label>
               </div>
@@ -6814,13 +6833,13 @@ class AppController {
           <!-- المجموعة 4: الحقول الإضافية والديناميكية الخاصة بالقسم -->
           ${dynamicFields.length > 0 ? `
             <div style="margin-top: 1rem; border-top: 1px dashed var(--md-sys-color-surface-variant); padding-top: 0.75rem;">
-              <div style="font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+              <div class="custom-export-group-header" style="border: none; margin-bottom: 0.45rem;">
                 <span>🧩</span> <span>حقول ومعلومات خاصة ومخصصة بالقسم (${dynamicFields.length} حقول):</span>
               </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; font-size: 0.82rem;">
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem;">
                 ${dynamicFields.map(df => `
-                  <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; background: var(--md-sys-color-surface-variant); padding: 0.3rem 0.65rem; border-radius: 6px;">
-                    <input type="checkbox" class="custom-exp-field" value="dyn_${df.key}">
+                  <label class="custom-export-dynamic-chip">
+                    <input type="checkbox" class="custom-exp-field custom-export-checkbox" value="dyn_${df.key}">
                     <span>${df.name}</span>
                   </label>
                 `).join('')}
@@ -6891,7 +6910,7 @@ class AppController {
         </div>
 
       </div>
-    `, { size: 'xl', maxWidth: '1080px' });
+    `, { size: 'xl', maxWidth: '1080px', glass: true });
   }
 
   executeCustomStaffExport(format) {
@@ -7159,6 +7178,162 @@ class AppController {
     }
     const badge = document.getElementById('customExportTargetCount');
     if (badge) badge.innerText = `${staff.length} منتسب مطابق`;
+  }
+
+  // --- Bulk Thanks & Seniority Modal (أداة توثيق وإضافة كتاب شكر وتقدير جماعي) ---
+  openBulkThanksModal() {
+    const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+    if (!actorUser) return;
+    const deptId = actorUser.departmentId || 'dept-south-prod';
+    const sections = (window.store && typeof window.store.getSections === 'function') ? window.store.getSections(deptId) : [];
+    const stations = (window.store && typeof window.store.getStations === 'function') ? window.store.getStations(deptId) : [];
+    const employees = (window.store && typeof window.store.getUnifiedEmployeeRoster === 'function') ? window.store.getUnifiedEmployeeRoster(actorUser) : [];
+    const totalCount = employees.length;
+
+    const content = `
+      <div style="direction: rtl; text-align: right;">
+        
+        <!-- Header Badge -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-surface-variant, rgba(255,255,255,0.1)); flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; font-weight: 800; color: var(--md-sys-color-primary, #0284c7); display: flex; align-items: center; gap: 0.4rem; font-size: 1.15rem;">
+              <span>🎖️</span> إضافة وتوثيق كتاب شكر وتقدير عام (جماعي)
+            </h4>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.78rem; color: var(--md-sys-color-outline, #94a3b8); font-weight: 600;">
+              توثيق الكتب الوزارية والرئاسية العامة ومنح القدم الوظيفي المعتمد لكافة المشمولين وتحديث حاسبة الترفيع دفعة واحدة.
+            </p>
+          </div>
+          <span class="badge badge-success" style="font-size: 0.78rem; padding: 0.35rem 0.8rem; font-weight: 800; border-radius: 999px;">
+            إجمالي الكادر المتاح: ${totalCount} منتسباً
+          </span>
+        </div>
+
+        <form id="bulkThanksForm" onsubmit="window.app.submitBulkThanks(event)">
+          
+          <!-- 1. الجهة المصدرة لكتاب الشكر -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">
+              🏛️ الجهة الرسمية المصدرة لكتاب الشكر:
+            </label>
+            <select id="bulkThanksIssuer" class="form-control" style="font-weight: 700; font-size: 0.85rem;" onchange="window.app.updateBulkThanksMonthsPreview()">
+              <option value="MINISTER">السيد وزير النفط / السيد المدير العام (+1 شهر قدم وظيفي)</option>
+              <option value="PM">دولة رئيس مجلس الوزراء (+6 أشهر قدم وظيفي)</option>
+              <option value="PRESIDENT">فخامة رئيس الجمهورية (+6 أشهر أو +12 شهراً قدم وظيفي)</option>
+            </select>
+          </div>
+
+          <!-- 2. رقم الكتاب وتاريخ الصدور -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">رقم الصادر للكتاب الرسمي:</label>
+              <input type="text" id="bulkThanksNumber" class="form-control" placeholder="مثال: ش/2026/892" required style="font-weight: 700; font-family: monospace;">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">تاريخ صدور الكتاب:</label>
+              <input type="date" id="bulkThanksDate" class="form-control" value="${new Date().toISOString().split('T')[0]}" required style="font-weight: 700; font-family: monospace;">
+            </div>
+          </div>
+
+          <!-- 3. موضوع الشكر والتثمين -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">موضوع / سبب منح الشكر والتقدير:</label>
+            <input type="text" id="bulkThanksSubject" class="form-control" value="تثميناً للجهود المتميزة في استقرار العمليات التشغيلية وتحقيق الأهداف الإنتاجية" required style="font-weight: 700;">
+          </div>
+
+          <!-- 4. نطاق التطبيق والشمول -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">🎯 نطاق الشمول (المستفيدون من كتاب الشكر):</label>
+            <select id="bulkThanksScope" class="form-control" style="font-weight: 700; font-size: 0.85rem;">
+              <option value="ALL">⭐ كافة منتسبي قسم الإنتاج الجنوبي (${totalCount} موظفاً - شامل الجميع)</option>
+              ${sections.map(s => `<option value="SECTION_${s.id}">شعبة: ${s.name}</option>`).join('')}
+              ${stations.map(st => `<option value="STATION_${st.id}">محطة: ${st.name}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Live Preview Impact Box -->
+          <div id="bulkThanksImpactBox" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(2, 132, 199, 0.08) 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; margin-bottom: 1.15rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.4rem;">
+                <span>⚡</span> <span>الأثر القانوني والوظيفي المباشر:</span>
+              </div>
+              <span id="bulkThanksMonthsBadge" class="badge badge-success" style="font-weight: 800; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 999px;">
+                +1 شهر قدم وظيفي لكل منتسب
+              </span>
+            </div>
+            <div style="font-size: 0.76rem; color: var(--md-sys-color-on-surface, currentColor); margin-top: 0.4rem; line-height: 1.45;">
+              ✓ سيتم إدراج الكتاب الرسمي في إضبارة وسجل كل موظف مشمول وتحديث عداد كُتب الشكر تلقائياً.<br>
+              ✓ سيتم تقليص موعد الترفيع القادم واحتساب الاستحقاق فوراً في الحاسبة الذكية.
+            </div>
+          </div>
+
+          <!-- Submit & Actions -->
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
+            <button type="submit" class="btn btn-primary" style="font-weight: 800; padding: 0.55rem 1.5rem; background: linear-gradient(135deg, #0b57d0 0%, #10b981 100%); border: none; box-shadow: 0 4px 14px rgba(11, 87, 208, 0.3); cursor: pointer;">
+              💾 اعتماد وإضافة كتاب الشكر لكافة المشمولين فوراً
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    this.showModal('توثيق كتاب شكر وتقدير جماعي', content, { size: 'lg' });
+  }
+
+  submitBulkThanks(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+    if (!actorUser) return;
+    const deptId = actorUser.departmentId || 'dept-south-prod';
+
+    const issuer = document.getElementById('bulkThanksIssuer') ? document.getElementById('bulkThanksIssuer').value : 'MINISTER';
+    const letterNumber = document.getElementById('bulkThanksNumber') ? document.getElementById('bulkThanksNumber').value : '';
+    const letterDate = document.getElementById('bulkThanksDate') ? document.getElementById('bulkThanksDate').value : '';
+    const subject = document.getElementById('bulkThanksSubject') ? document.getElementById('bulkThanksSubject').value : '';
+    const scope = document.getElementById('bulkThanksScope') ? document.getElementById('bulkThanksScope').value : 'ALL';
+
+    if (!letterNumber || !letterDate) {
+      if (typeof this.showToast === 'function') {
+        this.showToast('يرجى إدخال رقم وتاريخ الكتاب الرسمي.', 'warning');
+      } else if (typeof alert === 'function') {
+        alert('يرجى إدخال رقم وتاريخ الكتاب الرسمي.');
+      }
+      return;
+    }
+
+    if (window.store && typeof window.store.addBulkThanksLetter === 'function') {
+      const result = window.store.addBulkThanksLetter(deptId, {
+        issuer,
+        letterNumber,
+        letterDate,
+        subject
+      }, scope, actorUser);
+
+      if (typeof this.closeModal === 'function') this.closeModal();
+
+      if (typeof this.showToast === 'function') {
+        this.showToast(`🎖️ تم إضافة كتاب الشكر ومنح القدم لـ (${result.affectedCount}) منتسباً بنجاح!`, 'success');
+      } else if (typeof alert === 'function') {
+        alert(`🎖️ تم إضافة كتاب الشكر ومنح القدم لـ (${result.affectedCount}) منتسباً بنجاح!`);
+      }
+
+      if (typeof this.render === 'function') {
+        this.render();
+      }
+    }
+  }
+
+  updateBulkThanksMonthsPreview() {
+    const issuer = document.getElementById('bulkThanksIssuer') ? document.getElementById('bulkThanksIssuer').value : 'MINISTER';
+    const badge = document.getElementById('bulkThanksMonthsBadge');
+    if (!badge) return;
+    if (issuer === 'MINISTER') {
+      badge.textContent = '+1 شهر قدم وظيفي لكل منتسب';
+    } else if (issuer === 'PM') {
+      badge.textContent = '+6 أشهر قدم وظيفي لكل منتسب';
+    } else if (issuer === 'PRESIDENT') {
+      badge.textContent = '+6 أو +12 شهراً قدم وظيفي لكل منتسب';
+    }
   }
 
   // --- Dynamic Field Creator Modal ---
@@ -7753,24 +7928,43 @@ class AppController {
     }
   }
 
+  setDeptStaffPage(page) {
+    if (!this.deptStaffState) this.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
+    this.deptStaffState.page = Math.max(1, page);
+    this.render();
+  }
+
+  setDeptStaffPageSize(size) {
+    if (!this.deptStaffState) this.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
+    this.deptStaffState.pageSize = size;
+    this.deptStaffState.page = 1;
+    this.render();
+  }
+
   filterDeptStaff() {
-    const search = (document.getElementById('deptStaffSearchInput')?.value || '').toLowerCase().trim();
+    if (!this.deptStaffState) this.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
+    const searchInput = document.getElementById('deptStaffSearchInput');
+    const search = (searchInput?.value || '').trim();
     const sectionFilter = document.getElementById('deptStaffSectionFilter')?.value || 'ALL';
-    const shiftFilter = document.getElementById('deptStaffShiftFilter')?.value || 'ALL';
 
-    const rows = document.querySelectorAll('.dept-staff-row');
-    rows.forEach(row => {
-      const name = row.getAttribute('data-name') || '';
-      const empid = row.getAttribute('data-empid') || '';
-      const section = row.getAttribute('data-section') || '';
-      const shift = row.getAttribute('data-shift') || '';
+    const cursorStart = searchInput ? searchInput.selectionStart : null;
+    const isFocused = searchInput && (document.activeElement === searchInput);
 
-      const matchSearch = !search || name.includes(search) || empid.includes(search);
-      const matchSection = sectionFilter === 'ALL' || section === sectionFilter;
-      const matchShift = shiftFilter === 'ALL' || shift === shiftFilter;
+    this.deptStaffState.search = search;
+    this.deptStaffState.section = sectionFilter;
+    this.deptStaffState.page = 1;
 
-      row.style.display = (matchSearch && matchSection && matchShift) ? '' : 'none';
-    });
+    this.render();
+
+    if (isFocused) {
+      const newInput = document.getElementById('deptStaffSearchInput');
+      if (newInput) {
+        newInput.focus();
+        if (cursorStart !== null) {
+          try { newInput.setSelectionRange(cursorStart, cursorStart); } catch (e) {}
+        }
+      }
+    }
   }
 
   filterSectionStaffTable() {

@@ -10,10 +10,13 @@ global.localStorage = {
 };
 global.sessionStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 global.window = global;
+global.location = { hostname: 'localhost', href: 'http://localhost:3000' };
+global.window.location = global.location;
 global.document = {
   documentElement: { setAttribute: () => {}, getAttribute: () => 'light' },
   body: { classList: { toggle: () => {}, remove: () => {}, add: () => {} } },
   getElementById: () => ({ value: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} } }),
+  querySelector: () => null,
   querySelectorAll: () => [],
   addEventListener: () => {}
 };
@@ -37,7 +40,7 @@ for (const s of scripts) {
 
 console.log('✅ ALL SCRIPTS EVALUATED CLEANLY');
 
-window.auth.login('ahmed.mgr@southprod.iq', 'password123', 'EMP-2024-001');
+window.auth.login('ahmed.mgr@rumaila.iq', 'M1a2g3r4#2026', 'EMP-2024-001');
 const user = window.auth.getCurrentUser();
 console.log('Logged in as:', user.fullName, '| Role:', user.role);
 

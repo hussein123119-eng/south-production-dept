@@ -340,6 +340,44 @@ function renderDeptNotifsTab(notifs, actorUser, sections) {
 // ==========================================================================
 function renderDeptStaffTab(staff, actorUser, sections) {
   const safeSections = Array.isArray(sections) ? sections : [];
+  const secMap = {};
+  safeSections.forEach(s => { if (s && s.id) secMap[s.id] = s; });
+
+  if (typeof window !== 'undefined') {
+    if (!window.app) window.app = {};
+    if (!window.app.deptStaffState) {
+      window.app.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
+    }
+  }
+
+  const state = (typeof window !== 'undefined' && window.app && window.app.deptStaffState)
+    ? window.app.deptStaffState
+    : { page: 1, pageSize: 25, search: '', section: 'ALL' };
+
+  const q = (state.search || '').toLowerCase().trim();
+  const safeStaffList = Array.isArray(staff) ? staff : [];
+  const filtered = safeStaffList.filter(emp => {
+    if (state.section !== 'ALL') {
+      if (state.section === 'NONE' && emp.sectionId) return false;
+      if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
+    }
+    if (q) {
+      const name = (emp.fullName || emp.name || '').toLowerCase();
+      const empid = (emp.employeeId || '').toLowerCase();
+      const email = (emp.email || emp.userEmail || '').toLowerCase();
+      if (!name.includes(q) && !empid.includes(q) && !email.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const pageSizeNum = state.pageSize === 'ALL' ? (filtered.length || 1) : (parseInt(state.pageSize, 10) || 25);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSizeNum));
+  const currentPage = Math.min(Math.max(1, state.page || 1), totalPages);
+  state.page = currentPage;
+
+  const startIdx = (currentPage - 1) * pageSizeNum;
+  const endIdx = state.pageSize === 'ALL' ? filtered.length : Math.min(startIdx + pageSizeNum, filtered.length);
+  const pageItems = filtered.slice(startIdx, endIdx);
 
   return `
     <div class="card">
@@ -353,10 +391,10 @@ function renderDeptStaffTab(staff, actorUser, sections) {
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-          <input type="text" id="deptStaffSearchInput" class="form-control" style="width: 180px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" placeholder="🔍 بحث بالاسم أو الرقم..." oninput="window.app.filterDeptStaff()">
+          <input type="text" id="deptStaffSearchInput" class="form-control" style="width: 180px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" value="${state.search || ''}" placeholder="🔍 بحث بالاسم أو الرقم..." oninput="window.app.filterDeptStaff()">
           <select id="deptStaffSectionFilter" class="form-control" style="width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterDeptStaff()">
-            <option value="ALL">كافة الشعب</option>
-            ${safeSections.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+            <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة الشعب</option>
+            ${safeSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
           </select>
           
           <!-- Custom Data Export & Print Tool Button -->
@@ -385,16 +423,16 @@ function renderDeptStaffTab(staff, actorUser, sections) {
               <th style="text-align: center; min-width: 170px;">الإضبارة والبيانات</th>
             </tr>
           </thead>
-          <tbody>
-            ${staff.length === 0 ? `
+          <tbody id="deptStaffTableBody">
+            ${pageItems.length === 0 ? `
               <tr>
                 <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
                   <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">👥</div>
-                  <h4>لا يوجد مستخدمون مسجلون في كادر القسم حالياً</h4>
+                  <h4>لا توجد نتائج مطابقة لبحث كادر القسم</h4>
                 </td>
               </tr>
-            ` : staff.map(emp => {
-              const sec = safeSections.find(s => s.id === emp.sectionId);
+            ` : pageItems.map(emp => {
+              const sec = secMap[emp.sectionId];
               const roleInfo = (window.rbac && typeof window.rbac.getRoleInfo === 'function' && window.rbac.getRoleInfo(emp.role)) 
                 || { name: emp.role || 'منتسب', badgeClass: 'badge-secondary' };
 
@@ -455,6 +493,34 @@ function renderDeptStaffTab(staff, actorUser, sections) {
             }).join('')}
           </tbody>
         </table>
+      </div>
+
+      <!-- Department Staff Pagination Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--md-sys-color-surface-variant);">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--md-sys-color-outline);">
+          <span class="badge badge-info" style="font-size: 0.76rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 999px;">
+            ⚡ عرض ${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx} من أصل ${filtered.length} موظف
+          </span>
+          <span style="font-size: 0.78rem;">(إجمالي كادر القسم: ${safeStaffList.length})</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <label style="font-size: 0.8rem; margin: 0; color: var(--md-sys-color-outline);">عرض بالصفحة:</label>
+          <select class="form-control" style="width: 85px; font-size: 0.8rem; padding: 0.2rem 0.5rem;" onchange="window.app.setDeptStaffPageSize(this.value)">
+            <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
+            <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
+            <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
+            <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>الكل</option>
+          </select>
+
+          <div style="display: flex; gap: 0.25rem; align-items: center;">
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setDeptStaffPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">«</button>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setDeptStaffPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">‹</button>
+            <span style="font-size: 0.82rem; font-weight: 700; padding: 0 0.4rem; color: var(--md-sys-color-primary);">${currentPage} / ${totalPages}</span>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setDeptStaffPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">›</button>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setDeptStaffPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">»</button>
+          </div>
+        </div>
       </div>
     </div>
   `;

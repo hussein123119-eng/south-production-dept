@@ -10,10 +10,13 @@ global.localStorage = {
 };
 global.sessionStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 global.window = global;
+global.location = { hostname: 'localhost', href: 'http://localhost:3000' };
+global.window.location = global.location;
 global.document = {
   documentElement: { setAttribute: () => {}, getAttribute: () => 'light' },
   body: { classList: { toggle: () => {}, remove: () => {}, add: () => {} } },
   getElementById: () => ({ value: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} } }),
+  querySelector: () => null,
   querySelectorAll: () => [],
   addEventListener: () => {}
 };
@@ -40,7 +43,7 @@ console.log('🧪 RUNNING RIGOROUS STEP-BY-STEP VERIFICATION SUITE');
 console.log('====================================================');
 
 // 1. Login as DEPT_MANAGER
-window.auth.login('ahmed.mgr@southprod.iq', 'password123', 'EMP-2024-001');
+window.auth.login('ahmed.mgr@rumaila.iq', 'M1a2g3r4#2026', 'EMP-2024-001');
 const mgr = window.auth.getCurrentUser();
 console.log('1. Logged in as:', mgr.fullName, `(${mgr.role})`);
 
@@ -110,13 +113,13 @@ console.log('   ✓ Vehicle confirmed in HTML');
 // 8. Test Role Scope Permissions
 console.log('8. Testing Scope & Permissions across Roles...');
 const testRoles = [
-  { email: 'sec1@southprod.iq', id: 'EMP-2024-002', role: 'SECTION_MANAGER' },
-  { email: 'tech.unit@southprod.iq', id: 'EMP-2024-004', role: 'UNIT_MANAGER' },
-  { email: 'emp1@southprod.iq', id: 'EMP-2024-005', role: 'EMPLOYEE' }
+  { email: 'sec1@rumaila.iq', pwd: 'Sec1#Pass2026', id: 'EMP-2024-002', role: 'SECTION_MANAGER' },
+  { email: 'mohanad.tech@rumaila.iq', pwd: 'Unit1#Pass2026', id: 'EMP-2024-005', role: 'UNIT_MANAGER' },
+  { email: 'ammar.emp@rumaila.iq', pwd: 'Emp1#Pass2026', id: 'EMP-2024-004', role: 'EMPLOYEE' }
 ];
 
 testRoles.forEach(r => {
-  window.auth.login(r.email, 'password123', r.id);
+  window.auth.login(r.email, r.pwd, r.id);
   const u = window.auth.getCurrentUser();
   window.app.navigate('dept_management');
   tabs.forEach(t => {

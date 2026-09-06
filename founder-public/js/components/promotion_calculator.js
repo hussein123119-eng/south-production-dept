@@ -11,35 +11,47 @@ if (typeof window !== 'undefined') {
 function renderPromotionCalculatorView() {
   const user = (window.auth && typeof window.auth.getCurrentUser === 'function') ? window.auth.getCurrentUser() : {};
   const activeTab = window.app.activePromotionTab || 'calculator';
-  const employees = (window.store && typeof window.store.getEmployees === 'function') ? window.store.getEmployees() : [];
+  const actorUser = user || { role: 'SUPER_ADMIN', departmentId: 'dept-south-prod' };
+  const employees = (window.store && typeof window.store.getUnifiedEmployeeRoster === 'function') 
+    ? window.store.getUnifiedEmployeeRoster(actorUser) 
+    : ((window.store && typeof window.store.getEmployees === 'function') ? window.store.getEmployees() : []);
 
-  // Initialize or maintain calculation state
+  // Initialize or maintain calculation state with Dual-Mode support
   if (!window.promotionCalcState) {
+    const defaultEmp = (employees && employees.length > 0) ? employees[0] : null;
     window.promotionCalcState = {
-      employeeId: (user && user.id) ? user.id : '',
-      employeeName: (user && user.name) ? user.name : 'مهندس إنتاج (نموذج افتراضي)',
-      grade: (user && user.jobGrade) ? user.jobGrade : '4',
-      stage: (user && user.jobStage) ? user.jobStage : 1,
-      degree: (user && (user.degree || user.qualification)) ? (user.degree || user.qualification) : 'بكالوريوس',
-      lastPromo: (user && user.lastPromotionDate) ? user.lastPromotionDate : '2022-01-01',
-      thanksConfig: (user && user.thanksConfig) ? user.thanksConfig : {
-        minister: (user && user.thanksLettersCount) || 2,
+      calcMode: 'auto', // 'auto' (الوضع التلقائي من السجلات) | 'manual' (الوضع اليدوي / المحاكاة)
+      employeeId: defaultEmp ? (defaultEmp.employeeId || defaultEmp.id) : ((user && user.id) ? user.id : ''),
+      employeeName: defaultEmp ? (defaultEmp.name || defaultEmp.fullName) : ((user && user.name) ? user.name : 'فني تشغيلي (نموذج افتراضي)'),
+      jobTitle: defaultEmp ? (defaultEmp.jobTitle || 'فني') : ((user && user.jobTitle) ? user.jobTitle : 'فني'),
+      trackKey: 'technical',
+      grade: defaultEmp ? (defaultEmp.jobGrade || '8') : ((user && user.jobGrade) ? user.jobGrade : '8'),
+      stage: defaultEmp ? (parseInt(defaultEmp.jobStage, 10) || 1) : ((user && user.jobStage) ? user.jobStage : 1),
+      degree: defaultEmp ? (defaultEmp.qualification || defaultEmp.degree || 'دبلوم') : ((user && (user.degree || user.qualification)) ? (user.degree || user.qualification) : 'دبلوم'),
+      lastPromo: defaultEmp ? (defaultEmp.lastPromotionDate || defaultEmp.hireDate || '2023-01-01') : ((user && user.lastPromotionDate) ? user.lastPromotionDate : '2023-01-01'),
+      section: defaultEmp ? (defaultEmp.section || defaultEmp.station || '') : '',
+      thanksConfig: defaultEmp ? (defaultEmp.thanksConfig || { minister: defaultEmp.thanksLettersCount || 1, primeMinister: 0, president: 0 }) : ((user && user.thanksConfig) ? user.thanksConfig : {
+        minister: (user && user.thanksLettersCount) || 1,
         primeMinister: 0,
         president: 0
-      }
+      })
     };
   }
 
   const calcState = window.promotionCalcState;
-  const userGrade = calcState.grade || '4';
+  if (!calcState.calcMode) calcState.calcMode = 'auto';
+  const userGrade = calcState.grade || '8';
   const userStage = calcState.stage || 1;
-  const userDegree = calcState.degree || 'بكالوريوس';
-  const userLastPromo = calcState.lastPromo || '2022-01-01';
-  const thanksConfig = calcState.thanksConfig || { minister: 2, primeMinister: 0, president: 0 };
+  const userDegree = calcState.degree || 'دبلوم';
+  const userJobTitle = calcState.jobTitle || 'فني';
+  const userTrackKey = calcState.trackKey || 'technical';
+  const userLastPromo = calcState.lastPromo || '2023-01-01';
+  const thanksConfig = calcState.thanksConfig || { minister: 1, primeMinister: 0, president: 0 };
 
-  const result = window.store.calculateCareerPromotion(userGrade, userStage, userLastPromo, thanksConfig, userDegree);
+  const result = window.store.calculateCareerPromotion(userGrade, userStage, userLastPromo, thanksConfig, userDegree, userJobTitle, userTrackKey);
   const salaryScale = window.store.getBocSalaryScale();
   const promotionCourses = window.store.getBocPromotionCourses();
+  const careerTracks = window.store.getCareerTracks();
 
   return `
     <div style="width: 100%; margin-bottom: 1.5rem;">
@@ -51,10 +63,15 @@ function renderPromotionCalculatorView() {
             🧮 حاسبة استحقاق الترفيع والعلاوة وتغيير العنوان الوظيفي
           </h2>
           <p style="color: var(--md-sys-color-outline); margin: 0; font-size: 0.86rem; font-weight: 600;">
-            شركة نفط البصرة - الهيأة الإدارية - قسم إدارة الموارد البشرية | استناداً لقانون الرواتب رقم 22 لسنة 2008 وضوابط القدم الوظيفي المعتمدة.
+            شركة نفط البصرة - الهيأة الإدارية - قسم إدارة الموارد البشرية | استناداً لقانون الرواتب رقم 22 لسنة 2008 ومسارات التوصيف الوظيفي المعتمدة.
           </p>
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          ${(user && window.rbac && window.rbac.hasPermission(user, 'CAREER_EDIT_INFO')) || (user && ['DEPT_MANAGER', 'SUPER_ADMIN'].includes(user.role)) ? `
+            <button class="btn btn-glass-amber" onclick="window.app.openBulkThanksModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; font-weight: 800; border-radius: 999px;">
+              <span>🎖️ إضافة كتاب شكر للجميع</span>
+            </button>
+          ` : ''}
           <span class="badge badge-primary" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; font-weight: 800; border-radius: 999px; box-shadow: 0 2px 8px rgba(11, 87, 208, 0.2);">
             قانون الرواتب رقم 22 لسنة 2008
           </span>
@@ -104,12 +121,12 @@ function renderPromotionCalculatorView() {
             <line x1="16" y1="17" x2="8" y2="17"></line>
             <polyline points="10 9 9 9 8 9"></polyline>
           </svg>
-          <span>الضوابط والتعليمات القانونية</span>
+          <span>الضوابط ودليل الموظفين</span>
         </button>
       </div>
 
       <!-- Active Tab Content -->
-      ${activeTab === 'calculator' ? renderSmartCalculatorTab(result, userGrade, userStage, userDegree, userLastPromo, thanksConfig, calcState, employees) : ''}
+      ${activeTab === 'calculator' ? renderSmartCalculatorTab(result, userGrade, userStage, userDegree, userLastPromo, thanksConfig, calcState, employees, careerTracks) : ''}
       ${activeTab === 'salary_scale' ? renderSalaryScaleTab(salaryScale, result) : ''}
       ${activeTab === 'courses_matrix' ? renderCoursesMatrixTab(promotionCourses) : ''}
       ${activeTab === 'regulations' ? renderRegulationsTab() : ''}
@@ -130,9 +147,11 @@ if (typeof window !== 'undefined') {
 }
 
 // ==========================================================================
-// 1. تبويب الحاسبة الذكية والاستحقاق (Compact Vibrant Masterpiece)
+// 1. تبويب الحاسبة الذكية والاستحقاق (Dual Mode: Automatic & Manual Simulation)
 // ==========================================================================
-function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, userLastPromo, thanksConfig, calcState, employees) {
+function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, userLastPromo, thanksConfig, calcState, employees, careerTracks) {
+  const user = (window.auth && typeof window.auth.getCurrentUser === 'function') ? (window.auth.getCurrentUser() || {}) : {};
+  const isAutoMode = (calcState && calcState.calcMode === 'auto');
   const td = result.thanksDetails || {
     ministerCount: 0,
     ministerSeniorityMonths: 0,
@@ -148,14 +167,49 @@ function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, user
   return `
     <div style="display: flex; flex-direction: column; gap: 1rem;">
       
-      <!-- بلورات تاريخ الاستحقاق الثلاثية المضيئة -->
-      <div style="display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 0.85rem; align-items: stretch;">
+      <!-- المفتاح التبادلي الفاخر بين الوضع التلقائي والوضع اليدوي (Segmented Dual-Mode Switcher) -->
+      <div class="promo-mode-switcher-wrap">
+        <div class="promo-mode-switcher">
+          <button type="button" class="promo-mode-btn ${isAutoMode ? 'active-auto' : ''}" onclick="window.setPromotionCalcMode('auto')">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>الوضع التلقائي</span>
+          </button>
+          <button type="button" class="promo-mode-btn ${!isAutoMode ? 'active-manual' : ''}" onclick="window.setPromotionCalcMode('manual')">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>الوضع اليدوي</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- بلورات الاستحقاق الرباعية المضيئة الحديثة (Jewel Frosted Glass) -->
+      <div class="promo-crystal-grid">
         
-        <!-- البلورة 1: تاريخ الاستحقاق القادم -->
-        <div class="promo-crystal-card promo-crystal-due">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+        <!-- البلورة 1: العنوان الوظيفي القادم المستحق -->
+        <div class="promo-crystal-card promo-crystal-career">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
             <span class="promo-card-title">
-              🎯 تاريخ الاستحقاق القانوني القادم:
+              🎯 العنوان المستحق القادم:
+            </span>
+          </div>
+          <div class="promo-card-value promo-career-title">
+            ${result.nextJobTitle || 'مدير فني أقدم'}
+          </div>
+          <div class="promo-card-detail">
+            <span>الحالي: <strong>${result.currentJobTitle || 'فني'}</strong></span>
+            <span class="promo-next-grade-tag">${result.nextGradeName || ''}</span>
+          </div>
+        </div>
+
+        <!-- البلورة 2: تاريخ الاستحقاق القادم -->
+        <div class="promo-crystal-card promo-crystal-due">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span class="promo-card-title">
+              📅 تاريخ الاستحقاق القانوني:
             </span>
             <span class="mini-pulse-dot" style="background-color: ${result.isDue ? '#10b981' : '#00dfd8'};"></span>
           </div>
@@ -163,19 +217,21 @@ function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, user
             ${result.dueDate}
           </div>
           <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-            <span class="badge ${result.isDue ? 'badge-success' : 'badge-warning'}" style="font-size: 0.74rem; padding: 0.2rem 0.65rem; font-weight: 800; border-radius: 999px;">
+            <span class="badge ${result.isDue ? 'badge-success' : 'badge-warning'} promo-status-badge">
               ${result.status}
             </span>
           </div>
         </div>
 
-        <!-- البلورة 2: المدة الأصغرية القانونية -->
+        <!-- البلورة 3: المدة الأصغرية القانونية -->
         <div class="promo-crystal-card promo-crystal-duration">
-          <div class="promo-card-title">
-            ⏱️ المدة الأصغرية المطلوبة:
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span class="promo-card-title">
+              ⏱️ المدة الأصغرية المطلوبة:
+            </span>
           </div>
           <div class="promo-card-value">
-            ${result.requiredYears} سنوات <span class="promo-card-sub">(${result.totalMonthsRequired} شهراً)</span>
+            ${result.requiredYears} ${result.requiredYears === 1 ? 'سنة واحدة' : 'سنوات'} <span class="promo-card-sub">(${result.totalMonthsRequired} شهراً)</span>
           </div>
           <div class="promo-card-detail">
             <span>📅 المباشرة:</span>
@@ -183,13 +239,13 @@ function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, user
           </div>
         </div>
 
-        <!-- البلورة 3: إجمالي القدم المكتسب -->
+        <!-- البلورة 4: إجمالي القدم المكتسب -->
         <div class="promo-crystal-card promo-crystal-seniority">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
             <span class="promo-card-title">
               🎖️ إجمالي القدم المكتسب:
             </span>
-            <span class="badge badge-success" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800; border-radius: 999px;">
+            <span class="badge badge-seniority-sub">
               مخصومة
             </span>
           </div>
@@ -203,189 +259,502 @@ function renderSmartCalculatorTab(result, userGrade, userStage, userDegree, user
 
       </div>
 
-      ${result.exceptionNote ? `
-        <div style="padding: 0.55rem 0.95rem; background: rgba(245, 158, 11, 0.12); border-right: 3.5px solid #d97706; border-radius: 10px; font-size: 0.78rem; color: var(--md-sys-color-on-surface); line-height: 1.4; font-weight: 600;">
-          💡 <strong>تنبيه الاستحقاق القانوني الخاص:</strong> ${result.exceptionNote}
-        </div>
-      ` : ''}
-
-      <!-- قسم معطيات الموظف وكتب الشكر المدمج التفاعلي -->
-      <div class="card" style="box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.9); border-radius: 16px; border: 1px solid rgba(11, 87, 208, 0.14); background: var(--md-sys-color-surface); padding: 1.15rem; margin-bottom: 0;">
+      <!-- النصف السفلي التفاعلي حسب الوضع المختار (تلقائي أو يدوي) -->
+      ${isAutoMode ? `
+        <!-- ======================= الوضع التلقائي (AUTOMATIC ROSTER MODE) ======================= -->
         
-        
-        <!-- Presets Bar & Employee Roster Selection -->
-        <div style="margin-bottom: 1rem; padding: 0.85rem; background: var(--md-sys-color-background); border: 1.5px solid rgba(13, 110, 253, 0.2); border-radius: 12px;">
-          
-          <!-- Presets -->
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.65rem;">
-            <div style="font-size: 0.8rem; font-weight: 800; color: var(--md-sys-color-primary);">
-              ⚡ نماذج وظيفية سريعة للاختبار:
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-              <button type="button" onclick="window.applyPromotionCalcPreset('senior_engineer')" class="btn btn-sm" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; background: rgba(13, 110, 253, 0.08); color: #0d6efd; border: 1px solid rgba(13, 110, 253, 0.25); border-radius: 6px; font-weight: 700;">
-                ⚙️ مهندس أقدم (د 4)
-              </button>
-              <button type="button" onclick="window.applyPromotionCalcPreset('chief_technician')" class="btn btn-sm" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; background: rgba(25, 135, 84, 0.08); color: #198754; border: 1px solid rgba(25, 135, 84, 0.25); border-radius: 6px; font-weight: 700;">
-                🔧 رئيس فنيين (د 5)
-              </button>
-              <button type="button" onclick="window.applyPromotionCalcPreset('ready_for_promo')" class="btn btn-sm" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; font-weight: 800;">
-                🎖️ مستحق ترفيع فوري
-              </button>
-              <button type="button" onclick="window.applyPromotionCalcPreset('annual_increment')" class="btn btn-sm" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.25); border-radius: 6px; font-weight: 700;">
-                ⏳ علاوة سنوية
-              </button>
-            </div>
-          </div>
+        ${(() => {
+          const curUser = (user && typeof user === 'object') ? user : {};
+          const curRole = curUser.role || '';
+          const canBrowseAll = (window.rbac && typeof window.rbac.hasPermission === 'function' && window.rbac.hasPermission(curUser, 'CAREER_EDIT_INFO')) 
+            || ['SUPER_ADMIN', 'DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER', 'ADMIN_MANAGER'].includes(curRole);
+          const canBrowseSection = !canBrowseAll && ['SECTION_MANAGER', 'DEPUTY_SECTION_MANAGER', 'UNIT_MANAGER', 'STATION_MANAGER', 'DEPUTY_STATION_MANAGER', 'STATION_SUPERVISOR'].includes(curRole);
+          const isRegularEmployee = !canBrowseAll && !canBrowseSection;
 
-          <!-- Employee Roster Dropdown -->
-          ${employees && employees.length > 0 ? `
-          <div style="border-top: 1px solid var(--md-sys-color-surface-variant); padding-top: 0.65rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.35rem;">
-              <label style="font-weight: 800; font-size: 0.8rem; color: #0d6efd; margin: 0; display: flex; align-items: center; gap: 0.35rem;">
-                <span>👥</span> استيراد تلقائي من سجل منتسبي القسم:
-              </label>
-              <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); font-weight: 600;">
-                الموظف النشط: <strong>${calcState && calcState.employeeName ? calcState.employeeName : 'تعديل يدوي'}</strong>
-              </span>
-            </div>
-            <select class="form-control" onchange="window.loadEmployeeToPromotionCalc(this.value)" style="width: 100%; font-size: 0.85rem; padding: 0.45rem 0.75rem; border-radius: 8px; border: 1.5px solid #0d6efd; background: var(--md-sys-color-surface); font-weight: 700; color: var(--md-sys-color-on-surface);">
-              <option value="">-- اختر موظفاً من كادر القسم (لتعبئة الدرجة والمرحلة والمؤهل وتاريخ الترفيع تلقائياً) --</option>
-              ${employees.map(e => `<option value="${e.id}" ${calcState && String(calcState.employeeId) === String(e.id) ? 'selected' : ''}>${e.name || 'بدون اسم'} - ${e.jobTitle || 'موظف'} (${e.section || 'القسم'})</option>`).join('')}
-            </select>
-          </div>
-          ` : ''}
+          let allowedEmployees = employees || [];
+          if (isRegularEmployee) {
+            if (curUser && (curUser.id || curUser.employeeId)) {
+              const found = employees.find(e => 
+                (curUser.employeeId && String(e.employeeId) === String(curUser.employeeId)) ||
+                (curUser.id && (String(e.id) === String(curUser.id) || String(e.userId) === String(curUser.id)))
+              );
+              allowedEmployees = found ? [found] : (employees.length > 0 ? employees.slice(0, 1) : []);
+            } else {
+              allowedEmployees = (employees && employees.length > 0) ? employees.slice(0, 1) : [];
+            }
+          } else if (canBrowseSection && curUser) {
+            const secFiltered = employees.filter(e => {
+              const matchesSec = curUser.section && (e.section === curUser.section);
+              const matchesSta = (curUser.station || curUser.stationId) && (e.station === curUser.station || e.stationId === curUser.stationId || e.station === curUser.stationId);
+              const isSelf = (curUser.employeeId && String(e.employeeId) === String(curUser.employeeId)) || (curUser.id && String(e.id) === String(curUser.id));
+              return matchesSec || matchesSta || isSelf;
+            });
+            allowedEmployees = secFiltered.length > 0 ? secFiltered : employees;
+          }
 
-        </div>
-
-        <form onsubmit="window.app.handleCalculatePromotion(event)">
-          
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 1rem; align-items: start; margin-bottom: 0.85rem;">
-            
-            <!-- معطيات الدرجة والمرحلة والمؤهل والتاريخ -->
-            <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
-              <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.65rem; color: var(--md-sys-color-primary); font-weight: 800; font-size: 0.82rem;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>معطيات الدرجة والمؤهل والمباشرة:</span>
-              </div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem;">
-                <!-- الدرجة -->
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">الدرجة الوظيفية:</label>
-                  <select id="calcGrade" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
-                    <option value="SPECIAL" ${['SPECIAL', 'خاصة', 'الخاصة'].includes(userGrade) ? 'selected' : ''}>الدرجة الخاصة</option>
-                    <option value="1" ${['1', 'الأولى', 'الاولى'].includes(userGrade) ? 'selected' : ''}>الدرجة الأولى (سقف الترفيع)</option>
-                    <option value="2" ${['2', 'الثانية'].includes(userGrade) ? 'selected' : ''}>الدرجة الثانية (5 س)</option>
-                    <option value="3" ${['3', 'الثالثة'].includes(userGrade) ? 'selected' : ''}>الدرجة الثالثة (5 س)</option>
-                    <option value="4" ${['4', 'الرابعة'].includes(userGrade) ? 'selected' : ''}>الدرجة الرابعة (5 س)</option>
-                    <option value="5" ${['5', 'الخامسة'].includes(userGrade) ? 'selected' : ''}>الدرجة الخامسة (5 س)</option>
-                    <option value="6" ${['6', 'السادسة'].includes(userGrade) ? 'selected' : ''}>الدرجة السادسة (4 س)</option>
-                    <option value="7" ${['7', 'السابعة'].includes(userGrade) ? 'selected' : ''}>الدرجة السابعة (4 س)</option>
-                    <option value="8" ${['8', 'الثامنة'].includes(userGrade) ? 'selected' : ''}>الدرجة الثامنة (4 س)</option>
-                    <option value="9" ${['9', 'التاسعة'].includes(userGrade) ? 'selected' : ''}>الدرجة التاسعة (4 س)</option>
-                    <option value="10" ${['10', 'العاشرة'].includes(userGrade) ? 'selected' : ''}>الدرجة العاشرة (4 س)</option>
-                  </select>
+          if (isRegularEmployee) {
+            return `
+              <!-- بنر الخصوصية والأمان للموظف الفردي -->
+              <div class="promo-privacy-banner">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <span style="font-size: 1.35rem;">🔒</span>
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0284c7;">إضبارتك وسجلك الوظيفي الشخصي المعتمد | شركة نفط البصرة</strong>
+                    <p style="margin: 0; font-size: 0.76rem; color: var(--md-sys-color-outline);">
+                      يتم جلب بيانات درجتك وعنوانك واستحقاقك القانوني مباشرة من ملفك الوظيفي الموثق مع ضمان سرية وخصوصية البيانات.
+                    </p>
+                  </div>
                 </div>
-
-                <!-- المرحلة -->
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">المرحلة الحالية:</label>
-                  <select id="calcStage" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
-                    ${Array.from({ length: 11 }, (_, i) => i + 1).map(s => `
-                      <option value="${s}" ${parseInt(userStage, 10) === s ? 'selected' : ''}>المرحلة ${s}</option>
-                    `).join('')}
-                  </select>
-                </div>
-              </div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
-                <!-- التحصيل الدراسي -->
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">التحصيل الدراسي:</label>
-                  <select id="calcDegree" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
-                    <option value="دكتوراه" ${userDegree === 'دكتوراه' ? 'selected' : ''}>دكتوراه</option>
-                    <option value="ماجستير" ${userDegree === 'ماجستير' ? 'selected' : ''}>ماجستير</option>
-                    <option value="دبلوم عالي" ${userDegree === 'دبلوم عالي' ? 'selected' : ''}>دبلوم عالي</option>
-                    <option value="بكالوريوس" ${['بكالوريوس', 'بكلوريوس'].includes(userDegree) ? 'selected' : ''}>بكالوريوس</option>
-                    <option value="دبلوم" ${userDegree === 'دبلوم' ? 'selected' : ''}>دبلوم فني / معهد</option>
-                    <option value="اعدادية" ${['اعدادية', 'إعدادية'].includes(userDegree) ? 'selected' : ''}>إعدادية</option>
-                    <option value="متوسطة" ${userDegree === 'متوسطة' ? 'selected' : ''}>متوسطة</option>
-                    <option value="ابتدائية" ${userDegree === 'ابتدائية' ? 'selected' : ''}>ابتدائية</option>
-                  </select>
-                </div>
-
-                <!-- تاريخ آخر ترفيع -->
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">تاريخ آخر ترفيع / مباشرة:</label>
-                  <input type="date" id="calcLastDate" class="form-control" style="font-weight: 800; font-size: 0.78rem; border-radius: 7px; font-family: monospace; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.45rem;" value="${userLastPromo}" onchange="window.app.handleCalculatePromotion(event)">
-                </div>
-              </div>
-            </div>
-
-            <!-- كتب الشكر والتقدير المعتمدة -->
-            <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--md-sys-color-primary); font-weight: 800; font-size: 0.82rem;">
-                  <span class="nav-icon-box icon-amber" style="width: 18px; height: 18px; min-width: 18px; border-radius: 5px;">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="8" r="7"></circle>
-                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                    </svg>
-                  </span>
-                  <span>كتب الشكر والتقدير والقدم:</span>
-                </div>
-                <span class="badge badge-success" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800; border-radius: 999px;">
-                  ${td.totalSeniorityMonths} شهر قدم
+                <span class="badge badge-primary" style="font-size: 0.74rem; padding: 0.25rem 0.65rem; border-radius: 999px;">
+                  ✓ حساب شخصي مؤمن
                 </span>
               </div>
+            `;
+          }
 
-              <!-- 1. كتب الوزير / المدير العام -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(2, 132, 199, 0.18);">
-                <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">🏛️ الوزير / المدير العام:</span>
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span class="badge badge-success" style="font-size: 0.62rem; padding: 0.08rem 0.35rem; font-weight: 800; border-radius: 999px;">+1 ش (سقف 3)</span>
-                  <input type="number" id="calcThanksMinister" class="form-control" style="width: 50px; height: 26px; font-weight: 900; font-family: monospace; text-align: center; border-radius: 5px; padding: 0; font-size: 0.78rem;" value="${thanksConfig.minister || 0}" min="0" oninput="window.app.handleCalculatePromotion(event)">
+          const searchState = window.promotionCalcSearchState || { searchQuery: '', selectedSection: 'ALL' };
+          const searchQuery = (searchState.searchQuery || '').trim();
+          const selectedSection = searchState.selectedSection || 'ALL';
+          const isActivelyFiltering = !!searchQuery || selectedSection !== 'ALL';
+          const uniqueSections = Array.from(new Set(allowedEmployees.map(e => e.section || e.station).filter(Boolean))).sort();
+
+          const filteredEmployees = isActivelyFiltering ? allowedEmployees.filter(e => {
+            if (selectedSection !== 'ALL') {
+              const eSec = e.section || e.station || '';
+              if (eSec !== selectedSection) return false;
+            }
+            if (searchQuery) {
+              const q = searchQuery.toLowerCase();
+              const nameStr = (e.name || e.fullName || '').toLowerCase();
+              const idStr = String(e.employeeId || e.id || '').toLowerCase();
+              const titleStr = (e.jobTitle || '').toLowerCase();
+              const secStr = (e.section || e.station || '').toLowerCase();
+              return nameStr.includes(q) || idStr.includes(q) || titleStr.includes(q) || secStr.includes(q);
+            }
+            return true;
+          }) : [];
+
+          // Currently active / loaded employee object
+          const currentEmp = allowedEmployees.find(e => String(e.employeeId || e.id) === String(calcState.employeeId)) 
+            || allowedEmployees.find(e => (e.name || e.fullName) === calcState.employeeName)
+            || allowedEmployees[0];
+          const currentEmpId = currentEmp ? (currentEmp.employeeId || currentEmp.id) : (calcState.employeeId || '');
+          const currentEmpName = currentEmp ? (currentEmp.name || currentEmp.fullName) : (calcState.employeeName || 'المستخدم الحالي');
+          const currentEmpTitle = currentEmp ? (currentEmp.jobTitle || 'موظف') : (calcState.jobTitle || 'موظف');
+          const currentEmpSec = currentEmp ? (currentEmp.section || currentEmp.station || 'إدارة القسم') : (calcState.section || 'إدارة القسم');
+
+          return `
+            <!-- بطاقة البحث والفلترة الذكية واختيار الموظف للإدارة والمسؤولين -->
+            ${allowedEmployees && allowedEmployees.length > 0 ? `
+            <div class="card promo-search-filter-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                <label style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-primary); margin: 0; display: flex; align-items: center; gap: 0.45rem;">
+                  <span>👥</span>
+                  <span>${canBrowseAll ? 'البحث في سجلات الموظفين:' : `سجلات منتسبي ${curUser.section || curUser.station || 'الشعبة / المحطة'}:`}</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                  ${isActivelyFiltering ? `
+                    <span class="badge ${filteredEmployees.length > 0 ? 'badge-info' : 'badge-warning'}" id="promoMatchCountBadge" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; font-weight: 800; border-radius: 999px;">
+                      ⚡ النتائج المطابقة: ${filteredEmployees.length}
+                    </span>
+                  ` : `
+                    <span class="badge badge-info" id="promoMatchCountBadge" style="font-size: 0.74rem; padding: 0.2rem 0.6rem; font-weight: 800; border-radius: 999px;">
+                      ⚡ الوضع التلقائي للمستخدم
+                    </span>
+                  `}
+                  ${canBrowseSection ? `
+                    <span class="badge badge-success" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; font-weight: 800; border-radius: 999px;">
+                      🔒 نطاق الشعبة
+                    </span>
+                  ` : ''}
                 </div>
               </div>
 
-              <!-- 2. كتب رئيس مجلس الوزراء -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(16, 185, 129, 0.18);">
-                <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">🎖️ رئيس مجلس الوزراء:</span>
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span class="badge badge-success" style="font-size: 0.62rem; padding: 0.08rem 0.35rem; font-weight: 800; border-radius: 999px;">+6 ش (سقف 2)</span>
-                  <input type="number" id="calcThanksPM" class="form-control" style="width: 50px; height: 26px; font-weight: 900; font-family: monospace; text-align: center; border-radius: 5px; padding: 0; font-size: 0.78rem;" value="${thanksConfig.primeMinister || 0}" min="0" oninput="window.app.handleCalculatePromotion(event)">
+              <!-- Search Controls Grid -->
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.65rem; margin-bottom: 0.65rem; align-items: center;">
+                
+                <!-- Live Search Input with Clear Button -->
+                <div style="position: relative; width: 100%;">
+                  <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--md-sys-color-outline); display: flex; align-items: center;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </div>
+                  <input type="text" 
+                         id="promoEmployeeSearchInput" 
+                         class="form-control" 
+                         style="padding-right: 32px; padding-left: 30px; font-size: 0.82rem; height: 36px; border-radius: 8px; border: 1.5px solid rgba(11, 87, 208, 0.25); font-weight: 700; background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface);" 
+                         placeholder="🔍 بحث فوري بالاسم أو الرقم الوظيفي..." 
+                         value="${searchQuery}" 
+                         oninput="window.handlePromotionEmployeeSearch(this.value)">
+                  ${searchQuery ? `
+                    <button type="button" 
+                            onclick="window.clearPromotionEmployeeSearch()" 
+                            style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--md-sys-color-outline); font-size: 0.85rem; padding: 2px 5px; font-weight: 900;" 
+                            title="مسح البحث">✕</button>
+                  ` : ''}
                 </div>
+
+                <!-- Quick Section / Station Filter Dropdown -->
+                <div>
+                  <select class="form-control" 
+                          id="promoSectionFilterSelect"
+                          style="width: 100%; font-size: 0.82rem; height: 36px; border-radius: 8px; border: 1.5px solid rgba(11, 87, 208, 0.25); font-weight: 700; background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface);" 
+                          onchange="window.handlePromotionSectionFilter(this.value)">
+                    <option value="ALL" ${selectedSection === 'ALL' ? 'selected' : ''}>🏢 كافة الشُعب والمحطات</option>
+                    ${uniqueSections.map(sec => `<option value="${sec}" ${selectedSection === sec ? 'selected' : ''}>📍 ${sec}</option>`).join('')}
+                  </select>
+                </div>
+
               </div>
 
-              <!-- 3. كتب رئيس الجمهورية -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(168, 85, 247, 0.18);">
-                <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">👑 رئيس الجمهورية:</span>
-                <select id="calcThanksPres" class="form-control" style="width: 125px; height: 26px; font-weight: 800; font-size: 0.72rem; border-radius: 5px; padding: 0 0.3rem;" onchange="window.app.handleCalculatePromotion(event)">
-                  <option value="0" ${parseInt(thanksConfig.president, 10) === 0 ? 'selected' : ''}>لا يوجد (0 قدم)</option>
-                  <option value="1" ${parseInt(thanksConfig.president, 10) === 1 ? 'selected' : ''}>كتاب 1 (+6 أشهر)</option>
-                  <option value="2" ${parseInt(thanksConfig.president, 10) === 2 ? 'selected' : ''}>كتابان (+18 شهراً)</option>
+              <!-- Filtered Employee Dropdown Selector (Optimized Dynamic Select) -->
+              <div>
+                <select class="form-control" 
+                        id="promoEmployeeSelect"
+                        onchange="window.loadEmployeeToPromotionCalc(this.value)" 
+                        style="width: 100%; font-size: 0.88rem; padding: 0.5rem 0.85rem; border-radius: 8px; border: 1.8px solid #0d6efd; background: var(--md-sys-color-background); font-weight: 750; color: var(--md-sys-color-on-surface); box-shadow: 0 2px 6px rgba(13, 110, 253, 0.08);">
+                  ${!isActivelyFiltering ? `
+                    <option value="${currentEmpId}" selected>
+                      👤 ${currentEmpName} [الرقم: ${currentEmpId || '—'}] - ${currentEmpTitle} (${currentEmpSec})
+                    </option>
+                    <option value="" disabled style="color: var(--md-sys-color-outline); font-style: italic;">
+                      💡 ابحث أعلاه بالاسم أو الرقم الوظيفي لاختيار منتسب آخر...
+                    </option>
+                  ` : (filteredEmployees.length === 0 ? `
+                    <option value="">⚠️ لا توجد نتائج مطابقة لمعايير البحث الحالية</option>
+                  ` : `
+                    <option value="">-- اختر موظفاً من النتائج المطابقة (${filteredEmployees.length} نتيجة) --</option>
+                    ${filteredEmployees.slice(0, 30).map(e => {
+                      const empIdVal = e.employeeId || e.id;
+                      const isSel = (calcState && (String(calcState.employeeId) === String(empIdVal) || String(calcState.employeeId) === String(e.id)));
+                      return `<option value="${empIdVal}" ${isSel ? 'selected' : ''}>${e.name || e.fullName || 'بدون اسم'} [الرقم: ${empIdVal}] - ${e.jobTitle || 'موظف'} (${e.section || e.station || 'قسم الإنتاج الجنوبي'})</option>`;
+                    }).join('')}
+                    ${filteredEmployees.length > 30 ? `<option value="" disabled>... والمزيد (${filteredEmployees.length - 30} موظف إضافي) - حدد اسم الموظف بدقة أكبر في البحث</option>` : ''}
+                  `)}
                 </select>
+              </div>
+            </div>
+            ` : ''}
+          `;
+        })()}
+
+        <!-- بطاقة الإضبارة الشاملة المعتمدة للموظف (Master Dossier Summary Card) -->
+        <div class="promo-dossier-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; border-bottom: 1.5px solid rgba(37, 99, 235, 0.16); padding-bottom: 0.95rem;">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <div style="width: 50px; height: 50px; min-width: 50px; border-radius: 14px; background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 900; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);">
+                ${(calcState.employeeName || 'م').charAt(0)}
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;">
+                  <h3 style="margin: 0; font-size: 1.2rem; font-weight: 900; color: var(--md-sys-color-primary); letter-spacing: -0.2px;">
+                    ${calcState.employeeName || 'منتسب'}
+                  </h3>
+                  ${calcState.employeeId ? `
+                    <span class="promo-dossier-id-pill">
+                      الرقم الوظيفي: ${calcState.employeeId}
+                    </span>
+                  ` : ''}
+                  ${(() => {
+                    const knownRoles = ['مدير قسم', 'مسؤول شعبة', 'مسؤول وحدة', 'مسؤول موقع', 'مهندس مناوب', 'مشغل محطة'];
+                    const candidate = (calcState.jobTitle || calcState.role || '').trim();
+                    const isManagerial = knownRoles.some(r => candidate.includes(r)) || (calcState.role && !['EMPLOYEE', 'USER'].includes(calcState.role));
+                    if (isManagerial && candidate) {
+                      return `
+                        <span class="promo-dossier-role-pill">
+                          <span>⭐</span><span>${candidate}</span>
+                        </span>
+                      `;
+                    }
+                    return '';
+                  })()}
+                  ${calcState.section ? `
+                    <span class="promo-dossier-section-pill">
+                      <span>🏢</span><span>${calcState.section}</span>
+                    </span>
+                  ` : ''}
+                </div>
+                <p style="margin: 4px 0 0 0; font-size: 0.78rem; color: var(--md-sys-color-outline); font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                  <span>🏛️</span>
+                  <span>بيانات الإضبارة والخدمة الوظيفية المعتمدة رسمياً في شركة نفط البصرة</span>
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <button type="button" class="btn btn-glass-primary" style="font-size: 0.8rem; font-weight: 800; padding: 0.45rem 1rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.16);" onclick="window.app && typeof window.app.openMasterDossierModal === 'function' ? window.app.openMasterDossierModal('${calcState.employeeId}') : (window.app && window.app.showToast ? window.app.showToast('الإضبارة الرقمية للمنتسب محملة وجاهزة', 'info') : null)">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>📂 معاينة الإضبارة الشاملة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Single Unbroken Row Ribbon for All 6 Dossier Fields -->
+          <div class="promo-dossier-grid">
+            <!-- Col 1: Official Career Job Title -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>🏷️</span><span>العنوان الرسمي:</span>
+              </div>
+              <strong style="font-size: 0.88rem; color: var(--md-sys-color-on-surface); font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="${result.currentJobTitle || 'فني'}">
+                ${result.currentJobTitle || 'فني'}
+              </strong>
+            </div>
+
+            <!-- Col 2: Degree & Qualification -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>🎓</span><span>التحصيل والتخصص:</span>
+              </div>
+              <strong style="font-size: 0.86rem; color: var(--md-sys-color-on-surface); font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="${calcState.degree || 'بكالوريوس'}">
+                ${calcState.degree || 'بكالوريوس'}
+              </strong>
+            </div>
+
+            <!-- Col 3: Current Grade & Stage -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>📊</span><span>الدرجة والمرحلة:</span>
+              </div>
+              <strong style="font-size: 0.84rem; color: var(--md-sys-color-on-surface); font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                ${String(result.gradeName || calcState.grade || '').startsWith('الدرجة') ? (result.gradeName || calcState.grade) : ('الدرجة ' + (result.gradeName || calcState.grade))} <span style="font-size: 0.74rem; color: var(--md-sys-color-primary); font-weight: 800;">- م${calcState.stage || 1}</span>
+              </strong>
+            </div>
+
+            <!-- Col 4: Last Promotion Date -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>📅</span><span>آخر ترفيع:</span>
+              </div>
+              <strong style="font-size: 0.84rem; font-family: 'JetBrains Mono', Consolas, monospace; font-weight: 850; color: var(--md-sys-color-on-surface); white-space: nowrap;">
+                ${userLastPromo}
+              </strong>
+            </div>
+
+            <!-- Col 5: Last Annual Increment Date -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>📅</span><span>آخر علاوة سنوية:</span>
+              </div>
+              <strong style="font-size: 0.84rem; color: #0284c7; font-family: 'JetBrains Mono', Consolas, monospace; font-weight: 850; white-space: nowrap;">
+                ${(() => {
+                  let lastIncStr = calcState.lastIncrementDate;
+                  if (!lastIncStr && userLastPromo) {
+                    try {
+                      const pDate = new Date(userLastPromo);
+                      if (!isNaN(pDate.getTime())) {
+                        const stageNum = parseInt(calcState.stage, 10) || 1;
+                        const incDate = new Date(pDate.getTime());
+                        incDate.setFullYear(incDate.getFullYear() + Math.max(0, stageNum - 1));
+                        lastIncStr = incDate.toISOString().split('T')[0];
+                      }
+                    } catch (e) {
+                      lastIncStr = userLastPromo;
+                    }
+                  }
+                  return lastIncStr || userLastPromo;
+                })()}
+              </strong>
+            </div>
+
+            <!-- Col 6: Thanks Letters & Seniority Credit -->
+            <div class="promo-dossier-pill">
+              <div style="font-size: 0.68rem; color: var(--md-sys-color-outline); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;">
+                <span>🎖️</span><span>القدم والشكر:</span>
+              </div>
+              <strong style="font-size: 0.78rem; color: #059669; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                <span class="badge badge-success" style="font-size: 0.7rem; font-weight: 850; padding: 0.12rem 0.45rem; border-radius: 999px;">${td.totalSeniorityMonths || 0} شهر قدم</span>
+              </strong>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <!-- ======================= الوضع اليدوي / المحاكاة (MANUAL SIMULATION MODE) ======================= -->
+        
+        <div class="card" style="box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.9); border-radius: 16px; border: 1.5px solid rgba(16, 185, 129, 0.25); background: var(--md-sys-color-surface); padding: 1.15rem; margin-bottom: 0;">
+          
+          <!-- Simulation Mode Banner -->
+          <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">🧪</span>
+              <div>
+                <strong style="font-size: 0.86rem; color: #065f46;">وضع المحاكاة والاحتساب اليدوي الافتراضي (What-If Analysis)</strong>
+                <p style="margin: 0; font-size: 0.74rem; color: var(--md-sys-color-outline);">يمكنك تعديل كافة الحقول وتجربة السيناريوهات المختلفة بحرية تامة دون التأثير على سجلات الموظف الرسمية.</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" onclick="window.resetManualSimulation()" style="font-size: 0.75rem; padding: 0.3rem 0.75rem; font-weight: 800; border-radius: 8px; border: 1px solid #10b981; color: #047857; display: flex; align-items: center; gap: 0.3rem;">
+                <span>🔄</span>
+                <span>إعادة ضبط المحاكاة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Quick Bar -->
+          <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: var(--md-sys-color-primary);">⚡ نماذج جاهزة:</span>
+            <button type="button" class="btn btn-outline" onclick="window.applyPromotionCalcPreset('tech_institute')" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 999px;">فني معهد (سنة واحدة)</button>
+            <button type="button" class="btn btn-outline" onclick="window.applyPromotionCalcPreset('tech_preparatory')" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 999px;">فني إعدادية (4 سنوات)</button>
+            <button type="button" class="btn btn-outline" onclick="window.applyPromotionCalcPreset('chief_technician')" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 999px;">رئيس ملاحظين فني</button>
+            <button type="button" class="btn btn-outline" onclick="window.applyPromotionCalcPreset('senior_engineer')" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 999px;">مهندس أقدم</button>
+          </div>
+
+          <form onsubmit="window.app.handleCalculatePromotion(event)">
+            
+            <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 1rem; align-items: start; margin-bottom: 0.85rem;">
+              
+              <!-- معطيات العنوان والمسار والدرجة والمرحلة والمؤهل والتاريخ -->
+              <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
+                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.65rem; color: var(--md-sys-color-primary); font-weight: 800; font-size: 0.82rem;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span>بيانات العنوان الوظيفي والمسار والدرجة (محاكاة):</span>
+                </div>
+
+                <!-- السطر 1: العنوان الحالي + المسار الوظيفي -->
+                <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">العنوان الوظيفي:</label>
+                    <input type="text" id="calcJobTitle" class="form-control" style="font-weight: 800; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" value="${calcState.jobTitle || 'فني'}" placeholder="مثال: فني، ملاحظ فني، مهندس أقدم..." onchange="window.app.handleCalculatePromotion(event)">
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">المسار الوظيفي:</label>
+                    <select id="calcTrack" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
+                      <option value="technical" ${calcState.trackKey === 'technical' ? 'selected' : ''}>🔧 المسار الفني والتشغيلي</option>
+                      <option value="engineering" ${calcState.trackKey === 'engineering' ? 'selected' : ''}>⚙️ المسار الهندسي</option>
+                      <option value="administrative" ${calcState.trackKey === 'administrative' ? 'selected' : ''}>📋 المسار الإداري والمالي والقانوني</option>
+                      <option value="scientific" ${calcState.trackKey === 'scientific' ? 'selected' : ''}>🔬 المسار العلمي والجيولوجي</option>
+                      <option value="crafts" ${calcState.trackKey === 'crafts' ? 'selected' : ''}>🔨 المسار الحرفي والخدمي</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- السطر 2: الدرجة + المرحلة -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem;">
+                  <!-- الدرجة -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">الدرجة الوظيفية:</label>
+                    <select id="calcGrade" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
+                      <option value="SPECIAL" ${['SPECIAL', 'خاصة', 'الخاصة'].includes(userGrade) ? 'selected' : ''}>الدرجة الخاصة</option>
+                      <option value="1" ${['1', 'الأولى', 'الاولى'].includes(userGrade) ? 'selected' : ''}>الدرجة الأولى (سقف الترفيع)</option>
+                      <option value="2" ${['2', 'الثانية'].includes(userGrade) ? 'selected' : ''}>الدرجة الثانية (5 س)</option>
+                      <option value="3" ${['3', 'الثالثة'].includes(userGrade) ? 'selected' : ''}>الدرجة الثالثة (5 س)</option>
+                      <option value="4" ${['4', 'الرابعة'].includes(userGrade) ? 'selected' : ''}>الدرجة الرابعة (5 س)</option>
+                      <option value="5" ${['5', 'الخامسة'].includes(userGrade) ? 'selected' : ''}>الدرجة الخامسة (5 س)</option>
+                      <option value="6" ${['6', 'السادسة'].includes(userGrade) ? 'selected' : ''}>الدرجة السادسة (4 س)</option>
+                      <option value="7" ${['7', 'السابعة'].includes(userGrade) ? 'selected' : ''}>الدرجة السابعة (4 س)</option>
+                      <option value="8" ${['8', 'الثامنة'].includes(userGrade) ? 'selected' : ''}>الدرجة الثامنة (سنة للمعهد / 4 س للإعدادية)</option>
+                      <option value="9" ${['9', 'التاسعة'].includes(userGrade) ? 'selected' : ''}>الدرجة التاسعة (4 س)</option>
+                      <option value="10" ${['10', 'العاشرة'].includes(userGrade) ? 'selected' : ''}>الدرجة العاشرة (4 س)</option>
+                    </select>
+                  </div>
+
+                  <!-- المرحلة -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">المرحلة الحالية:</label>
+                    <select id="calcStage" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
+                      ${Array.from({ length: 11 }, (_, i) => i + 1).map(s => `
+                        <option value="${s}" ${parseInt(userStage, 10) === s ? 'selected' : ''}>المرحلة ${s}</option>
+                      `).join('')}
+                    </select>
+                  </div>
+                </div>
+
+                <!-- السطر 3: التحصيل الدراسي + تاريخ المباشرة/الترفيع -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+                  <!-- التحصيل الدراسي -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">التحصيل الدراسي:</label>
+                    <select id="calcDegree" class="form-control" style="font-weight: 700; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.5rem;" onchange="window.app.handleCalculatePromotion(event)">
+                      <option value="دكتوراه" ${userDegree === 'دكتوراه' ? 'selected' : ''}>دكتوراه</option>
+                      <option value="ماجستير" ${userDegree === 'ماجستير' ? 'selected' : ''}>ماجستير</option>
+                      <option value="دبلوم عالي" ${userDegree === 'دبلوم عالي' ? 'selected' : ''}>دبلوم عالي</option>
+                      <option value="بكالوريوس" ${['بكالوريوس', 'بكلوريوس'].includes(userDegree) ? 'selected' : ''}>بكالوريوس</option>
+                      <option value="دبلوم" ${userDegree === 'دبلوم' ? 'selected' : ''}>دبلوم فني / معهد نفطي</option>
+                      <option value="اعدادية" ${['اعدادية', 'إعدادية'].includes(userDegree) ? 'selected' : ''}>إعدادية (صناعة / عامة)</option>
+                      <option value="متوسطة" ${userDegree === 'متوسطة' ? 'selected' : ''}>متوسطة</option>
+                      <option value="ابتدائية" ${userDegree === 'ابتدائية' ? 'selected' : ''}>ابتدائية</option>
+                    </select>
+                  </div>
+
+                  <!-- تاريخ آخر ترفيع -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.74rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.2rem;">تاريخ آخر ترفيع / مباشرة:</label>
+                    <input type="date" id="calcLastDate" class="form-control" style="font-weight: 800; font-size: 0.78rem; border-radius: 7px; font-family: monospace; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); height: 35px; padding: 0 0.45rem;" value="${userLastPromo}" onchange="window.app.handleCalculatePromotion(event)">
+                  </div>
+                </div>
+              </div>
+
+              <!-- كتب الشكر والتقدير المعتمدة -->
+              <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                  <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--md-sys-color-primary); font-weight: 800; font-size: 0.82rem;">
+                    <span class="nav-icon-box icon-amber" style="width: 18px; height: 18px; min-width: 18px; border-radius: 5px;">
+                      <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="7"></circle>
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                      </svg>
+                    </span>
+                    <span>كتب الشكر والتقدير والقدم (محاكاة):</span>
+                  </div>
+                  <span class="badge badge-success" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800; border-radius: 999px;">
+                    ${td.totalSeniorityMonths} شهر قدم
+                  </span>
+                </div>
+
+                <!-- 1. كتب الوزير / المدير العام -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(2, 132, 199, 0.18);">
+                  <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">🏛️ الوزير / المدير العام:</span>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span class="badge badge-success" style="font-size: 0.62rem; padding: 0.08rem 0.35rem; font-weight: 800; border-radius: 999px;">+1 ش (سقف 3)</span>
+                    <input type="number" id="calcThanksMinister" class="form-control" style="width: 50px; height: 26px; font-weight: 900; font-family: monospace; text-align: center; border-radius: 5px; padding: 0; font-size: 0.78rem;" value="${thanksConfig.minister || 0}" min="0" oninput="window.app.handleCalculatePromotion(event)">
+                  </div>
+                </div>
+
+                <!-- 2. كتب رئيس مجلس الوزراء -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(168, 85, 247, 0.18);">
+                  <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">🎖️ رئيس مجلس الوزراء:</span>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span class="badge badge-success" style="font-size: 0.62rem; padding: 0.08rem 0.35rem; font-weight: 800; border-radius: 999px;">+6 ش (سقف 2)</span>
+                    <input type="number" id="calcThanksPM" class="form-control" style="width: 50px; height: 26px; font-weight: 900; font-family: monospace; text-align: center; border-radius: 5px; padding: 0; font-size: 0.78rem;" value="${thanksConfig.primeMinister || 0}" min="0" oninput="window.app.handleCalculatePromotion(event)">
+                  </div>
+                </div>
+
+                <!-- 3. كتب رئيس الجمهورية -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; background: var(--md-sys-color-surface); padding: 0.35rem 0.6rem; border-radius: 7px; border: 1px solid rgba(168, 85, 247, 0.18);">
+                  <span style="font-size: 0.74rem; font-weight: 700; color: var(--md-sys-color-on-surface);">👑 رئيس الجمهورية:</span>
+                  <select id="calcThanksPres" class="form-control" style="width: 125px; height: 26px; font-weight: 800; font-size: 0.72rem; border-radius: 5px; padding: 0 0.3rem;" onchange="window.app.handleCalculatePromotion(event)">
+                    <option value="0" ${parseInt(thanksConfig.president, 10) === 0 ? 'selected' : ''}>لا يوجد (0 قدم)</option>
+                    <option value="1" ${parseInt(thanksConfig.president, 10) === 1 ? 'selected' : ''}>كتاب 1 (+6 أشهر)</option>
+                    <option value="2" ${parseInt(thanksConfig.president, 10) === 2 ? 'selected' : ''}>كتابان (+18 شهراً)</option>
+                  </select>
+                </div>
+
               </div>
 
             </div>
 
-          </div>
+            <!-- زر احتساب وتثبيت نتائج المحاكاة -->
+            <button type="submit" class="btn" style="width: 100%; height: 40px; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; box-shadow: 0 3px 14px rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; font-size: 0.88rem; transition: all 0.2s ease;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>💾 احتساب وتحديث نتائج المحاكاة الآن</span>
+            </button>
 
-          <!-- زر حفظ وتثبيت واحتساب الاستحقاق فوري مشع ومرتب -->
-          <button type="submit" class="btn" style="width: 100%; height: 42px; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, #0b57d0 0%, #0284c7 50%, #10b981 100%); color: #ffffff; box-shadow: 0 3px 14px rgba(11, 87, 208, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; font-size: 0.88rem; transition: all 0.2s ease;">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-              <polyline points="17 21 17 13 7 13 7 21"></polyline>
-              <polyline points="7 3 7 8 15 8"></polyline>
-            </svg>
-            <span>💾 حفظ بيانات الموظف واحتساب الاستحقاق وتحديث الإضبارة</span>
-          </button>
-
-        </form>
-      </div>
+          </form>
+        </div>
+      `}
 
       <!-- كروت المقارنة المالية الثلاثية المضيئة المدمجة -->
       <div style="display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 0.85rem; align-items: stretch;">
@@ -892,16 +1261,20 @@ if (typeof window !== 'undefined') {
   window.app.handleCalculatePromotion = function(event) {
     if (event && event.preventDefault) event.preventDefault();
 
-    const grade = document.getElementById('calcGrade') ? document.getElementById('calcGrade').value : '4';
+    const jobTitle = document.getElementById('calcJobTitle') ? document.getElementById('calcJobTitle').value.trim() : 'فني';
+    const trackKey = document.getElementById('calcTrack') ? document.getElementById('calcTrack').value : 'technical';
+    const grade = document.getElementById('calcGrade') ? document.getElementById('calcGrade').value : '8';
     const stage = document.getElementById('calcStage') ? parseInt(document.getElementById('calcStage').value, 10) : 1;
-    const degree = document.getElementById('calcDegree') ? document.getElementById('calcDegree').value : 'بكالوريوس';
-    const lastPromo = document.getElementById('calcLastDate') ? document.getElementById('calcLastDate').value : '2022-01-01';
+    const degree = document.getElementById('calcDegree') ? document.getElementById('calcDegree').value : 'دبلوم';
+    const lastPromo = document.getElementById('calcLastDate') ? document.getElementById('calcLastDate').value : '2023-01-01';
 
     const minister = document.getElementById('calcThanksMinister') ? parseInt(document.getElementById('calcThanksMinister').value, 10) || 0 : 0;
     const pm = document.getElementById('calcThanksPM') ? parseInt(document.getElementById('calcThanksPM').value, 10) || 0 : 0;
     const pres = document.getElementById('calcThanksPres') ? parseInt(document.getElementById('calcThanksPres').value, 10) || 0 : 0;
 
     if (!window.promotionCalcState) window.promotionCalcState = {};
+    window.promotionCalcState.jobTitle = jobTitle;
+    window.promotionCalcState.trackKey = trackKey;
     window.promotionCalcState.grade = grade;
     window.promotionCalcState.stage = stage;
     window.promotionCalcState.degree = degree;
@@ -910,6 +1283,7 @@ if (typeof window !== 'undefined') {
 
     const user = (window.auth && typeof window.auth.getCurrentUser === 'function') ? window.auth.getCurrentUser() : null;
     if (user && (!window.promotionCalcState.employeeId || window.promotionCalcState.employeeId === user.id)) {
+      user.jobTitle = jobTitle;
       user.jobGrade = grade;
       user.jobStage = stage;
       user.degree = degree;
@@ -924,7 +1298,7 @@ if (typeof window !== 'undefined') {
 
     if (event && event.type === 'submit') {
       if (typeof window.app.showToast === 'function') {
-        window.app.showToast('تم تحديث وحساب استحقاق الترفيع والعلاوة بنجاح! 💾', 'success');
+        window.app.showToast('تم تحديث وحساب استحقاق الترفيع والعنوان الوظيفي بنجاح! 💾', 'success');
       }
     }
 
@@ -939,10 +1313,10 @@ if (typeof window !== 'undefined') {
         '📝 تقديم طلب ترفيع / ترقية وظيفية رسمي',
         `
           <p style="color: var(--md-sys-color-outline); font-size: 0.88rem; line-height: 1.5;">
-            سيتم إرسال طلب الترفيع الإلكتروني مباشرة إلى شعبة تخطيط الموارد البشرية واللجنة الفنية المركزية للترقيات مع كافة معطيات الإضبارة وكتب الشكر المعتمدة.
+            سيتم إرسال طلب الترفيع وتغيير العنوان الإلكتروني مباشرة إلى شعبة تخطيط الموارد البشرية واللجنة الفنية المركزية للترقيات مع كافة معطيات الإضبارة وكتب الشكر المعتمدة.
           </p>
           <div class="form-group" style="margin-top: 1rem;">
-            <label class="form-label" style="font-weight: 700;">ملاحظات الموظف أو طلب تغيير العنوان الوظيفي المفضل:</label>
+            <label class="form-label" style="font-weight: 700;">ملاحظات الموظف أو طلب العنوان الوظيفي المفضل:</label>
             <textarea id="promoRequestNotes" class="form-control" rows="3" placeholder="اكتب أي ملاحظات أو تفاصيل إضافية..."></textarea>
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
@@ -962,7 +1336,7 @@ if (typeof window !== 'undefined') {
   window.app.submitPromotionRequest = function() {
     if (typeof window.app.closeModal === 'function') window.app.closeModal();
     if (typeof window.app.showToast === 'function') {
-      window.app.showToast('تم إرسال طلب الترفيع الرسمي إلى شعبة الموارد البشرية بنجاح! 🚀', 'success');
+      window.app.showToast('تم إرسال طلب الترفيع وتغيير العنوان الرسمي إلى شعبة الموارد البشرية بنجاح! 🚀', 'success');
     }
   };
 }
@@ -980,9 +1354,50 @@ if (typeof window !== 'undefined') {
 
 
 // ==========================================================================
-// Employee Roster Loading & Presets Handling for Promotion Calculator
+// Mode Switcher & Employee Roster Loading Handling for Promotion Calculator
 // ==========================================================================
 if (typeof window !== 'undefined') {
+  window.setPromotionCalcMode = function(mode) {
+    if (!window.promotionCalcState) window.promotionCalcState = {};
+    window.promotionCalcState.calcMode = mode;
+    if (mode === 'auto') {
+      const user = (window.auth && typeof window.auth.getCurrentUser === 'function') ? window.auth.getCurrentUser() : {};
+      const actorUser = user || { role: 'SUPER_ADMIN', departmentId: 'dept-south-prod' };
+      const employees = (window.store && typeof window.store.getUnifiedEmployeeRoster === 'function')
+        ? window.store.getUnifiedEmployeeRoster(actorUser)
+        : ((window.store && typeof window.store.getEmployees === 'function') ? window.store.getEmployees() : []);
+      
+      if (!window.promotionCalcState.employeeId && employees.length > 0) {
+        window.loadEmployeeToPromotionCalc(employees[0].employeeId || employees[0].id);
+        return;
+      }
+    }
+    if (window.app && typeof window.app.render === 'function') {
+      window.app.render();
+    }
+  };
+
+  window.resetManualSimulation = function() {
+    if (!window.promotionCalcState) window.promotionCalcState = {};
+    window.promotionCalcState.calcMode = 'manual';
+    window.promotionCalcState.employeeId = '';
+    window.promotionCalcState.employeeName = 'نموذج محاكاة مخصص';
+    window.promotionCalcState.jobTitle = 'فني';
+    window.promotionCalcState.trackKey = 'technical';
+    window.promotionCalcState.grade = '8';
+    window.promotionCalcState.stage = 1;
+    window.promotionCalcState.degree = 'دبلوم';
+    window.promotionCalcState.lastPromo = '2023-01-01';
+    window.promotionCalcState.section = '';
+    window.promotionCalcState.thanksConfig = { minister: 1, primeMinister: 0, president: 0 };
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast('تمت إعادة ضبط نموذج المحاكاة الافتراضي بنجاح 🔄', 'info');
+    }
+    if (window.app && typeof window.app.render === 'function') {
+      window.app.render();
+    }
+  };
+
   window.loadEmployeeToPromotionCalc = function(empId) {
     if (!window.promotionCalcState) window.promotionCalcState = {};
     if (!empId) {
@@ -991,16 +1406,41 @@ if (typeof window !== 'undefined') {
       if (window.app && typeof window.app.render === 'function') window.app.render();
       return;
     }
-    const employees = (window.store && typeof window.store.getEmployees === 'function') ? window.store.getEmployees() : [];
-    const emp = employees.find(e => String(e.id) === String(empId));
+    const user = (window.auth && typeof window.auth.getCurrentUser === 'function') ? window.auth.getCurrentUser() : {};
+    const actorUser = user || { role: 'SUPER_ADMIN', departmentId: 'dept-south-prod' };
+    const employees = (window.store && typeof window.store.getUnifiedEmployeeRoster === 'function')
+      ? window.store.getUnifiedEmployeeRoster(actorUser)
+      : ((window.store && typeof window.store.getEmployees === 'function') ? window.store.getEmployees() : []);
+
+    const emp = employees.find(e => String(e.id) === String(empId) || String(e.employeeId) === String(empId));
     if (!emp) return;
 
-    window.promotionCalcState.employeeId = emp.id;
-    window.promotionCalcState.employeeName = emp.name || 'منتسب';
+    window.promotionCalcState.employeeId = emp.employeeId || emp.id;
+    window.promotionCalcState.employeeName = emp.name || emp.fullName || 'منتسب';
+    window.promotionCalcState.jobTitle = emp.jobTitle || 'فني';
+    window.promotionCalcState.section = emp.section || emp.station || '';
+
+    // Map Track
+    if (emp.careerTrack && ['technical', 'engineering', 'administrative', 'scientific', 'crafts'].includes(emp.careerTrack)) {
+      window.promotionCalcState.trackKey = emp.careerTrack;
+    } else {
+      const titleLower = (emp.jobTitle || '').toLowerCase();
+      if (titleLower.includes('فني') || titleLower.includes('تشغيل') || titleLower.includes('مشغل') || titleLower.includes('صيانة') || titleLower.includes('ميكانيك') || titleLower.includes('كهرباء')) {
+        window.promotionCalcState.trackKey = 'technical';
+      } else if (titleLower.includes('مهندس')) {
+        window.promotionCalcState.trackKey = 'engineering';
+      } else if (titleLower.includes('جيولوج') || titleLower.includes('كيمياو') || titleLower.includes('فيزياو') || titleLower.includes('مختبر')) {
+        window.promotionCalcState.trackKey = 'scientific';
+      } else if (titleLower.includes('حرفي') || titleLower.includes('سائق') || titleLower.includes('خدمات')) {
+        window.promotionCalcState.trackKey = 'crafts';
+      } else {
+        window.promotionCalcState.trackKey = 'administrative';
+      }
+    }
 
     // Map Grade
-    let grade = '4';
-    const gStr = String(emp.jobGrade || '').trim();
+    let grade = '8';
+    const gStr = String(emp.jobGrade || emp.grade || '').trim();
     if (gStr.includes('خاص') || gStr === 'SPECIAL') grade = 'SPECIAL';
     else if (gStr.includes('أول') || gStr.includes('اول') || gStr === '1') grade = '1';
     else if (gStr.includes('ثاني') || gStr === '2') grade = '2';
@@ -1014,22 +1454,22 @@ if (typeof window !== 'undefined') {
     else if (gStr.includes('عاشر') || gStr === '10') grade = '10';
 
     window.promotionCalcState.grade = grade;
-    window.promotionCalcState.stage = parseInt(emp.jobStage, 10) || 1;
+    window.promotionCalcState.stage = parseInt(emp.jobStage || emp.stage, 10) || 1;
 
     // Map Degree
     const dStr = (emp.qualification || emp.degree || '').toLowerCase();
     if (dStr.includes('دكتور') || dStr.includes('phd')) window.promotionCalcState.degree = 'دكتوراه';
     else if (dStr.includes('ماجستير') || dStr.includes('master')) window.promotionCalcState.degree = 'ماجستير';
     else if (dStr.includes('عالي') || dStr.includes('دبلوم عالي')) window.promotionCalcState.degree = 'دبلوم عالي';
-    else if (dStr.includes('بكالوريوس') || dStr.includes('bachelor')) window.promotionCalcState.degree = 'بكالوريوس';
-    else if (dStr.includes('دبلوم')) window.promotionCalcState.degree = 'دبلوم';
-    else if (dStr.includes('إعداد') || dStr.includes('اعداد')) window.promotionCalcState.degree = 'إعدادية';
+    else if (dStr.includes('بكالوريوس') || dStr.includes('بكلوريوس') || dStr.includes('bachelor')) window.promotionCalcState.degree = 'بكالوريوس';
+    else if (dStr.includes('دبلوم') || dStr.includes('معهد')) window.promotionCalcState.degree = 'دبلوم';
+    else if (dStr.includes('إعداد') || dStr.includes('اعداد')) window.promotionCalcState.degree = 'اعدادية';
     else if (dStr.includes('متوسط')) window.promotionCalcState.degree = 'متوسطة';
     else if (dStr.includes('ابتدائ')) window.promotionCalcState.degree = 'ابتدائية';
     else window.promotionCalcState.degree = 'بكالوريوس';
 
     // Last Promotion Date
-    window.promotionCalcState.lastPromo = emp.lastPromotionDate || emp.hireDate || '2022-01-01';
+    window.promotionCalcState.lastPromo = emp.lastPromotionDate || emp.hireDate || emp.appointmentDate || '2023-01-01';
 
     // Thanks Letters
     window.promotionCalcState.thanksConfig = emp.thanksConfig || {
@@ -1045,40 +1485,87 @@ if (typeof window !== 'undefined') {
 
   window.applyPromotionCalcPreset = function(preset) {
     if (!window.promotionCalcState) window.promotionCalcState = {};
-    if (preset === 'senior_engineer') {
+    if (preset === 'tech_institute') {
       window.promotionCalcState.employeeId = '';
-      window.promotionCalcState.employeeName = 'مهندس أقدم (نموذج افتراضي)';
-      window.promotionCalcState.grade = '4';
-      window.promotionCalcState.stage = 2;
-      window.promotionCalcState.degree = 'بكالوريوس';
-      window.promotionCalcState.lastPromo = '2020-07-01';
-      window.promotionCalcState.thanksConfig = { minister: 2, primeMinister: 0, president: 0 };
+      window.promotionCalcState.employeeName = 'فني معهد نفطي (استثناء سنة واحدة)';
+      window.promotionCalcState.jobTitle = 'فني';
+      window.promotionCalcState.trackKey = 'technical';
+      window.promotionCalcState.grade = '8';
+      window.promotionCalcState.stage = 1;
+      window.promotionCalcState.degree = 'دبلوم';
+      window.promotionCalcState.lastPromo = '2025-09-01';
+      window.promotionCalcState.thanksConfig = { minister: 1, primeMinister: 0, president: 0 };
+    } else if (preset === 'tech_preparatory') {
+      window.promotionCalcState.employeeId = '';
+      window.promotionCalcState.employeeName = 'فني خريج إعدادية (مدة 4 سنوات)';
+      window.promotionCalcState.jobTitle = 'فني';
+      window.promotionCalcState.trackKey = 'technical';
+      window.promotionCalcState.grade = '8';
+      window.promotionCalcState.stage = 1;
+      window.promotionCalcState.degree = 'اعدادية';
+      window.promotionCalcState.lastPromo = '2022-09-01';
+      window.promotionCalcState.thanksConfig = { minister: 1, primeMinister: 0, president: 0 };
     } else if (preset === 'chief_technician') {
       window.promotionCalcState.employeeId = '';
-      window.promotionCalcState.employeeName = 'رئيس فنيين (نموذج افتراضي)';
+      window.promotionCalcState.employeeName = 'رئيس ملاحظين فني (نموذج المسار الفني)';
+      window.promotionCalcState.jobTitle = 'رئيس ملاحظين فني';
+      window.promotionCalcState.trackKey = 'technical';
       window.promotionCalcState.grade = '5';
       window.promotionCalcState.stage = 3;
       window.promotionCalcState.degree = 'دبلوم';
       window.promotionCalcState.lastPromo = '2021-03-15';
-      window.promotionCalcState.thanksConfig = { minister: 1, primeMinister: 0, president: 0 };
-    } else if (preset === 'ready_for_promo') {
+      window.promotionCalcState.thanksConfig = { minister: 2, primeMinister: 0, president: 0 };
+    } else if (preset === 'senior_engineer') {
       window.promotionCalcState.employeeId = '';
-      window.promotionCalcState.employeeName = 'مستحق ترفيع فوري (مكتمل المدة القانونية)';
-      window.promotionCalcState.grade = '6';
-      window.promotionCalcState.stage = 4;
-      window.promotionCalcState.degree = 'بكالوريوس';
-      window.promotionCalcState.lastPromo = '2021-01-01';
-      window.promotionCalcState.thanksConfig = { minister: 3, primeMinister: 0, president: 0 };
-    } else if (preset === 'annual_increment') {
-      window.promotionCalcState.employeeId = '';
-      window.promotionCalcState.employeeName = 'مستحق علاوة سنوية فقط';
-      window.promotionCalcState.grade = '3';
+      window.promotionCalcState.employeeName = 'مهندس أقدم (نموذج المسار الهندسي)';
+      window.promotionCalcState.jobTitle = 'مهندس أقدم';
+      window.promotionCalcState.trackKey = 'engineering';
+      window.promotionCalcState.grade = '4';
       window.promotionCalcState.stage = 2;
-      window.promotionCalcState.degree = 'ماجستير';
-      window.promotionCalcState.lastPromo = '2024-02-01';
-      window.promotionCalcState.thanksConfig = { minister: 0, primeMinister: 0, president: 0 };
+      window.promotionCalcState.degree = 'بكالوريوس';
+      window.promotionCalcState.lastPromo = '2021-07-01';
+      window.promotionCalcState.thanksConfig = { minister: 2, primeMinister: 0, president: 0 };
     }
 
+    if (window.app && typeof window.app.render === 'function') {
+      window.app.render();
+    }
+  };
+
+  window.handlePromotionEmployeeSearch = function(query) {
+    if (!window.promotionCalcSearchState) {
+      window.promotionCalcSearchState = { searchQuery: '', selectedSection: 'ALL' };
+    }
+    window.promotionCalcSearchState.searchQuery = query;
+    if (window.app && typeof window.app.render === 'function') {
+      window.app.render();
+      setTimeout(() => {
+        const inp = document.getElementById('promoEmployeeSearchInput');
+        if (inp) {
+          if (typeof inp.focus === 'function') inp.focus();
+          const valLen = inp.value ? inp.value.length : 0;
+          if (typeof inp.setSelectionRange === 'function') inp.setSelectionRange(valLen, valLen);
+        }
+      }, 30);
+    }
+  };
+
+  window.handlePromotionSectionFilter = function(section) {
+    if (!window.promotionCalcSearchState) {
+      window.promotionCalcSearchState = { searchQuery: '', selectedSection: 'ALL' };
+    }
+    window.promotionCalcSearchState.selectedSection = section;
+    if (window.app && typeof window.app.render === 'function') {
+      window.app.render();
+    }
+  };
+
+  window.clearPromotionEmployeeSearch = function() {
+    if (!window.promotionCalcSearchState) {
+      window.promotionCalcSearchState = { searchQuery: '', selectedSection: 'ALL' };
+    }
+    window.promotionCalcSearchState.searchQuery = '';
+    window.promotionCalcSearchState.selectedSection = 'ALL';
     if (window.app && typeof window.app.render === 'function') {
       window.app.render();
     }

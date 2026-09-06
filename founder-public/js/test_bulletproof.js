@@ -10,10 +10,13 @@ global.localStorage = {
 };
 global.sessionStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 global.window = global;
+global.location = { hostname: 'localhost', href: 'http://localhost:3000' };
+global.window.location = global.location;
 global.document = {
   documentElement: { setAttribute: () => {}, getAttribute: () => 'light' },
   body: { classList: { toggle: () => {}, remove: () => {}, add: () => {} } },
   getElementById: () => ({ value: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} } }),
+  querySelector: () => null,
   querySelectorAll: () => [],
   addEventListener: () => {}
 };
@@ -38,17 +41,17 @@ for (const s of scripts) {
 console.log('✅ ALL SCRIPTS PARSED & LOADED');
 
 const usersToTest = [
-  { email: 'ahmed.mgr@southprod.iq', id: 'EMP-2024-001', role: 'DEPT_MANAGER' },
-  { email: 'sec1@southprod.iq', id: 'EMP-2024-002', role: 'SECTION_MANAGER' },
-  { email: 'tech.unit@southprod.iq', id: 'EMP-2024-004', role: 'UNIT_MANAGER' },
-  { email: 'emp1@southprod.iq', id: 'EMP-2024-005', role: 'EMPLOYEE' },
-  { email: 'founder@southprod.iq', id: 'EMP-0000', role: 'SUPER_ADMIN' }
+  { email: 'ahmed.mgr@rumaila.iq', pwd: 'M1a2g3r4#2026', id: 'EMP-2024-001', role: 'DEPT_MANAGER' },
+  { email: 'sec1@rumaila.iq', pwd: 'Sec1#Pass2026', id: 'EMP-2024-002', role: 'SECTION_MANAGER' },
+  { email: 'sec2@rumaila.iq', pwd: 'Sec2#Pass2026', id: 'EMP-2024-003', role: 'SECTION_MANAGER' },
+  { email: 'mohanad.tech@rumaila.iq', pwd: 'Unit1#Pass2026', id: 'EMP-2024-005', role: 'UNIT_MANAGER' },
+  { email: 'ammar.emp@rumaila.iq', pwd: 'Emp1#Pass2026', id: 'EMP-2024-004', role: 'EMPLOYEE' }
 ];
 
 const tabs = ['notifs', 'staff', 'docs', 'interviews', 'vehicles'];
 
 usersToTest.forEach(u => {
-  window.auth.login(u.email, 'password123', u.id);
+  window.auth.login(u.email, u.pwd, u.id);
   const curUser = window.auth.getCurrentUser();
   console.log(`\nTesting Role [${curUser.role}] (${curUser.fullName})...`);
 
@@ -75,7 +78,7 @@ db.vehicleMovements = [];
 db.documents = [];
 window.store.saveDb(db);
 
-window.auth.login('emp1@southprod.iq', 'password123', 'EMP-2024-005');
+window.auth.login('ammar.emp@rumaila.iq', 'Emp1#Pass2026', 'EMP-2024-004');
 tabs.forEach(tab => {
   window.app.setDeptManagementSubTab(tab);
   const html = window.renderDeptManagementView();

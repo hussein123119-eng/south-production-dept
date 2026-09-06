@@ -2054,6 +2054,54 @@ body.sidebar-collapsed .nav-item-meta {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* User Management 2x2 Header Action Tools (Proportional -25% Width & Height) */
+.user-mgmt-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: auto;
+}
+
+@media (max-width: 640px) {
+  .user-mgmt-tools-grid {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 0.35rem;
+  }
+}
+
+.user-mgmt-tool-btn {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 0.74rem !important;
+  padding: 0 0.82rem !important;
+  border-radius: 8px !important;
+  font-weight: 750 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  letter-spacing: -0.1px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+.user-mgmt-tool-btn svg {
+  width: 12px !important;
+  height: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+.user-mgmt-tool-btn:hover {
+  transform: translateY(-1.2px) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+}
+
 /* User Management Quick Stats Chips (Compact & Highly Vivid) */
 .user-quick-stats-grid {
   display: grid;
@@ -5666,79 +5714,188 @@ body[data-theme="dark"],
 
 /* ==========================================================================
    12. Promotion Crystal Cards System (Light & Dark Optical Architecture)
+/* ==========================================================================
+   12. Promotion Crystal Cards System (Ultra-Vibrant Jewel Frosted Glass)
    ========================================================================== */
+.promo-crystal-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1.15fr 1fr 1fr;
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .promo-crystal-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .promo-crystal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .promo-crystal-card {
-  border-radius: 14px;
-  padding: 0.85rem 1.15rem;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.promo-crystal-card:hover {
+  transform: translateY(-3px);
 }
 
 .promo-card-title {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .promo-card-date {
-  font-size: 1.65rem;
+  font-size: 1.55rem;
   font-weight: 900;
   font-family: 'Consolas', 'Roboto Mono', monospace;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: 0.5px;
+  margin: 0.2rem 0;
 }
 
 .promo-card-value {
   font-size: 1.35rem;
   font-weight: 900;
   font-family: 'Cairo', sans-serif;
-  line-height: 1.2;
+  line-height: 1.25;
+  margin: 0.2rem 0;
+}
+
+.promo-career-title {
+  font-size: 1.25rem;
+  font-weight: 900;
 }
 
 .promo-card-sub {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
+  opacity: 0.85;
 }
 
 .promo-card-detail {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: space-between;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
 }
 
-/* Light Mode Promotion Cards */
+.promo-next-grade-tag {
+  font-weight: 800;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+}
+
+.badge-career-track {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.55rem;
+  font-weight: 800;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+.badge-seniority-sub {
+  font-size: 0.65rem;
+  padding: 0.12rem 0.5rem;
+  font-weight: 800;
+  border-radius: 999px;
+}
+
+.promo-status-badge {
+  font-size: 0.74rem;
+  padding: 0.2rem 0.65rem;
+  font-weight: 800;
+  border-radius: 999px;
+}
+
+/* 🌟 Light Mode (Day Crystal Architecture) */
+.promo-crystal-career {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(5, 150, 105, 0.16) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.38);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.1), inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
+}
+.promo-crystal-career .promo-card-title { color: #065f46; }
+.promo-crystal-career .promo-card-value { color: #047857; }
+.promo-crystal-career .promo-card-detail { color: #065f46; }
+.promo-crystal-career .badge-career-track {
+  background: rgba(16, 185, 129, 0.18);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.promo-crystal-career .promo-next-grade-tag {
+  background: rgba(11, 87, 208, 0.1);
+  color: #0b57d0;
+}
+.promo-crystal-career:hover {
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.18), inset 0 1.5px 2px rgba(255, 255, 255, 1);
+  border-color: rgba(16, 185, 129, 0.6);
+}
+
 .promo-crystal-due {
-  background: linear-gradient(135deg, rgba(11, 87, 208, 0.08) 0%, rgba(2, 132, 199, 0.14) 100%);
-  border: 1.5px solid rgba(11, 87, 208, 0.24);
-  box-shadow: 0 4px 18px rgba(11, 87, 208, 0.07), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(11, 87, 208, 0.1) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(2, 132, 199, 0.15) 100%);
+  border: 1.5px solid rgba(11, 87, 208, 0.35);
+  box-shadow: 0 6px 20px rgba(11, 87, 208, 0.09), inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
 }
 .promo-crystal-due .promo-card-title { color: #1e40af; }
 .promo-crystal-due .promo-card-date { color: #0b57d0; }
+.promo-crystal-due:hover {
+  box-shadow: 0 10px 28px rgba(11, 87, 208, 0.16), inset 0 1.5px 2px rgba(255, 255, 255, 1);
+  border-color: rgba(11, 87, 208, 0.55);
+}
 
 .promo-crystal-duration {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.07) 0%, rgba(129, 140, 248, 0.12) 100%);
-  border: 1.5px solid rgba(99, 102, 241, 0.22);
-  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(129, 140, 248, 0.15) 100%);
+  border: 1.5px solid rgba(99, 102, 241, 0.32);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.08), inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
 }
 .promo-crystal-duration .promo-card-title { color: #4338ca; }
 .promo-crystal-duration .promo-card-value { color: #3730a3; }
 .promo-crystal-duration .promo-card-sub { color: #6366f1; }
 .promo-crystal-duration .promo-card-detail { color: #4f46e5; }
+.promo-crystal-duration:hover {
+  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.16), inset 0 1.5px 2px rgba(255, 255, 255, 1);
+  border-color: rgba(99, 102, 241, 0.55);
+}
 
 .promo-crystal-seniority {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.09) 0%, rgba(5, 150, 105, 0.15) 100%);
-  border: 1.5px solid rgba(16, 185, 129, 0.28);
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.07), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(5, 150, 105, 0.15) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.32);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.08), inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
 }
 .promo-crystal-seniority .promo-card-title { color: #065f46; }
 .promo-crystal-seniority .promo-card-value { color: #047857; }
 .promo-crystal-seniority .promo-card-sub { color: #059669; }
 .promo-crystal-seniority .promo-card-detail { color: #047857; }
+.promo-crystal-seniority .badge-seniority-sub {
+  background: rgba(16, 185, 129, 0.18);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.promo-crystal-seniority:hover {
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.16), inset 0 1.5px 2px rgba(255, 255, 255, 1);
+  border-color: rgba(16, 185, 129, 0.55);
+}
 
 .promo-crystal-salary-current {
   background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.85) 100%);
@@ -5771,34 +5928,88 @@ body[data-theme="dark"],
 .promo-crystal-salary-inc .promo-card-value { color: #0284c7; }
 .promo-crystal-salary-inc .promo-card-detail { color: #4f46e5; }
 
-/* Dark Mode Promotion Cards (Jeweled High-Contrast Frosted Glass) */
+/* 🌌 Dark & Neon Mode (Jeweled Glowing Optical Matrix) */
+[data-theme="dark"] .promo-crystal-career {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(10, 22, 44, 0.88) 50%, rgba(5, 150, 105, 0.28) 100%) !important;
+  border: 1.5px solid rgba(52, 211, 153, 0.55) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 24px rgba(16, 185, 129, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.22) !important;
+}
+[data-theme="dark"] .promo-crystal-career .promo-card-title { color: #a7f3d0 !important; }
+[data-theme="dark"] .promo-crystal-career .promo-card-value { 
+  color: #6ee7b7 !important; 
+  text-shadow: 0 0 16px rgba(16, 185, 129, 0.65) !important; 
+}
+[data-theme="dark"] .promo-crystal-career .promo-card-detail { color: #d1fae5 !important; }
+[data-theme="dark"] .promo-crystal-career .badge-career-track {
+  background: rgba(16, 185, 129, 0.28) !important;
+  color: #a7f3d0 !important;
+  border: 1px solid rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35) !important;
+}
+[data-theme="dark"] .promo-crystal-career .promo-next-grade-tag {
+  background: rgba(0, 223, 216, 0.2) !important;
+  color: #00dfd8 !important;
+  border: 1px solid rgba(0, 223, 216, 0.4) !important;
+}
+[data-theme="dark"] .promo-crystal-career:hover {
+  border-color: #34d399 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 32px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+}
+
 [data-theme="dark"] .promo-crystal-due {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(11, 20, 42, 0.8) 100%) !important;
-  border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.22) 0%, rgba(10, 22, 44, 0.88) 50%, rgba(2, 132, 199, 0.28) 100%) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.55) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 223, 216, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.22) !important;
 }
 [data-theme="dark"] .promo-crystal-due .promo-card-title { color: #7dd3fc !important; }
-[data-theme="dark"] .promo-crystal-due .promo-card-date { color: #00dfd8 !important; text-shadow: 0 2px 10px rgba(0, 223, 216, 0.4) !important; }
+[data-theme="dark"] .promo-crystal-due .promo-card-date { 
+  color: #00dfd8 !important; 
+  text-shadow: 0 0 16px rgba(0, 223, 216, 0.65) !important; 
+}
+[data-theme="dark"] .promo-crystal-due:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 32px rgba(0, 223, 216, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+}
 
 [data-theme="dark"] .promo-crystal-duration {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(11, 20, 42, 0.8) 100%) !important;
-  border: 1.5px solid rgba(129, 140, 248, 0.45) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(10, 22, 44, 0.88) 50%, rgba(129, 140, 248, 0.28) 100%) !important;
+  border: 1.5px solid rgba(129, 140, 248, 0.55) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 24px rgba(99, 102, 241, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.22) !important;
 }
 [data-theme="dark"] .promo-crystal-duration .promo-card-title { color: #c7d2fe !important; }
-[data-theme="dark"] .promo-crystal-duration .promo-card-value { color: #ffffff !important; text-shadow: 0 2px 10px rgba(129, 140, 248, 0.3) !important; }
+[data-theme="dark"] .promo-crystal-duration .promo-card-value { 
+  color: #ffffff !important; 
+  text-shadow: 0 0 16px rgba(129, 140, 248, 0.6) !important; 
+}
 [data-theme="dark"] .promo-crystal-duration .promo-card-sub { color: #a5b4fc !important; }
 [data-theme="dark"] .promo-crystal-duration .promo-card-detail { color: #c7d2fe !important; }
+[data-theme="dark"] .promo-crystal-duration:hover {
+  border-color: #818cf8 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 32px rgba(99, 102, 241, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+}
 
 [data-theme="dark"] .promo-crystal-seniority {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(11, 20, 42, 0.8) 100%) !important;
-  border: 1.5px solid rgba(52, 211, 153, 0.45) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(10, 22, 44, 0.88) 50%, rgba(5, 150, 105, 0.28) 100%) !important;
+  border: 1.5px solid rgba(52, 211, 153, 0.55) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 24px rgba(16, 185, 129, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.22) !important;
 }
 [data-theme="dark"] .promo-crystal-seniority .promo-card-title { color: #a7f3d0 !important; }
-[data-theme="dark"] .promo-crystal-seniority .promo-card-value { color: #6ee7b7 !important; text-shadow: 0 2px 10px rgba(16, 185, 129, 0.35) !important; }
+[data-theme="dark"] .promo-crystal-seniority .promo-card-value { 
+  color: #6ee7b7 !important; 
+  text-shadow: 0 0 16px rgba(16, 185, 129, 0.65) !important; 
+}
 [data-theme="dark"] .promo-crystal-seniority .promo-card-sub { color: #d1fae5 !important; }
 [data-theme="dark"] .promo-crystal-seniority .promo-card-detail { color: #a7f3d0 !important; }
+[data-theme="dark"] .promo-crystal-seniority .badge-seniority-sub {
+  background: rgba(16, 185, 129, 0.28) !important;
+  color: #a7f3d0 !important;
+  border: 1px solid rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35) !important;
+}
+[data-theme="dark"] .promo-crystal-seniority:hover {
+  border-color: #34d399 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 32px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+}
 
 [data-theme="dark"] .promo-crystal-salary-current {
   background: linear-gradient(135deg, rgba(148, 163, 184, 0.14) 0%, rgba(11, 20, 42, 0.8) 100%) !important;
@@ -6694,4 +6905,196 @@ body[data-theme="dark"],
     white-space: nowrap !important;
     flex-shrink: 0 !important;
   }
+}
+
+/* ==========================================================================
+   Custom Staff Export Modal - Dual Theme (Day Light & Neon Dark)
+   ========================================================================== */
+
+.custom-export-banner {
+  background: linear-gradient(135deg, #0b57d0 0%, #0284c7 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.4rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 8px 24px -4px rgba(11, 87, 208, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .custom-export-banner {
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid rgba(0, 223, 216, 0.35);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 223, 216, 0.15);
+}
+
+.custom-export-step-box {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1.5px solid #e2e8f0;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.15rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+[data-theme="dark"] .custom-export-step-box {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.65) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+}
+
+.custom-export-step-title {
+  margin: 0;
+  font-weight: 850;
+  font-size: 0.95rem;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+[data-theme="dark"] .custom-export-step-title {
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.custom-export-group-card {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-theme="dark"] .custom-export-group-card {
+  background: linear-gradient(135deg, rgba(11, 20, 38, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(0, 223, 216, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.custom-export-group-header {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #0369a1;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+[data-theme="dark"] .custom-export-group-header {
+  color: #00dfd8;
+  border-bottom-color: rgba(0, 223, 216, 0.2);
+  text-shadow: 0 0 10px rgba(0, 223, 216, 0.35);
+}
+
+.custom-export-field-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.28rem 0.45rem;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+  user-select: none;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.custom-export-field-item:hover {
+  background: rgba(11, 87, 208, 0.06);
+}
+
+[data-theme="dark"] .custom-export-field-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .custom-export-field-item:hover {
+  background: rgba(0, 223, 216, 0.1);
+  color: #ffffff;
+}
+
+.custom-export-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: #0284c7;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .custom-export-checkbox {
+  accent-color: #00dfd8;
+}
+
+.custom-export-pill-btn {
+  font-size: 0.76rem !important;
+  font-weight: 750 !important;
+  padding: 0.22rem 0.65rem !important;
+  border-radius: 6px !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-export-pill-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .custom-export-pill-btn {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.15) !important;
+}
+
+[data-theme="dark"] .custom-export-pill-btn:hover {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35) !important;
+}
+
+.custom-export-dynamic-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  padding: 0.32rem 0.7rem;
+  border-radius: 8px;
+  color: #1e293b;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.custom-export-dynamic-chip:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+[data-theme="dark"] .custom-export-dynamic-chip {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(0, 223, 216, 0.25);
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .custom-export-dynamic-chip:hover {
+  background: rgba(0, 223, 216, 0.15);
+  border-color: #00dfd8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 223, 216, 0.25);
 }

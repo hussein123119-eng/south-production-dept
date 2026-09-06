@@ -33,37 +33,45 @@ function renderUserManagementView() {
           🛡️ إدارة المستخدمين
         </h2>
         <p style="color: var(--md-sys-color-outline); font-size: 0.88rem; margin: 0;">
-          نظام التحكم المركزي في حسابات المنتسبين، سجل المستخدمين، مصفوفة الصلاحيات المنظمة، وطلبات القبول المعتمدة.
+          نظام التحكم المركزي في حسابات المنتسبين
         </p>
       </div>
-      <div style="display: flex; gap: 0.65rem; align-items: center; justify-content: flex-end; margin-right: auto; flex-wrap: nowrap; white-space: nowrap;">
+      <div class="user-mgmt-tools-grid">
         ${window.rbac.hasPermission(actorUser, 'CAREER_EDIT_INFO') || ['DEPT_MANAGER', 'SUPER_ADMIN'].includes(actorUser.role) ? `
-          <button class="btn btn-glass-primary" onclick="window.app.openCreateMasterRecordModal()" title="إضافة منتسب ومستخدم جديد إلى السجل الموحد">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <button class="btn btn-glass-primary user-mgmt-tool-btn" onclick="window.app.openCreateMasterRecordModal()" title="إضافة منتسب ومستخدم جديد إلى السجل الموحد">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 5v14M5 12h14"></path>
             </svg>
             <span>إضافة مستخدم جديد للسجل</span>
           </button>
+          <button class="btn btn-glass-amber user-mgmt-tool-btn" onclick="window.app.openBulkThanksModal()" title="إضافة وتوثيق كتاب شكر وتقدير جماعي لكافة الكادر أو جهة محددة">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+            <span>إضافة كتاب شكر للجميع</span>
+            <span style="font-size: 0.78rem; line-height: 1;">🎖️</span>
+          </button>
         ` : ''}
         ${window.rbac.hasPermission(actorUser, 'USERS_IMPORT_ROSTER') ? `
-          <button class="btn btn-glass-amber" onclick="window.app.setUserManagementSubTab('import_ids')" title="استيراد وتحديث السجلات الرسمية">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <button class="btn btn-glass-amber user-mgmt-tool-btn" onclick="window.app.setUserManagementSubTab('import_ids')" title="استيراد وتحديث السجلات الرسمية">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             <span>استيراد سجلات الموظفين</span>
-            <span style="font-size: 0.95rem;">📥</span>
+            <span style="font-size: 0.78rem; line-height: 1;">📥</span>
           </button>
         ` : ''}
-        <button class="btn btn-glass-emerald" onclick="window.app.openCustomStaffExportModal()" title="أداة التصدير والطباعة المخصصة لبيانات الكادر">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <button class="btn btn-glass-emerald user-mgmt-tool-btn" onclick="window.app.openCustomStaffExportModal()" title="أداة التصدير والطباعة المخصصة لبيانات الكادر">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
           <span>تصدير وطباعة مخصصة</span>
-          <span style="font-size: 0.95rem;">⚡</span>
+          <span style="font-size: 0.78rem; line-height: 1;">⚡</span>
         </button>
       </div>
     </div>
@@ -197,6 +205,51 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
     { key: 'EMPLOYEE', name: 'منتسب' }
   ];
 
+  const secMap = {};
+  (sections || []).forEach(s => { if (s && s.id) secMap[s.id] = s; });
+  const unitMap = {};
+  (units || []).forEach(u => { if (u && u.id) unitMap[u.id] = u; });
+  const staMap = {};
+  (stations || []).forEach(st => { if (st && st.id) staMap[st.id] = st; });
+
+  if (typeof window !== 'undefined') {
+    if (!window.app) window.app = {};
+    if (!window.app.userRegistryState) {
+      window.app.userRegistryState = { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+    }
+  }
+
+  const state = (typeof window !== 'undefined' && window.app && window.app.userRegistryState)
+    ? window.app.userRegistryState
+    : { page: 1, pageSize: 25, search: '', section: 'ALL', jobTitle: 'ALL', status: 'ALL', role: 'ALL' };
+
+  const q = (state.search || '').toLowerCase().trim();
+  const filtered = roster.filter(emp => {
+    if (state.section !== 'ALL') {
+      if (state.section === 'NONE' && emp.sectionId) return false;
+      if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
+    }
+    if (state.jobTitle !== 'ALL' && (emp.jobTitle || '').toLowerCase().trim() !== state.jobTitle.toLowerCase().trim()) return false;
+    if (state.status !== 'ALL' && emp.accountStatus !== state.status) return false;
+    if (state.role !== 'ALL' && (emp.role || 'EMPLOYEE') !== state.role) return false;
+    if (q) {
+      const name = (emp.fullName || emp.name || '').toLowerCase();
+      const empid = (emp.employeeId || '').toLowerCase();
+      const email = (emp.userEmail || emp.emailPersonal || '').toLowerCase();
+      if (!name.includes(q) && !empid.includes(q) && !email.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const pageSizeNum = state.pageSize === 'ALL' ? (filtered.length || 1) : (parseInt(state.pageSize, 10) || 25);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSizeNum));
+  const currentPage = Math.min(Math.max(1, state.page || 1), totalPages);
+  state.page = currentPage;
+
+  const startIdx = (currentPage - 1) * pageSizeNum;
+  const endIdx = state.pageSize === 'ALL' ? filtered.length : Math.min(startIdx + pageSizeNum, filtered.length);
+  const pageItems = filtered.slice(startIdx, endIdx);
+
   return `
     <div class="card" style="margin-bottom: 1.5rem;">
       <!-- Search & Filters Toolbar -->
@@ -204,44 +257,44 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
         
         <!-- Search Input -->
         <div style="flex: 2; min-width: 220px;">
-          <input type="text" id="unifiedRosterSearchInput" class="form-control" placeholder="🔍 بحث باسم المستخدم أو الرقم الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
+          <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${state.search || ''}" placeholder="🔍 بحث باسم المستخدم أو الرقم الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
         </div>
 
         <!-- Filter 1: Linked Scope / Section -->
         <div style="flex: 1; min-width: 140px;">
           <select id="unifiedRosterSectionFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL">كافة جهات الارتباط</option>
-            <option value="NONE">-- بدون شعبة --</option>
-            ${sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+            <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
+            <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون شعبة --</option>
+            ${sections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
           </select>
         </div>
 
         <!-- Filter 2: Job Title (المسمى الوظيفي) -->
         <div style="flex: 1; min-width: 130px;">
           <select id="unifiedRosterJobTitleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL">كافة المسميات الوظيفية</option>
-            ${uniqueJobTitles.map(title => `<option value="${title}">${title}</option>`).join('')}
+            <option value="ALL" ${state.jobTitle === 'ALL' ? 'selected' : ''}>كافة المسميات الوظيفية</option>
+            ${uniqueJobTitles.map(title => `<option value="${title}" ${state.jobTitle === title ? 'selected' : ''}>${title}</option>`).join('')}
           </select>
         </div>
 
         <!-- Filter 3: Account Status (حالة الحساب) -->
         <div style="flex: 1; min-width: 130px;">
           <select id="unifiedRosterStatusFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL">كافة حالات الحساب</option>
-            <option value="ACTIVE">🟢 نشط</option>
-            <option value="NO_ACCOUNT">⚪ غير نشط</option>
-            <option value="PENDING">🟡 بانتظار الموافقة</option>
-            <option value="SUSPENDED">⏸️ معلق</option>
-            <option value="DISABLED">🔴 غير نشط / معطل</option>
-            <option value="REJECTED">🔴 مرفوض</option>
+            <option value="ALL" ${state.status === 'ALL' ? 'selected' : ''}>كافة حالات الحساب</option>
+            <option value="ACTIVE" ${state.status === 'ACTIVE' ? 'selected' : ''}>🟢 نشط</option>
+            <option value="NO_ACCOUNT" ${state.status === 'NO_ACCOUNT' ? 'selected' : ''}>⚪ غير نشط</option>
+            <option value="PENDING" ${state.status === 'PENDING' ? 'selected' : ''}>🟡 بانتظار الموافقة</option>
+            <option value="SUSPENDED" ${state.status === 'SUSPENDED' ? 'selected' : ''}>⏸️ معلق</option>
+            <option value="DISABLED" ${state.status === 'DISABLED' ? 'selected' : ''}>🔴 غير نشط / معطل</option>
+            <option value="REJECTED" ${state.status === 'REJECTED' ? 'selected' : ''}>🔴 مرفوض</option>
           </select>
         </div>
 
         <!-- Filter 4: Role (الدور) -->
         <div style="flex: 1; min-width: 130px;">
           <select id="unifiedRosterRoleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL">كافة الأدوار</option>
-            ${rolesList.map(r => `<option value="${r.key}">${r.name}</option>`).join('')}
+            <option value="ALL" ${state.role === 'ALL' ? 'selected' : ''}>كافة الأدوار</option>
+            ${rolesList.map(r => `<option value="${r.key}" ${state.role === r.key ? 'selected' : ''}>${r.name}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -260,11 +313,19 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
               <th style="min-width: 120px; text-align: center;">الإضبارة</th>
             </tr>
           </thead>
-          <tbody>
-            ${roster.map(emp => {
-              const sec = sections.find(s => s.id === emp.sectionId);
-              const un = units.find(u => u.id === emp.unitId);
-              const st = stations.find(station => station.id === emp.stationId);
+          <tbody id="unifiedRosterTableBody">
+            ${pageItems.length === 0 ? `
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
+                  <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🔍</div>
+                  <h4>لا توجد نتائج مطابقة لمعايير البحث الحالية</h4>
+                  <p style="font-size: 0.85rem; margin: 0;">جرب تغيير كلمة البحث أو إعادة تعيين الفلاتر.</p>
+                </td>
+              </tr>
+            ` : pageItems.map(emp => {
+              const sec = secMap[emp.sectionId];
+              const un = unitMap[emp.unitId];
+              const st = staMap[emp.stationId];
               const scopeText = sec ? sec.name : (un ? un.name : (st ? st.name : 'إدارة القسم'));
               const roleInfo = window.rbac.getRoleInfo(emp.role);
 
@@ -366,6 +427,34 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
             }).join('')}
           </tbody>
         </table>
+      </div>
+
+      <!-- High-Performance Pagination Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--md-sys-color-surface-variant);">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--md-sys-color-outline);">
+          <span class="badge badge-info" style="font-size: 0.76rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 999px;">
+            ⚡ عرض ${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx} من أصل ${filtered.length} موظف
+          </span>
+          <span style="font-size: 0.78rem;">(إجمالي السجل: ${roster.length})</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <label style="font-size: 0.8rem; margin: 0; color: var(--md-sys-color-outline);">عرض بالصفحة:</label>
+          <select class="form-control" style="width: 85px; font-size: 0.8rem; padding: 0.2rem 0.5rem;" onchange="window.app.setUserRegistryPageSize(this.value)">
+            <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
+            <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
+            <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
+            <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>الكل</option>
+          </select>
+
+          <div style="display: flex; gap: 0.25rem; align-items: center;">
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">«</button>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">‹</button>
+            <span style="font-size: 0.82rem; font-weight: 700; padding: 0 0.4rem; color: var(--md-sys-color-primary);">${currentPage} / ${totalPages}</span>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">›</button>
+            <button class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.8rem;" onclick="window.app.setUserRegistryPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">»</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -670,3 +759,192 @@ function renderAuthorityHandoverTab(usersWithAccounts, actorUser) {
 
 // Export global helper
 window.renderUserManagementView = renderUserManagementView;
+
+// ==========================================================================
+// 6. نافذة وأداة توثيق وإضافة كتاب شكر وتقدير جماعي (Bulk Thanks & Seniority Modal)
+// ==========================================================================
+if (typeof window !== 'undefined') {
+  if (!window.app) window.app = {};
+
+  const bulkThanksMethods = {
+    openBulkThanksModal: function() {
+      const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+      if (!actorUser) return;
+      const deptId = actorUser.departmentId || 'dept-south-prod';
+      const sections = (window.store && typeof window.store.getSections === 'function') ? window.store.getSections(deptId) : [];
+      const stations = (window.store && typeof window.store.getStations === 'function') ? window.store.getStations(deptId) : [];
+      const employees = (window.store && typeof window.store.getUnifiedEmployeeRoster === 'function') ? window.store.getUnifiedEmployeeRoster(actorUser) : [];
+      const totalCount = employees.length;
+
+      const content = `
+        <div style="direction: rtl; text-align: right;">
+          
+          <!-- Header Badge -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-surface-variant, rgba(255,255,255,0.1)); flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h4 style="margin: 0; font-weight: 800; color: var(--md-sys-color-primary, #0284c7); display: flex; align-items: center; gap: 0.4rem; font-size: 1.15rem;">
+                <span>🎖️</span> إضافة وتوثيق كتاب شكر وتقدير عام (جماعي)
+              </h4>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.78rem; color: var(--md-sys-color-outline, #94a3b8); font-weight: 600;">
+                توثيق الكتب الوزارية والرئاسية العامة ومنح القدم الوظيفي المعتمد لكافة المشمولين وتحديث حاسبة الترفيع دفعة واحدة.
+              </p>
+            </div>
+            <span class="badge badge-success" style="font-size: 0.78rem; padding: 0.35rem 0.8rem; font-weight: 800; border-radius: 999px;">
+              إجمالي الكادر المتاح: ${totalCount} منتسباً
+            </span>
+          </div>
+
+          <form id="bulkThanksForm" onsubmit="window.app.submitBulkThanks(event)">
+            
+            <!-- 1. الجهة المصدرة لكتاب الشكر -->
+            <div class="form-group" style="margin-bottom: 0.85rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">
+                🏛️ الجهة الرسمية المصدرة لكتاب الشكر:
+              </label>
+              <select id="bulkThanksIssuer" class="form-control" style="font-weight: 700; font-size: 0.85rem;" onchange="window.app.updateBulkThanksMonthsPreview()">
+                <option value="MINISTER">السيد وزير النفط / السيد المدير العام (+1 شهر قدم وظيفي)</option>
+                <option value="PM">دولة رئيس مجلس الوزراء (+6 أشهر قدم وظيفي)</option>
+                <option value="PRESIDENT">فخامة رئيس الجمهورية (+6 أشهر أو +12 شهراً قدم وظيفي)</option>
+              </select>
+            </div>
+
+            <!-- 2. رقم الكتاب وتاريخ الصدور -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">رقم الصادر للكتاب الرسمي:</label>
+                <input type="text" id="bulkThanksNumber" class="form-control" placeholder="مثال: ش/2026/892" required style="font-weight: 700; font-family: monospace;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">تاريخ صدور الكتاب:</label>
+                <input type="date" id="bulkThanksDate" class="form-control" value="${new Date().toISOString().split('T')[0]}" required style="font-weight: 700; font-family: monospace;">
+              </div>
+            </div>
+
+            <!-- 3. موضوع الشكر والتثمين -->
+            <div class="form-group" style="margin-bottom: 0.85rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">موضوع / سبب منح الشكر والتقدير:</label>
+              <input type="text" id="bulkThanksSubject" class="form-control" value="تثميناً للجهود المتميزة في استقرار العمليات التشغيلية وتحقيق الأهداف الإنتاجية" required style="font-weight: 700;">
+            </div>
+
+            <!-- 4. نطاق التطبيق والشمول -->
+            <div class="form-group" style="margin-bottom: 0.85rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.82rem; color: var(--md-sys-color-on-surface, currentColor);">🎯 نطاق الشمول (المستفيدون من كتاب الشكر):</label>
+              <select id="bulkThanksScope" class="form-control" style="font-weight: 700; font-size: 0.85rem;">
+                <option value="ALL">⭐ كافة منتسبي قسم الإنتاج الجنوبي (${totalCount} موظفاً - شامل الجميع)</option>
+                ${sections.map(s => `<option value="SECTION_${s.id}">شعبة: ${s.name}</option>`).join('')}
+                ${stations.map(st => `<option value="STATION_${st.id}">محطة: ${st.name}</option>`).join('')}
+              </select>
+            </div>
+
+            <!-- Live Preview Impact Box -->
+            <div id="bulkThanksImpactBox" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(2, 132, 199, 0.08) 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; margin-bottom: 1.15rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>⚡</span> <span>الأثر القانوني والوظيفي المباشر:</span>
+                </div>
+                <span id="bulkThanksMonthsBadge" class="badge badge-success" style="font-weight: 800; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 999px;">
+                  +1 شهر قدم وظيفي لكل منتسب
+                </span>
+              </div>
+              <div style="font-size: 0.76rem; color: var(--md-sys-color-on-surface, currentColor); margin-top: 0.4rem; line-height: 1.45;">
+                ✓ سيتم إدراج الكتاب الرسمي في إضبارة وسجل كل موظف مشمول وتحديث عداد كُتب الشكر تلقائياً.<br>
+                ✓ سيتم تقليص موعد الترفيع القادم واحتساب الاستحقاق فوراً في الحاسبة الذكية.
+              </div>
+            </div>
+
+            <!-- Submit & Actions -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn btn-outline" onclick="window.app.closeModal ? window.app.closeModal() : (window.closeModal && window.closeModal())">إلغاء</button>
+              <button type="submit" class="btn btn-primary" style="font-weight: 800; padding: 0.55rem 1.5rem; background: linear-gradient(135deg, #0b57d0 0%, #10b981 100%); border: none; box-shadow: 0 4px 14px rgba(11, 87, 208, 0.3); cursor: pointer;">
+                💾 اعتماد وإضافة كتاب الشكر لكافة المشمولين فوراً
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      if (window.app && typeof window.app.showModal === 'function') {
+        window.app.showModal('توثيق كتاب شكر وتقدير جماعي', content, { size: 'lg' });
+      } else if (typeof window.showModal === 'function') {
+        window.showModal('توثيق كتاب شكر وتقدير جماعي', content, { size: 'lg' });
+      }
+    },
+
+    submitBulkThanks: function(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+      if (!actorUser) return;
+      const deptId = actorUser.departmentId || 'dept-south-prod';
+
+      const issuer = document.getElementById('bulkThanksIssuer') ? document.getElementById('bulkThanksIssuer').value : 'MINISTER';
+      const letterNumber = document.getElementById('bulkThanksNumber') ? document.getElementById('bulkThanksNumber').value : '';
+      const letterDate = document.getElementById('bulkThanksDate') ? document.getElementById('bulkThanksDate').value : '';
+      const subject = document.getElementById('bulkThanksSubject') ? document.getElementById('bulkThanksSubject').value : '';
+      const scope = document.getElementById('bulkThanksScope') ? document.getElementById('bulkThanksScope').value : 'ALL';
+
+      if (!letterNumber || !letterDate) {
+        if (window.app && typeof window.app.showToast === 'function') {
+          window.app.showToast('يرجى إدخال رقم وتاريخ الكتاب الرسمي.', 'warning');
+        } else if (typeof alert === 'function') {
+          alert('يرجى إدخال رقم وتاريخ الكتاب الرسمي.');
+        }
+        return;
+      }
+
+      if (window.store && typeof window.store.addBulkThanksLetter === 'function') {
+        const result = window.store.addBulkThanksLetter(deptId, {
+          issuer,
+          letterNumber,
+          letterDate,
+          subject
+        }, scope, actorUser);
+
+        if (window.app && typeof window.app.closeModal === 'function') {
+          window.app.closeModal();
+        } else if (typeof window.closeModal === 'function') {
+          window.closeModal();
+        }
+
+        if (window.app && typeof window.app.showToast === 'function') {
+          window.app.showToast(`🎖️ تم إضافة كتاب الشكر ومنح القدم لـ (${result.affectedCount}) منتسباً بنجاح!`, 'success');
+        } else if (typeof alert === 'function') {
+          alert(`🎖️ تم إضافة كتاب الشكر ومنح القدم لـ (${result.affectedCount}) منتسباً بنجاح!`);
+        }
+
+        if (window.app && typeof window.app.render === 'function') {
+          window.app.render();
+        }
+      }
+    },
+
+    updateBulkThanksMonthsPreview: function() {
+      const issuer = document.getElementById('bulkThanksIssuer') ? document.getElementById('bulkThanksIssuer').value : 'MINISTER';
+      const badge = document.getElementById('bulkThanksMonthsBadge');
+      if (!badge) return;
+      if (issuer === 'MINISTER') {
+        badge.textContent = '+1 شهر قدم وظيفي لكل منتسب';
+      } else if (issuer === 'PM') {
+        badge.textContent = '+6 أشهر قدم وظيفي لكل منتسب';
+      } else if (issuer === 'PRESIDENT') {
+        badge.textContent = '+6 أو +12 شهراً قدم وظيفي لكل منتسب';
+      }
+    }
+  };
+
+  // Bind to window.app
+  Object.assign(window.app, bulkThanksMethods);
+  
+  // Bind globally to window
+  window.openBulkThanksModal = bulkThanksMethods.openBulkThanksModal;
+  window.submitBulkThanks = bulkThanksMethods.submitBulkThanks;
+  window.updateBulkThanksMonthsPreview = bulkThanksMethods.updateBulkThanksMonthsPreview;
+
+  // Bind to App.prototype if available
+  if (typeof App !== 'undefined' && App.prototype) {
+    Object.assign(App.prototype, bulkThanksMethods);
+  }
+}
+
+// Export global helper
+window.renderUserManagementView = renderUserManagementView;
+
