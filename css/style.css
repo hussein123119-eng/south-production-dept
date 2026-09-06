@@ -4897,48 +4897,73 @@ select.form-control option {
 
 /* Dark Mode Overrides for Dossier Tabs (Jeweled Frosted Translucent Glass) */
 [data-theme="dark"] .dossier-glass-tabs-container {
-  background: rgba(7, 13, 29, 0.8) !important;
-  border: 1.2px solid rgba(0, 223, 216, 0.22) !important;
+  background: rgba(7, 13, 29, 0.85) !important;
+  border: 1.5px solid rgba(0, 223, 216, 0.25) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.06) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
 }
 
 [data-theme="dark"] .dossier-step-tab {
-  background: rgba(11, 20, 42, 0.65) !important;
-  border: 1.2px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(15, 27, 56, 0.75) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .dossier-step-tab .step-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark"] .dossier-step-tab .step-subtitle {
   color: #94a3b8 !important;
+  font-weight: 600 !important;
 }
 
 [data-theme="dark"] .dossier-step-tab .step-num {
-  background: rgba(255, 255, 255, 0.08);
-  color: #00dfd8;
-  border-color: rgba(0, 223, 216, 0.2);
+  background: rgba(0, 223, 216, 0.12) !important;
+  color: #00dfd8 !important;
+  border-color: rgba(0, 223, 216, 0.3) !important;
 }
 
 [data-theme="dark"] .dossier-step-tab:hover {
-  background: rgba(0, 223, 216, 0.08) !important;
-  border-color: rgba(0, 223, 216, 0.4) !important;
+  background: rgba(0, 223, 216, 0.15) !important;
+  border-color: rgba(0, 223, 216, 0.5) !important;
   color: #00dfd8 !important;
-  box-shadow: 0 4px 16px rgba(0, 223, 216, 0.15) !important;
+  box-shadow: 0 4px 16px rgba(0, 223, 216, 0.2) !important;
+}
+
+[data-theme="dark"] .dossier-step-tab:hover .step-title {
+  color: #00dfd8 !important;
+}
+
+[data-theme="dark"] .dossier-step-tab:hover .step-subtitle {
+  color: #e0f2fe !important;
 }
 
 [data-theme="dark"] .dossier-step-tab.active {
-  background: linear-gradient(135deg, rgba(0, 223, 216, 0.9) 0%, rgba(0, 128, 128, 0.9) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
+  background: linear-gradient(135deg, #00dfd8 0%, #0284c7 100%) !important;
+  border-color: #00dfd8 !important;
   color: #041e24 !important;
-  font-weight: 800 !important;
-  box-shadow: 0 5px 20px rgba(0, 223, 216, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 5px 22px rgba(0, 223, 216, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
-[data-theme="dark"] .dossier-step-tab.active .step-num {
-  background: rgba(4, 30, 36, 0.35) !important;
+[data-theme="dark"] .dossier-step-tab.active .step-title {
   color: #041e24 !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
+  font-weight: 900 !important;
 }
 
 [data-theme="dark"] .dossier-step-tab.active .step-subtitle {
-  color: rgba(4, 30, 36, 0.8) !important;
+  color: #003344 !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+
+[data-theme="dark"] .dossier-step-tab.active .step-num {
+  background: #041e24 !important;
+  color: #00dfd8 !important;
+  border-color: rgba(4, 30, 36, 0.5) !important;
+  font-weight: 900 !important;
 }
 
 /* ==========================================================================
@@ -7731,4 +7756,87 @@ body[data-theme="dark"],
     border-radius: 8px !important;
   }
 }
+
+/* ==============================================================================
+   🛡️ Role & Permissions Matrix Luxury Modal Enhancements
+   ============================================================================== */
+.perm-grid-card {
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.perm-grid-card:hover:not([style*="not-allowed"]) {
+  border-color: var(--md-sys-color-primary, #00dfd8) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 223, 216, 0.12);
+}
+
+/* ==============================================================================
+   🌟 Soft Neon Glassmorphic Badges (Soft Luminous Neon Pill Identity)
+   ============================================================================== */
+.neon-pill-role,
+.neon-pill-status {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.neon-pill-role:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 223, 216, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+  border-color: #00dfd8 !important;
+}
+
+.neon-pill-status:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+  border-color: #34d399 !important;
+}
+
+/* ==============================================================================
+   🏷️ Roster Station Shift Badge (إشارة نصية لحرف النوبة بجانب اسم المحطة)
+   ============================================================================== */
+.roster-shift-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  font-family: monospace, 'Cairo', 'Tajawal', sans-serif !important;
+  padding: 0.08rem 0.38rem !important;
+  border-radius: 4px !important;
+  line-height: 1.1 !important;
+  vertical-align: middle !important;
+  letter-spacing: 0.5px !important;
+  margin-inline-start: 0.35rem !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  user-select: none !important;
+}
+
+/* Shift A: Emerald Green */
+.roster-shift-pill.shift-A {
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Shift B: Royal Blue / Cyan */
+.roster-shift-pill.shift-B {
+  color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Shift C: Vivid Amber / Gold */
+.roster-shift-pill.shift-C {
+  color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Shift D: Vivid Purple / Violet */
+.roster-shift-pill.shift-D {
+  color: #a855f7 !important;
+  background: rgba(168, 85, 247, 0.12) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+}
+
 

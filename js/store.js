@@ -131,10 +131,13 @@ const INITIAL_DB = {
       sectionId: 'sec-1',
       unitId: null,
       stationId: 'st-101',
+      workShift: 'مناوب',
+      assignedShift: 'B',
+      shift: 'B',
       phone: '07704567890',
       emailPersonal: 'ammar.emp@rumaila.iq',
       emailOfficial: 'ammar.emp@rumaila.iq',
-      jobTitle: 'مشغل محطة إنتاجية أقدم',
+      jobTitle: 'مشغل محطة إنتاجية أقدم (نوبة B)',
       motherName: 'سعاد ناصر',
       passportNumber: 'A45678901',
       unifiedCardNumber: '199045678901',
@@ -240,6 +243,26 @@ const INITIAL_DB = {
       motherName: 'أميرة جاسم',
       passportNumber: 'A01234567',
       unifiedCardNumber: '198601234567',
+      dynamicValues: {},
+      transferHistory: []
+    },
+    {
+      employeeId: 'EMP-2024-011',
+      fullName: 'م. ضرغام صادق الخفاجي',
+      departmentId: 'dept-south-prod',
+      sectionId: 'sec-2',
+      unitId: null,
+      stationId: 'st-202',
+      workShift: 'مناوب',
+      assignedShift: 'A',
+      shift: 'A',
+      phone: '07709988776',
+      emailPersonal: 'dhurgham.ops@rumaila.iq',
+      emailOfficial: 'dhurgham.ops@rumaila.iq',
+      jobTitle: 'مشغل محطة إنتاجية (نوبة A)',
+      motherName: 'زينب عبد الكريم',
+      passportNumber: 'A99887766',
+      unifiedCardNumber: '199499887766',
       dynamicValues: {},
       transferHistory: []
     }
@@ -1045,6 +1068,30 @@ class StoreManager {
     }
 
     if (isLocalEnv) {
+      // البيئة المحلية (localhost): مزامنة وتحديث سجلات الكوادر والمناوبين الافتراضية
+      if (!db.employeeMasterRecords || !Array.isArray(db.employeeMasterRecords)) {
+        db.employeeMasterRecords = JSON.parse(JSON.stringify(INITIAL_DB.employeeMasterRecords || []));
+        modified = true;
+      } else {
+        (INITIAL_DB.employeeMasterRecords || []).forEach(initialMaster => {
+          const cleanId = (initialMaster.employeeId || '').trim().toUpperCase();
+          const existing = db.employeeMasterRecords.find(r => r && (r.employeeId || '').trim().toUpperCase() === cleanId);
+          if (!existing) {
+            db.employeeMasterRecords.push(JSON.parse(JSON.stringify(initialMaster)));
+            modified = true;
+          } else {
+            if (initialMaster.workShift && existing.workShift !== initialMaster.workShift) {
+              existing.workShift = initialMaster.workShift;
+              existing.assignedShift = initialMaster.assignedShift;
+              existing.shift = initialMaster.shift;
+              existing.stationId = initialMaster.stationId;
+              existing.sectionId = initialMaster.sectionId;
+              modified = true;
+            }
+          }
+        });
+      }
+
       // البيئة المحلية (localhost): تفعيل حسابات الاختبار للمطور والمؤسس للتجربة
       if (!db.users) db.users = [];
       const localTestUsers = [
@@ -1106,7 +1153,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-2024-004',
           fullName: 'عمار الساعدي',
-          jobTitle: 'مشغل محطة إنتاجية أقدم',
+          jobTitle: 'مشغل محطة إنتاجية أقدم (نوبة B)',
           phone: '07704567890',
           role: 'EMPLOYEE',
           status: 'APPROVED',
@@ -1132,6 +1179,23 @@ class StoreManager {
           unitId: 'unit-1',
           stationId: null,
           createdAt: '2026-01-05T08:00:00Z'
+        },
+        {
+          id: 'user-emp-shift-a',
+          departmentId: 'dept-south-prod',
+          email: 'dhurgham.ops@rumaila.iq',
+          password: '123456',
+          employeeId: 'EMP-2024-011',
+          fullName: 'م. ضرغام صادق الخفاجي',
+          jobTitle: 'مشغل محطة إنتاجية (نوبة A)',
+          phone: '07709988776',
+          role: 'EMPLOYEE',
+          status: 'APPROVED',
+          profileCompleted: true,
+          sectionId: 'sec-2',
+          unitId: null,
+          stationId: 'st-202',
+          createdAt: '2026-02-01T08:00:00Z'
         },
         {
           id: 'user-founder',
@@ -2006,48 +2070,30 @@ class StoreManager {
     const db = this.getDb();
     let records = db.employeeMasterRecords;
     if (!records || records.length === 0) {
-      // Fallback & Seamless Migration from approvedEmployeeIds
-      records = (db.approvedEmployeeIds || []).map(a => ({
-        employeeId: a.id || a.employeeId,
-        fullName: a.name || a.fullName || 'منتسب معتمد',
-        departmentId: a.departmentId || deptId || 'dept-south-prod',
-        sectionId: a.sectionId || null,
-        unitId: a.unitId || null,
-        stationId: a.stationId || null,
-        fatherName: a.fatherName || '',
-        grandfatherName: a.grandfatherName || '',
-        motherName: a.motherName || '',
-        birthDate: a.birthDate || '',
-        birthPlace: a.birthPlace || '',
-        maritalStatus: a.maritalStatus || 'متزوج',
-        phone: a.phone || '',
-        emailPersonal: a.emailPersonal || a.email || '',
-        emailOfficial: a.emailOfficial || a.email || '',
-        jobTitle: a.jobTitle || 'موظف تشغيل',
-        degree: a.degree || 'بكالوريوس',
-        specialization: a.specialization || '',
-        graduationYear: a.graduationYear || '',
-        university: a.university || '',
-        jobGrade: a.jobGrade || 'الخامسة',
-        jobStage: a.jobStage || 'الأولى',
-        hireDate: a.hireDate || '',
-        deptJoinDate: a.deptJoinDate || '',
-        lastPromotionDate: a.lastPromotionDate || '',
-        thanksLettersCount: a.thanksLettersCount || 0,
-        unifiedCardNumber: a.unifiedCardNumber || '',
-        passportNumber: a.passportNumber || '',
-        residenceCardNumber: a.residenceCardNumber || '',
-        rationCardNumber: a.rationCardNumber || '',
-        safetyPassportNumber: a.safetyPassportNumber || '',
-        workShift: a.workShift || 'صباحي',
-        sectionNotes: a.sectionNotes || '',
-        dynamicValues: a.dynamicValues || {},
-        transferHistory: a.transferHistory || [],
-        createdAt: a.createdAt || new Date().toISOString(),
-        updatedAt: a.updatedAt || new Date().toISOString()
-      }));
+      records = JSON.parse(JSON.stringify(INITIAL_DB.employeeMasterRecords || []));
       db.employeeMasterRecords = records;
       this.saveDb(db);
+    } else {
+      let updated = false;
+      (INITIAL_DB.employeeMasterRecords || []).forEach(initialMaster => {
+        const cleanId = (initialMaster.employeeId || '').trim().toUpperCase();
+        const existing = records.find(r => r && (r.employeeId || '').trim().toUpperCase() === cleanId);
+        if (!existing) {
+          records.push(JSON.parse(JSON.stringify(initialMaster)));
+          updated = true;
+        } else if (initialMaster.workShift && existing.workShift !== initialMaster.workShift) {
+          existing.workShift = initialMaster.workShift;
+          existing.assignedShift = initialMaster.assignedShift;
+          existing.shift = initialMaster.shift;
+          existing.stationId = initialMaster.stationId;
+          existing.sectionId = initialMaster.sectionId;
+          updated = true;
+        }
+      });
+      if (updated) {
+        db.employeeMasterRecords = records;
+        this.saveDb(db);
+      }
     }
     return deptId ? records.filter(r => r.departmentId === deptId) : records;
   }

@@ -251,12 +251,12 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
         <table class="data-table" id="unifiedRosterTable" style="font-size: 0.88rem;">
           <thead>
             <tr>
-              <th style="min-width: 180px;">الاسم</th>
-              <th style="min-width: 130px;">الرقم الوظيفي</th>
-              <th style="min-width: 140px;">جهة الارتباط</th>
-              <th style="min-width: 140px;">المسمى الوظيفي</th>
+              <th style="min-width: 220px;">الاسم</th>
+              <th style="min-width: 120px;">الرقم الوظيفي</th>
+              <th style="min-width: 160px;">جهة الارتباط</th>
+              <th style="min-width: 130px;">المسمى الوظيفي</th>
               <th style="min-width: 120px;">الدور</th>
-              <th style="min-width: 140px; text-align: center;">الصلاحيات</th>
+              <th style="min-width: 120px; text-align: center;">الصلاحيات</th>
               <th style="min-width: 120px; text-align: center;">الإضبارة</th>
             </tr>
           </thead>
@@ -267,6 +267,19 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
               const st = stations.find(station => station.id === emp.stationId);
               const scopeText = sec ? sec.name : (un ? un.name : (st ? st.name : 'إدارة القسم'));
               const roleInfo = window.rbac.getRoleInfo(emp.role);
+
+              // Check if employee is shift worker and get shift letter
+              const rawShift = emp.assignedShift || emp.shift || '';
+              const isShiftWorker = emp.workShift === 'مناوب' || (rawShift && rawShift !== 'صباحي' && rawShift !== 'حقلي');
+              let shiftLetter = '';
+              if (isShiftWorker) {
+                const match = String(rawShift).match(/[ABCDأبجد]/i);
+                shiftLetter = match ? match[0].toUpperCase() : (emp.workShift === 'مناوب' ? 'A' : '');
+                if (shiftLetter === 'أ') shiftLetter = 'A';
+                else if (shiftLetter === 'ب') shiftLetter = 'B';
+                else if (shiftLetter === 'ج') shiftLetter = 'C';
+                else if (shiftLetter === 'د') shiftLetter = 'D';
+              }
 
               return `
                 <tr class="unified-roster-row" 
@@ -280,31 +293,40 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
                   
                   <!-- 1. الاسم -->
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.6rem;">
-                      <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--md-sys-color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 0;">
+                      <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--md-sys-color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
                         ${(emp.fullName || 'م').substring(0, 2)}
                       </div>
-                      <div>
-                        <strong style="font-size: 0.92rem; color: var(--md-sys-color-on-surface);">${emp.fullName}</strong>
-                        <div style="font-size: 0.75rem; color: var(--md-sys-color-outline);">${emp.userEmail || emp.emailPersonal || 'مستخدم مسجل'}</div>
+                      <div style="min-width: 0;">
+                        <strong style="font-size: 0.92rem; color: var(--md-sys-color-on-surface); white-space: nowrap; display: block;" title="${emp.fullName}">${emp.fullName}</strong>
+                        <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); white-space: nowrap;">${emp.userEmail || emp.emailPersonal || 'مستخدم مسجل'}</div>
                       </div>
                     </div>
                   </td>
 
                   <!-- 2. الرقم الوظيفي -->
-                  <td style="font-family: monospace; font-weight: 700;">
+                  <td style="font-family: monospace; font-weight: 700; white-space: nowrap;">
                     <code>${emp.employeeId}</code>
                   </td>
 
                   <!-- 3. جهة الارتباط -->
                   <td>
-                    <div style="font-weight: 700; color: var(--md-sys-color-on-surface);">${scopeText}</div>
-                    ${st ? `<div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px;">📍 الموقع: <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span></div>` : ''}
+                    <div style="font-weight: 700; color: var(--md-sys-color-on-surface); white-space: nowrap;">${scopeText}</div>
+                    ${st ? `
+                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem;">
+                        <span>📍 الموقع: <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span></span>
+                        ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter}" title="نوبة الموظف: ${shiftLetter}">${shiftLetter}</span>` : ''}
+                      </div>
+                    ` : (isShiftWorker && shiftLetter ? `
+                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap;">
+                        <span class="roster-shift-pill shift-${shiftLetter}" title="نوبة الموظف: ${shiftLetter}">${shiftLetter}</span>
+                      </div>
+                    ` : '')}
                   </td>
 
                   <!-- 4. المسمى الوظيفي -->
                   <td>
-                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600;">
+                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف تشغيل'}">
                       ${emp.jobTitle || 'موظف تشغيل'}
                     </span>
                   </td>
@@ -312,7 +334,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations, uni
                   <!-- 5. الدور -->
                   <td>
                     ${emp.hasAccount ? `
-                      <span class="badge ${roleInfo.badgeClass}" style="font-size: 0.78rem;">
+                      <span class="badge ${roleInfo.badgeClass}" style="font-size: 0.78rem; max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${roleInfo.name}">
                         ${roleInfo.name}
                       </span>
                     ` : `

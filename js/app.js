@@ -5067,53 +5067,64 @@ class AppController {
 
     this.showModal(`🛡️ تعديل الدور والصلاحيات - ${targetUser.fullName}`, `
       <form class="modal-form-container" onsubmit="window.app.handleSaveUserRoleAndPermissions(event, '${targetUser.id}')">
-        <div class="modal-form-body">
+        <div class="modal-form-body" style="padding: 0.5rem 0.25rem;">
           
-          <!-- User Summary Banner (Luxury Crystal Header) -->
-          <div class="crystal-action-banner" style="background: linear-gradient(135deg, rgba(11, 87, 208, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%); border: 1.5px solid rgba(11, 87, 208, 0.22); padding: 1.1rem 1.4rem; border-radius: 16px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);">
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #0b57d0 0%, #0284c7 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; box-shadow: 0 4px 12px rgba(11, 87, 208, 0.25);">
+          <!-- User Summary Banner (Ultra-Modern Soft Neon Frosted Glass Header) -->
+          <div class="crystal-action-banner" style="background: linear-gradient(135deg, rgba(8, 28, 62, 0.92) 0%, rgba(12, 45, 88, 0.85) 50%, rgba(5, 20, 48, 0.92) 100%); border: 1.5px solid rgba(0, 223, 216, 0.4); padding: 1.35rem 1.6rem; border-radius: 18px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 25px rgba(0, 223, 216, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.18); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);">
+            <div style="display: flex; align-items: center; gap: 1.2rem;">
+              <div style="width: 58px; height: 58px; min-width: 58px; border-radius: 50%; background: linear-gradient(135deg, #00dfd8 0%, #0284c7 100%); color: #041e24; display: flex; align-items: center; justify-content: center; font-size: 1.65rem; font-weight: 900; box-shadow: 0 4px 20px rgba(0, 223, 216, 0.45), 0 0 0 3px rgba(0, 223, 216, 0.25); border: 2.5px solid #ffffff;">
                 👤
               </div>
               <div>
-                <strong style="font-size: 1.18rem; color: #0f172a; display: block; font-weight: 800;">${targetUser.fullName}</strong>
-                <div style="font-size: 0.84rem; color: #64748b; margin-top: 2px; font-weight: 600;">
-                  <span>البريد: ${targetUser.email}</span> • <span>الرقم الوظيفي: <code>${targetUser.employeeId}</code></span>
+                <div style="font-size: 1.35rem; color: #ffffff; font-weight: 900; letter-spacing: -0.3px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); line-height: 1.3; margin-bottom: 0.4rem;">
+                  ${targetUser.fullName}
+                </div>
+                <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap; font-size: 0.86rem;">
+                  <span style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(255, 255, 255, 0.07); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.14);">
+                    <span style="color: #38bdf8; font-size: 0.95rem;">📧</span>
+                    <span style="color: #f1f5f9; font-weight: 600;">${targetUser.email}</span>
+                  </span>
+                  <span style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(0, 223, 216, 0.12); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(0, 223, 216, 0.35);">
+                    <span style="color: #94a3b8; font-weight: 700;">الرقم الوظيفي:</span>
+                    <code style="color: #00dfd8; font-weight: 900; font-family: monospace; font-size: 0.92rem; letter-spacing: 0.5px;">${targetUser.employeeId}</code>
+                  </span>
                 </div>
               </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span class="badge ${window.rbac.getRoleInfo(targetUser.role).badgeClass}" style="font-size: 0.88rem; padding: 0.35rem 0.85rem; font-weight: 800;">
-                الدور الحالي: ${window.rbac.getRoleInfo(targetUser.role).name}
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span class="neon-pill-role" style="font-size: 0.94rem; padding: 0.55rem 1.4rem; font-weight: 800; border-radius: 9999px; background: linear-gradient(135deg, rgba(0, 223, 216, 0.22) 0%, rgba(14, 165, 233, 0.14) 100%); color: #ffffff; border: 1.5px solid rgba(0, 223, 216, 0.7); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3), 0 0 14px rgba(0, 223, 216, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: inline-flex; align-items: center; gap: 0.55rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); letter-spacing: 0.2px;">
+                <span style="color: #00dfd8; font-size: 1.1rem; filter: drop-shadow(0 0 6px rgba(0, 223, 216, 0.7));">🎭</span>
+                <span style="color: #94a3b8; font-size: 0.86rem; font-weight: 700;">الدور الحالي:</span>
+                <strong style="color: #ffffff; font-weight: 900; text-shadow: 0 0 10px rgba(0, 223, 216, 0.5);">${window.rbac.getRoleInfo(targetUser.role).name}</strong>
               </span>
             </div>
           </div>
 
           <!-- Section 1: Role Selection -->
-          <div style="background: rgba(255, 255, 255, 0.65); border: 1.2px solid rgba(0,0,0,0.08); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
-            <label class="form-label" style="font-weight: 800; color: #0f172a; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+          <div style="background: var(--md-sys-color-surface, rgba(15, 27, 56, 0.8)); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12)); border-radius: 16px; padding: 1.35rem; margin-bottom: 1.35rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+            <label class="form-label" style="font-weight: 800; color: var(--md-sys-color-on-surface, #ffffff); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.45rem; font-size: 1rem;">
               <span>🎭 1. الدور الوظيفي الأساسي (System Role):</span>
-              <span style="color: #dc2626;">*</span>
+              <span style="color: #ef4444;">*</span>
             </label>
-            <select id="editUserRoleSelect" class="form-control" style="font-weight: 700; font-size: 0.95rem;">
+            <select id="editUserRoleSelect" class="form-control" style="font-weight: 700; font-size: 0.98rem; background: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.9)); color: var(--md-sys-color-on-surface, #ffffff); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.15)); border-radius: 10px; padding: 0.7rem 0.9rem;">
               ${availableRoles.map(r => `
                 <option value="${r.key}" ${targetUser.role === r.key ? 'selected' : ''}>${r.name}</option>
               `).join('')}
             </select>
-            <div style="font-size: 0.78rem; color: #64748b; margin-top: 5px;">
-              يمنح الدور حزمة الصلاحيات الافتراضية المحددة بالنظام، ويمكنك تخصيص صلاحيات إضافية بالأسفل.
+            <div style="font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant, #cbd5e1); margin-top: 6px; opacity: 0.95;">
+              💡 يمنح الدور حزمة الصلاحيات الافتراضية المحددة بالنظام، ويمكنك تخصيص وتوسيع الصلاحيات الإضافية في مصفوفة الصلاحيات بالأسفل.
             </div>
           </div>
 
           <!-- Section 2: Organizational Scopes (الارتباط والتشكيلات) -->
-          <div style="background: rgba(255, 255, 255, 0.65); border: 1.2px solid rgba(0,0,0,0.08); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
-            <strong style="font-size: 0.96rem; color: #0f172a; display: block; margin-bottom: 0.85rem; font-weight: 800;">
+          <div style="background: var(--md-sys-color-surface, rgba(15, 27, 56, 0.8)); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12)); border-radius: 16px; padding: 1.35rem; margin-bottom: 1.35rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+            <strong style="font-size: 1rem; color: var(--md-sys-color-on-surface, #ffffff); display: block; margin-bottom: 0.9rem; font-weight: 800;">
               🏢 2. نطاق المسؤولية والارتباط التنظيمي (Organizational Scope):
             </strong>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">الشعبة:</label>
-                <select id="editUserSectionSelect" class="form-control" onchange="window.app.onModalScopeSectionChange(this.value)">
+                <label class="form-label" style="color: var(--md-sys-color-on-surface, #ffffff); font-weight: 700; margin-bottom: 0.4rem;">الشعبة:</label>
+                <select id="editUserSectionSelect" class="form-control" style="background: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.9)); color: var(--md-sys-color-on-surface, #ffffff); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.15)); border-radius: 10px; padding: 0.65rem 0.85rem;" onchange="window.app.onModalScopeSectionChange(this.value)">
                   <option value="">-- بدون شعبة (إدارة القسم) --</option>
                   ${sections.map(s => `
                     <option value="${s.id}" ${targetUser.sectionId === s.id ? 'selected' : ''}>${s.name}</option>
@@ -5121,8 +5132,8 @@ class AppController {
                 </select>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">الوحدة:</label>
-                <select id="editUserUnitSelect" class="form-control">
+                <label class="form-label" style="color: var(--md-sys-color-on-surface, #ffffff); font-weight: 700; margin-bottom: 0.4rem;">الوحدة:</label>
+                <select id="editUserUnitSelect" class="form-control" style="background: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.9)); color: var(--md-sys-color-on-surface, #ffffff); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.15)); border-radius: 10px; padding: 0.65rem 0.85rem;">
                   <option value="">-- بدون وحدة --</option>
                   ${units.map(u => `
                     <option value="${u.id}" ${targetUser.unitId === u.id ? 'selected' : ''}>${u.name}</option>
@@ -5130,8 +5141,8 @@ class AppController {
                 </select>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">الموقع / المحطة:</label>
-                <select id="editUserStationSelect" class="form-control">
+                <label class="form-label" style="color: var(--md-sys-color-on-surface, #ffffff); font-weight: 700; margin-bottom: 0.4rem;">الموقع / المحطة:</label>
+                <select id="editUserStationSelect" class="form-control" style="background: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.9)); color: var(--md-sys-color-on-surface, #ffffff); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.15)); border-radius: 10px; padding: 0.65rem 0.85rem;">
                   <option value="">-- بدون محطة --</option>
                   ${stations.map(st => `
                     <option value="${st.id}" ${targetUser.stationId === st.id ? 'selected' : ''}>${st.name}</option>
@@ -5141,55 +5152,60 @@ class AppController {
             </div>
           </div>
 
-          <!-- Section 3: Permission Groups Matrix -->
-          <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <strong style="font-size: 1.05rem; color: #0f172a; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+          <!-- Section 3: Permission Groups Matrix (المجاميع المنظمة) -->
+          <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12));">
+            <strong style="font-size: 1.12rem; color: var(--md-sys-color-on-surface, #ffffff); font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
               <span>🛡️ 3. مصفوفة الصلاحيات المخصصة (Permission Matrix):</span>
             </strong>
-            <div style="display: flex; gap: 0.5rem;">
-              <button type="button" class="btn btn-sm btn-outline" onclick="window.app.selectAllModalPermissions(true)">
-                تحديد جميع الصلاحيات المتاحة
+            <div style="display: flex; gap: 0.6rem;">
+              <button type="button" class="btn btn-sm btn-glass-primary" style="padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 800; border-radius: 8px;" onclick="window.app.selectAllModalPermissions(true)">
+                ✓ تحديد جميع الصلاحيات
               </button>
-              <button type="button" class="btn btn-sm btn-outline" onclick="window.app.selectAllModalPermissions(false)">
-                إلغاء التحديد
+              <button type="button" class="btn btn-sm btn-outline" style="padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 800; border-radius: 8px;" onclick="window.app.selectAllModalPermissions(false)">
+                ✕ إلغاء التحديد
               </button>
             </div>
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Permission Groups Cards -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
             ${groups.map(grp => `
-              <div style="background: #ffffff; border: 1.5px solid rgba(0,0,0,0.09); border-radius: 14px; padding: 1.15rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px dashed rgba(0,0,0,0.12); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-                  <div>
-                    <strong style="font-size: 0.96rem; color: #0b57d0; display: flex; align-items: center; gap: 0.45rem; font-weight: 800;">
-                      ${grp.icon} ${grp.name}
-                    </strong>
-                    <div style="font-size: 0.76rem; color: #64748b; margin-top: 2px; font-weight: 600;">
-                      ${grp.desc} (${grp.permissions.length} صلاحيات)
+              <div style="background: var(--md-sys-color-surface, rgba(15, 27, 56, 0.8)); border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12)); border-radius: 16px; padding: 1.25rem 1.4rem; box-shadow: 0 4px 18px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+                
+                <!-- Group Header Bar -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px dashed var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.15)); padding-bottom: 0.65rem; flex-wrap: wrap; gap: 0.65rem;">
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <span style="font-size: 1.45rem; line-height: 1;">${grp.icon}</span>
+                    <div>
+                      <div style="font-size: 1.04rem; font-weight: 800; color: var(--md-sys-color-primary, #00dfd8); letter-spacing: -0.2px;">${grp.name}</div>
+                      <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant, #cbd5e1); margin-top: 2px; font-weight: 600;">
+                        ${grp.desc} • <span style="font-weight: 800; color: var(--md-sys-color-secondary, #38bdf8);">${grp.permissions.length} صلاحيات</span>
+                      </div>
                     </div>
                   </div>
-                  <div style="display: flex; gap: 0.35rem;">
-                    <button type="button" class="btn btn-sm btn-glass-emerald" style="padding: 0.2rem 0.55rem; font-size: 0.72rem; font-weight: 700;" onclick="window.app.selectGroupModalPermissions('${grp.id}', true)">
-                      تحديد الكل
+                  <div style="display: flex; gap: 0.4rem;">
+                    <button type="button" class="btn btn-sm btn-glass-emerald" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 800; border-radius: 8px;" onclick="window.app.selectGroupModalPermissions('${grp.id}', true)">
+                      ✓ تحديد الكل
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.72rem; font-weight: 700;" onclick="window.app.selectGroupModalPermissions('${grp.id}', false)">
-                      إلغاء
+                    <button type="button" class="btn btn-sm btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 800; border-radius: 8px;" onclick="window.app.selectGroupModalPermissions('${grp.id}', false)">
+                      ✕ إلغاء
                     </button>
                   </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
+                <!-- Structured Grid of Permissions within this Group -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 0.75rem;">
                   ${grp.permissions.map(p => {
                     const isChecked = targetPerms.includes(p.key) || window.rbac.hasPermission(targetUser, p.key);
                     const canGrant = window.rbac.canGrantPermission(actorUser, p.key);
 
                     return `
-                      <label style="display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.84rem; background: rgba(248, 250, 252, 0.85); padding: 0.55rem 0.75rem; border-radius: 10px; border: 1.2px solid rgba(0,0,0,0.06); cursor: ${canGrant ? 'pointer' : 'not-allowed'}; opacity: ${canGrant ? 1 : 0.55}; transition: all 0.15s ease;" title="${p.desc}">
-                        <input type="checkbox" class="modal-perm-checkbox" data-group="${grp.id}" name="userPermissions" value="${p.key}" ${isChecked ? 'checked' : ''} ${canGrant ? '' : 'disabled'} style="margin-top: 3px; transform: scale(1.15);">
-                        <div style="flex: 1;">
-                          <strong style="color: #0f172a; font-weight: 700;">${p.name}</strong>
-                          <div style="font-size: 0.74rem; color: #64748b; margin-top: 1px; line-height: 1.4;">${p.desc}</div>
-                          ${!canGrant ? '<span style="font-size: 0.7rem; color: #dc2626; font-weight: 800; display: block; margin-top: 2px;">(غير مصرح لك بمنح هذه الصلاحية)</span>' : ''}
+                      <label style="display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.85rem; background: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.85)); padding: 0.75rem 0.85rem; border-radius: 12px; border: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12)); cursor: ${canGrant ? 'pointer' : 'not-allowed'}; opacity: ${canGrant ? 1 : 0.45}; transition: all 0.2s ease; position: relative; user-select: none;" title="${p.desc}">
+                        <input type="checkbox" class="modal-perm-checkbox" data-group="${grp.id}" name="userPermissions" value="${p.key}" ${isChecked ? 'checked' : ''} ${canGrant ? '' : 'disabled'} style="margin-top: 3px; transform: scale(1.2); accent-color: var(--md-sys-color-primary, #00dfd8);">
+                        <div style="flex: 1; min-width: 0;">
+                          <div style="color: var(--md-sys-color-on-surface, #ffffff); font-weight: 800; font-size: 0.88rem; line-height: 1.35; margin-bottom: 2px;">${p.name}</div>
+                          <div style="font-size: 0.73rem; color: var(--md-sys-color-on-surface-variant, #cbd5e1); line-height: 1.4; opacity: 0.9;">${p.desc}</div>
+                          ${!canGrant ? '<span style="font-size: 0.68rem; color: var(--md-sys-color-error, #ef4444); font-weight: 800; display: block; margin-top: 4px;">⛔ غير مصرح لك بمنحها</span>' : ''}
                         </div>
                       </label>
                     `;
@@ -5201,11 +5217,11 @@ class AppController {
 
         </div>
 
-        <div class="modal-form-sticky-footer">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()" style="font-weight: 700; padding: 0.6rem 1.4rem; border-radius: 10px;">
+        <div class="modal-form-sticky-footer" style="padding: 1rem 1.5rem; background: var(--md-sys-color-surface, rgba(15, 27, 56, 0.95)); border-top: 1.5px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.12)); border-radius: 0 0 16px 16px; display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()" style="font-weight: 700; padding: 0.65rem 1.5rem; border-radius: 10px;">
             إلغاء
           </button>
-          <button type="submit" class="btn btn-save-prominent">
+          <button type="submit" class="btn btn-save-prominent" style="padding: 0.65rem 1.6rem; border-radius: 10px; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
               <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -5215,7 +5231,7 @@ class AppController {
           </button>
         </div>
       </form>
-    `, { size: 'xl', maxWidth: '1150px' });
+    `, { size: 'xl', maxWidth: '1200px' });
   }
 
   selectAllModalPermissions(checkAll) {
@@ -5659,30 +5675,38 @@ class AppController {
     this.showModal(`📂 إضبارة الموظف الموحدة والأصلية - ${master.fullName}`, `
       <div style="max-height: 75vh; overflow-y: auto; padding-left: 0.5rem;">
         
-        <!-- Header Identity Banner -->
-        <div style="background: linear-gradient(135deg, var(--md-sys-color-primary), #003366); color: white; border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.25);">
+        <!-- Header Identity Banner (Deep Midnight Petroleum Glass Banner) -->
+        <div class="dossier-hero-banner" style="background: linear-gradient(135deg, #06152d 0%, #0a254a 55%, #021a38 100%) !important; color: #ffffff !important; border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 223, 216, 0.1) !important; border: 1.5px solid rgba(0, 223, 216, 0.35) !important;">
           <div style="display: flex; align-items: center; gap: 1.25rem;">
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: white; color: var(--md-sys-color-primary); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #00dfd8 0%, #0284c7 100%); color: #041e24; display: flex; align-items: center; justify-content: center; font-size: 1.7rem; font-weight: 900; box-shadow: 0 4px 18px rgba(0, 223, 216, 0.4);">
               ${(master.fullName || 'م').substring(0, 2)}
             </div>
             <div>
-              <h3 style="margin: 0; font-weight: 900; font-size: 1.5rem; color: white; letter-spacing: -0.3px;">${master.fullName}</h3>
-              <div style="font-size: 0.92rem; opacity: 0.95; margin-top: 4px; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                <span>الرقم الوظيفي:</span>
-                <code style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.95rem; color: #fff;">${master.employeeId}</code>
-                <span>|</span>
-                <strong style="color: #f8fafc;">${master.jobTitle || 'موظف تشغيل'}</strong>
+              <h3 style="margin: 0; font-weight: 900; font-size: 1.55rem; color: #ffffff !important; letter-spacing: -0.3px; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">${master.fullName}</h3>
+              <div style="font-size: 0.92rem; color: #cbd5e1; margin-top: 4px; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <span style="color: #94a3b8;">الرقم الوظيفي:</span>
+                <code style="background: rgba(0, 223, 216, 0.15); padding: 3px 10px; border-radius: 6px; font-weight: 800; font-size: 0.95rem; color: #00dfd8; border: 1.2px solid rgba(0, 223, 216, 0.4); font-family: monospace;">${master.employeeId}</code>
+                <span style="color: #64748b;">|</span>
+                <strong style="color: #f1f5f9; font-weight: 700;">${master.jobTitle || 'موظف تشغيل'}</strong>
               </div>
             </div>
           </div>
-          <div style="display: flex; gap: 0.6rem; flex-direction: column; align-items: flex-end;">
-            <span class="badge ${roleInfo.badgeClass}" style="font-size: 0.9rem; padding: 0.45rem 0.95rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-              ${roleInfo.name} (${scopeName})
+          <div style="display: flex; gap: 0.65rem; flex-direction: column; align-items: flex-end;">
+            <span class="neon-pill-role" style="font-size: 0.92rem; padding: 0.45rem 1.2rem; font-weight: 800; border-radius: 9999px; background: linear-gradient(135deg, rgba(0, 223, 216, 0.2) 0%, rgba(14, 165, 233, 0.12) 100%); color: #ffffff; border: 1.5px solid rgba(0, 223, 216, 0.65); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 12px rgba(0, 223, 216, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: inline-flex; align-items: center; gap: 0.45rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); letter-spacing: 0.2px;">
+              <span style="color: #00dfd8; font-size: 1rem;">🛡️</span>
+              <span style="color: #ffffff; font-weight: 800;">${roleInfo.name}</span>
+              <span style="color: #67e8f9; font-size: 0.85rem; font-weight: 700;">(${scopeName})</span>
             </span>
             ${linkedUser ? `
-              <span class="badge badge-success" style="font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.75rem;">🟢 حساب معتمد ومفعل (${linkedUser.status})</span>
+              <span class="neon-pill-status" style="font-size: 0.88rem; font-weight: 800; padding: 0.4rem 1.2rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.12) 100%); color: #ffffff; border: 1.5px solid rgba(52, 211, 153, 0.65); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 12px rgba(16, 185, 129, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: inline-flex; align-items: center; gap: 0.5rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);">
+                <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981, 0 0 4px #34d399;"></span>
+                <span style="color: #ffffff; font-weight: 800;">حساب معتمد</span>
+                <span style="color: #6ee7b7; font-size: 0.82rem; font-weight: 700;">(${linkedUser.status})</span>
+              </span>
             ` : `
-              <span class="badge" style="background: rgba(255,255,255,0.22); color: white; font-size: 0.82rem; padding: 0.3rem 0.75rem;">⚪ بدون حساب مستخدم</span>
+              <span class="neon-pill-status" style="font-size: 0.88rem; font-weight: 800; padding: 0.4rem 1.2rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%); color: #ffffff; border: 1.5px solid rgba(255, 255, 255, 0.35); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: inline-flex; align-items: center; gap: 0.5rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);">
+                <span>⚪ بدون حساب مستخدم</span>
+              </span>
             `}
           </div>
         </div>
