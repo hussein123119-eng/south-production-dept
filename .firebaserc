@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "south-prod-rumaila"
-  }
+  },
+  "targets": {
+    "south-prod-rumaila": {
+      "hosting": {
+        "prod": [
+          "south-prod-rumaila"
+        ],
+        "founder": [
+          "south-prod-founder"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
