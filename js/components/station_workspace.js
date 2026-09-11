@@ -131,11 +131,16 @@ function renderStationWorkspaceView(stationId) {
           👥 <span>الكوادر العاملة</span> 
           <span class="tab-count-badge">${stationStaffList.length}</span>
         </button>
+        <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" 
+                onclick="window.app.setStationSubTab('mail')">
+          📬 <span>البريد</span>
+        </button>
       </div>
 
       ${(activeSubTab === 'reports' || activeSubTab === 'documents') ? renderSpecializedStationReportsTab(station, section, stationDocs, user) : ''}
       ${activeSubTab === 'notifs' ? renderSpecializedStationNotifsTab(station, section, relevantNotifs, user) : ''}
       ${activeSubTab === 'staff' ? renderSpecializedStationStaffTab(station, section, stationStaffList) : ''}
+      ${activeSubTab === 'mail' ? (typeof window.renderMailTab === 'function' ? window.renderMailTab({ level: 'station', id: station.id }) : '<div class="card" style="padding:2rem;text-align:center;">⏳ جاري تحميل نظام البريد...</div>') : ''}
     ` : `
       <!-- التبويبات القياسية لمحطات الشعب الإنتاجية الأولى والثانية -->
       <div class="tabs-header" style="margin-bottom: 1.5rem;">
@@ -143,12 +148,14 @@ function renderStationWorkspaceView(stationId) {
         <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setStationSubTab('documents')">📄 <span>الوثائق والمستندات</span> <span class="tab-count-badge">${stationDocs.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'staff' ? 'active' : ''}" onclick="window.app.setStationSubTab('staff')">👥 <span>الكوادر العاملة</span> <span class="tab-count-badge">${stationStaffList.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'technical' ? 'active' : ''}" onclick="window.app.setStationSubTab('technical')">⚙️ <span>البيانات الفنية والتشغيل</span></button>
+        <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setStationSubTab('mail')">📬 <span>البريد</span></button>
       </div>
 
       ${activeSubTab === 'overview' ? renderStationOverviewTab(station, section, stationDocs, stationStaffList, user) : ''}
       ${activeSubTab === 'documents' ? renderStationDocsTab(station, stationDocs, user) : ''}
       ${activeSubTab === 'staff' ? renderStationStaffTab(station, stationStaffList) : ''}
       ${activeSubTab === 'technical' ? renderStationTechnicalTab(station) : ''}
+      ${activeSubTab === 'mail' ? (typeof window.renderMailTab === 'function' ? window.renderMailTab({ level: 'station', id: station.id }) : '<div class="card" style="padding:2rem;text-align:center;">⏳ جاري تحميل نظام البريد...</div>') : ''}
     `}
   `;
 }

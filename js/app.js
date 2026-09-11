@@ -1169,8 +1169,8 @@ class AppController {
       return;
     }
 
-    const cleanEmail = email.toLowerCase();
-    const isFounderEmail = cleanEmail === 'hussein123119@gmail.com' || cleanEmail === 'southprod.rumaila@gmail.com';
+    const cleanEmail = email.toLowerCase().trim();
+    const isFounderEmail = cleanEmail === 'hussein123119@gmail.com' || cleanEmail === 'southprod.rumaila@gmail.com' || cleanEmail === 'founder@local.spd';
 
     if (!isFounderEmail && !empId) {
       if (errEl) {
@@ -1180,7 +1180,11 @@ class AppController {
       return;
     }
 
-    const user = window.store.getUserByEmail(email);
+    let user = window.store.getUserByEmail(email);
+    if (!user && isFounderEmail) {
+      user = window.store.getUserById('user-founder') || (window.store.getDb().users || []).find(u => u && (u.role === 'SUPER_ADMIN' || u.id === 'user-founder'));
+    }
+
     if (!user) {
       if (errEl) {
         errEl.textContent = 'عذراً، هذا البريد الإلكتروني غير مسجل في المنظومة.';
@@ -10075,6 +10079,11 @@ window.app = app;
 
 document.addEventListener('DOMContentLoaded', () => {
   app.render();
+
+  // تسجيل وظائف نظام البريد الداخلي
+  if (typeof window.registerMailAppMethods === 'function') {
+    window.registerMailAppMethods(app);
+  }
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();

@@ -63,6 +63,8 @@ class AuthService {
     let user = users.find(u => {
       if (!u) return false;
       if (isEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
+      if (isEmail && u.secondaryEmail && u.secondaryEmail.toLowerCase() === cleanEmail) return true;
+      if (isEmail && (cleanEmail === 'hussein123119@gmail.com' || cleanEmail === 'southprod.rumaila@gmail.com' || cleanEmail === 'founder@local.spd') && (u.id === 'user-founder' || u.role === 'SUPER_ADMIN')) return true;
       if (u.employeeId && u.employeeId.toUpperCase() === cleanEmpId) return true;
       if (!isEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
       if (legacyEmpId && u.employeeId && u.employeeId.toUpperCase() === legacyEmpId.toUpperCase().trim()) return true;
@@ -75,7 +77,8 @@ class AuthService {
         {
           id: 'user-founder',
           departmentId: 'dept-south-prod',
-          email: 'founder@local.spd',
+          email: 'hussein123119@gmail.com',
+          secondaryEmail: 'southprod.rumaila@gmail.com',
           password: '123456',
           employeeId: 'EMP-0000',
           fullName: 'المؤسس العام للمنظومة',

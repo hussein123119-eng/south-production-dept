@@ -199,6 +199,9 @@ function renderDeptManagementView() {
         <button class="tab-btn ${activeTab === 'vehicles' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('vehicles')">
           🚘 <span>مرآب وعجلات القسم</span> <span class="tab-count-badge">${safeVehicles.length}</span>
         </button>
+        <button class="tab-btn ${activeTab === 'mail' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('mail')">
+          📬 <span>البريد</span>
+        </button>
       </div>
 
       <!-- Sub-Tab Content View -->
@@ -209,6 +212,7 @@ function renderDeptManagementView() {
         ${activeTab === 'docs' ? renderDeptDocsTab(safeDocs, actorUser, safeSections) : ''}
         ${activeTab === 'interviews' ? renderDeptInterviewsTab(safeInterviews, actorUser) : ''}
         ${activeTab === 'vehicles' ? renderDeptVehiclesTab(safeVehicles, actorUser, safeSections) : ''}
+        ${activeTab === 'mail' ? (typeof window.renderMailTab === 'function' ? window.renderMailTab({ level: 'department', id: actorUser.departmentId || 'dept-south-prod' }) : '<div class="card" style="padding:2rem;text-align:center;">⏳ جاري تحميل نظام البريد...</div>') : ''}
       </div>
     `;
   } catch (err) {

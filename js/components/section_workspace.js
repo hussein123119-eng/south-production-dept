@@ -140,6 +140,7 @@ function renderSectionWorkspaceView(sectionId) {
       <button class="tab-btn ${activeSubTab === 'forms' ? 'active' : ''}" onclick="window.app.setSectionSubTab('forms')">📝 <span>الاستمارات والبيانات</span></button>
       <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setSectionSubTab('documents')">📄 <span>الوثائق والتقارير</span> <span class="tab-count-badge">${sectionDocs.length}</span></button>
       <button class="tab-btn ${activeSubTab === 'vehicles' ? 'active' : ''}" onclick="window.app.setSectionSubTab('vehicles')">🚘 <span>السيارات</span></button>
+      <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setSectionSubTab('mail')">📬 <span>البريد</span></button>
     </div>
 
     ${activeSubTab === 'stations' ? renderSectionStationsTab(section, stations, user) : ''}
@@ -149,6 +150,7 @@ function renderSectionWorkspaceView(sectionId) {
     ${activeSubTab === 'staff' ? renderSectionStaffTab(section, sectionStaff) : ''}
     ${activeSubTab === 'documents' ? renderSectionDocsTab(section, sectionDocs, user) : ''}
     ${activeSubTab === 'vehicles' ? renderSectionVehiclesTab(section, user) : ''}
+    ${activeSubTab === 'mail' ? (typeof window.renderMailTab === 'function' ? window.renderMailTab({ level: 'section', id: section.id }) : '<div class="card" style="padding:2rem;text-align:center;">⏳ جاري تحميل نظام البريد...</div>') : ''}
   `;
 }
 

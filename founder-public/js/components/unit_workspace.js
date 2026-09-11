@@ -93,6 +93,7 @@ function renderUnitWorkspaceView(unitId) {
       <button class="tab-btn ${activeSubTab === 'notifs' ? 'active' : ''}" onclick="window.app.setUnitSubTab('notifs')">📢 <span>التبليغات والتوجيهات</span> <span class="tab-count-badge">${unitNotifs.length}</span></button>
       <button class="tab-btn ${activeSubTab === 'forms' ? 'active' : ''}" onclick="window.app.setUnitSubTab('forms')">📝 <span>استمارات وبيانات الوحدة</span></button>
       <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setUnitSubTab('documents')">📄 <span>الدراسات والتقارير الفنية</span> <span class="tab-count-badge">${unitDocs.length}</span></button>
+      <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setUnitSubTab('mail')">📬 <span>البريد</span></button>
     </div>
 
     ${activeSubTab === 'staff' ? renderUnitStaffTab(unit, unitStaff) : ''}
@@ -100,6 +101,7 @@ function renderUnitWorkspaceView(unitId) {
     ${activeSubTab === 'notifs' ? renderUnitNotificationsTab(unit, unitNotifs, user) : ''}
     ${activeSubTab === 'forms' ? renderUnitFormsTab(unit, user, unitRequests) : ''}
     ${activeSubTab === 'documents' ? renderUnitDocsTab(unit, unitDocs, user) : ''}
+    ${activeSubTab === 'mail' ? (typeof window.renderMailTab === 'function' ? window.renderMailTab({ level: 'unit', id: unit.id }) : '<div class="card" style="padding:2rem;text-align:center;">⏳ جاري تحميل نظام البريد...</div>') : ''}
   `;
 }
 

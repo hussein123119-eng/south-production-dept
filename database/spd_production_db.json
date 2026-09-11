@@ -18257,7 +18257,8 @@
     {
       "id": "user-founder",
       "departmentId": "dept-south-prod",
-      "email": "founder@local.spd",
+      "email": "hussein123119@gmail.com",
+      "secondaryEmail": "southprod.rumaila@gmail.com",
       "password": "123456",
       "employeeId": "EMP-0000",
       "fullName": "المؤسس العام للمنظومة",
@@ -18270,7 +18271,7 @@
       "unitId": null,
       "stationId": null,
       "createdAt": "2026-01-01T00:00:00Z",
-      "updatedAt": "2026-09-04T22:50:28.304Z"
+      "updatedAt": "2026-09-11T09:00:00.000Z"
     },
     {
       "id": "user-dept-mgr",

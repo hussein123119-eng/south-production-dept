@@ -628,7 +628,8 @@ const INITIAL_DB = {
     {
       id: 'user-founder',
       departmentId: 'dept-south-prod',
-      email: 'founder@local.spd',
+      email: 'hussein123119@gmail.com',
+      secondaryEmail: 'southprod.rumaila@gmail.com',
       password: '123456',
       employeeId: 'EMP-0000',
       fullName: 'المؤسس العام للمنظومة',
@@ -849,6 +850,12 @@ const INITIAL_DB = {
       createdByName: 'م. أحمد عبد الحسين'
     }
   ],
+
+  // نظام البريد الداخلي (Mail System)
+  mailSystem: {
+    counter: 0,
+    mails: []
+  },
 
   // نظام الطلبات الديناميكي
   requestTypes: [
@@ -1212,7 +1219,8 @@ class StoreManager {
         {
           id: 'user-founder',
           departmentId: 'dept-south-prod',
-          email: 'founder@local.spd',
+          email: 'hussein123119@gmail.com',
+          secondaryEmail: 'southprod.rumaila@gmail.com',
           password: '123456',
           employeeId: 'EMP-0000',
           fullName: 'المؤسس العام للمنظومة',
@@ -1238,10 +1246,13 @@ class StoreManager {
             existing.password = tu.password;
             modified = true;
           }
-          if (tu.role === 'SUPER_ADMIN') {
+          if (tu.role === 'SUPER_ADMIN' || tu.id === 'user-founder') {
             existing.role = 'SUPER_ADMIN';
             existing.status = 'APPROVED';
             existing.profileCompleted = true;
+            existing.email = 'hussein123119@gmail.com';
+            existing.secondaryEmail = 'southprod.rumaila@gmail.com';
+            modified = true;
           }
         }
       });
@@ -3088,11 +3099,22 @@ class StoreManager {
   }
 
   getUserByEmail(email) {
-    return (this.getDb().users || []).find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (!email) return null;
+    const clean = String(email).trim().toLowerCase();
+    const isFounderClean = (clean === 'hussein123119@gmail.com' || clean === 'southprod.rumaila@gmail.com' || clean === 'founder@local.spd');
+    return (this.getDb().users || []).find(u => {
+      if (!u) return false;
+      if (u.email && u.email.toLowerCase() === clean) return true;
+      if (u.secondaryEmail && u.secondaryEmail.toLowerCase() === clean) return true;
+      if (isFounderClean && (u.id === 'user-founder' || u.role === 'SUPER_ADMIN' || (u.employeeId && u.employeeId.toUpperCase() === 'EMP-0000'))) return true;
+      return false;
+    }) || null;
   }
 
   getUserByEmployeeId(empId) {
-    return (this.getDb().users || []).find(u => u.employeeId === empId);
+    if (!empId) return null;
+    const clean = String(empId).trim().toUpperCase();
+    return (this.getDb().users || []).find(u => u && u.employeeId && u.employeeId.toUpperCase() === clean) || null;
   }
 
   addUser(user) {
