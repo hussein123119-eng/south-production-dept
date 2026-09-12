@@ -8,6 +8,7 @@
 const FounderPortal = {
   // الحالة المركزية للبوابة
   currentTab: 'control',
+  currentTheme: 'dark',
   dossiers: [],
   roles: [],
   pendingUsers: [],
@@ -15,6 +16,42 @@ const FounderPortal = {
   customForms: [],
   auditLogs: [],
   broadcastMessage: '',
+
+  // تهيئة سمة الواجهة (الوضع الحليبي أو الداكن)
+  initTheme: function() {
+    const savedTheme = localStorage.getItem('spd_founder_theme_mode') || 'dark';
+    this.applyTheme(savedTheme);
+  },
+
+  toggleTheme: function() {
+    const newTheme = this.currentTheme === 'milky' ? 'dark' : 'milky';
+    this.applyTheme(newTheme);
+    localStorage.setItem('spd_founder_theme_mode', newTheme);
+    const msg = newTheme === 'milky' ? 'تم تفعيل الوضع الحليبي الملكي (Milky Porcelain Luxury)' : 'تم تفعيل وضع الأوبسيديان الداكن الفاخر (Dark Obsidian Luxury)';
+    this.showToast(msg, 'info');
+  },
+
+  applyTheme: function(theme) {
+    this.currentTheme = theme;
+    const body = document.body;
+    const iconDark = document.getElementById('themeIconDark');
+    const iconMilky = document.getElementById('themeIconMilky');
+    const textLabel = document.getElementById('themeToggleText');
+
+    if (theme === 'milky') {
+      body.classList.add('theme-milky');
+      body.setAttribute('data-theme', 'milky');
+      if (iconDark) iconDark.style.display = 'inline-block';
+      if (iconMilky) iconMilky.style.display = 'none';
+      if (textLabel) textLabel.textContent = 'الوضع الداكن';
+    } else {
+      body.classList.remove('theme-milky');
+      body.removeAttribute('data-theme');
+      if (iconDark) iconDark.style.display = 'none';
+      if (iconMilky) iconMilky.style.display = 'inline-block';
+      if (textLabel) textLabel.textContent = 'الوضع الحليبي';
+    }
+  },
 
   // الملاكات الافتراضية الرسمية الشاملة
   defaultDossiers: [
@@ -41,6 +78,7 @@ const FounderPortal = {
   // تهيئة النظام
   init: function() {
     this.loadState();
+    this.initTheme();
     this.checkAuthSession();
 
     // ضبط روابط العودة لتطبيق العمليات حسب البيئة (محلي أو سحابي)
