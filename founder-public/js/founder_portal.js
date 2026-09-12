@@ -17,17 +17,17 @@ const FounderPortal = {
   auditLogs: [],
   broadcastMessage: '',
 
-  // تهيئة سمة الواجهة (الوضع الحليبي أو الداكن)
+  // تهيئة سمة الواجهة (الوضع النهاري أو الليلي)
   initTheme: function() {
     const savedTheme = localStorage.getItem('spd_founder_theme_mode') || 'dark';
     this.applyTheme(savedTheme);
   },
 
   toggleTheme: function() {
-    const newTheme = this.currentTheme === 'milky' ? 'dark' : 'milky';
+    const newTheme = (this.currentTheme === 'day' || this.currentTheme === 'milky' || this.currentTheme === 'light') ? 'dark' : 'day';
     this.applyTheme(newTheme);
     localStorage.setItem('spd_founder_theme_mode', newTheme);
-    const msg = newTheme === 'milky' ? 'تم تفعيل الوضع الحليبي الملكي (Milky Porcelain Luxury)' : 'تم تفعيل وضع الأوبسيديان الداكن الفاخر (Dark Obsidian Luxury)';
+    const msg = newTheme === 'day' ? 'تم تفعيل الوضع النهاري المعتمد' : 'تم تفعيل الوضع الليلي الفاخر';
     this.showToast(msg, 'info');
   },
 
@@ -38,18 +38,18 @@ const FounderPortal = {
     const iconMilky = document.getElementById('themeIconMilky');
     const textLabel = document.getElementById('themeToggleText');
 
-    if (theme === 'milky') {
-      body.classList.add('theme-milky');
-      body.setAttribute('data-theme', 'milky');
+    if (theme === 'day' || theme === 'milky' || theme === 'light') {
+      body.classList.add('theme-day', 'theme-milky');
+      body.setAttribute('data-theme', 'day');
       if (iconDark) iconDark.style.display = 'inline-block';
       if (iconMilky) iconMilky.style.display = 'none';
-      if (textLabel) textLabel.textContent = 'الوضع الداكن';
+      if (textLabel) textLabel.textContent = 'الوضع الليلي';
     } else {
-      body.classList.remove('theme-milky');
+      body.classList.remove('theme-day', 'theme-milky', 'theme-light');
       body.removeAttribute('data-theme');
       if (iconDark) iconDark.style.display = 'none';
       if (iconMilky) iconMilky.style.display = 'inline-block';
-      if (textLabel) textLabel.textContent = 'الوضع الحليبي';
+      if (textLabel) textLabel.textContent = 'الوضع النهاري';
     }
   },
 
