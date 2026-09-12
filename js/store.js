@@ -18,11 +18,11 @@ const INITIAL_DB = {
     shiftSettings: {
       startTime: '07:30',
       shiftDurationHours: 24,
-      referenceDate: '2026-01-01T07:30:00Z',
-      referenceShift: 'A',
+      referenceDate: '2026-09-11T07:30:00',
+      referenceShift: 'B',
       shifts: ['A', 'B', 'C', 'D'],
       autoRotate: true,
-      lastModifiedAt: '2026-01-01T08:00:00Z',
+      lastModifiedAt: '2026-09-11T07:30:00',
       lastModifiedBy: 'مدير القسم'
     },
     featureFlags: {
@@ -69,7 +69,7 @@ const INITIAL_DB = {
       departmentId: 'dept-south-prod', 
       sectionId: null, unitId: null, stationId: null,
       phone: '07700000000', emailPersonal: 'hussein123119@gmail.com', emailOfficial: 'southprod.rumaila@gmail.com',
-      jobTitle: 'المؤسس والمدير العام للنظام',
+      jobTitle: 'رئيس مهندسين أقدم',
       motherName: '-', passportNumber: '-', unifiedCardNumber: '-',
       dynamicValues: {}, transferHistory: []
     },
@@ -83,7 +83,7 @@ const INITIAL_DB = {
       phone: '07701234567',
       emailPersonal: 'ahmed.mgr@rumaila.iq',
       emailOfficial: 'ahmed.mgr@rumaila.iq',
-      jobTitle: 'مدير قسم الإنتاج الجنوبي',
+      jobTitle: 'رئيس مهندسين أقدم',
       motherName: 'فاطمة كاظم',
       passportNumber: 'A12345678',
       unifiedCardNumber: '198012345678',
@@ -100,7 +100,7 @@ const INITIAL_DB = {
       phone: '07702345678',
       emailPersonal: 'sec1@rumaila.iq',
       emailOfficial: 'sec1@rumaila.iq',
-      jobTitle: 'مسؤول الشعبة الأولى',
+      jobTitle: 'رئيس مهندسين',
       motherName: 'زينب حسن',
       passportNumber: 'A23456789',
       unifiedCardNumber: '198523456789',
@@ -117,7 +117,7 @@ const INITIAL_DB = {
       phone: '07703456789',
       emailPersonal: 'sec2@rumaila.iq',
       emailOfficial: 'sec2@rumaila.iq',
-      jobTitle: 'مسؤول الشعبة الثانية',
+      jobTitle: 'رئيس مهندسين',
       motherName: 'مريم علي',
       passportNumber: 'A34567890',
       unifiedCardNumber: '198834567890',
@@ -154,7 +154,7 @@ const INITIAL_DB = {
       phone: '07705678901',
       emailPersonal: 'mohanad.tech@rumaila.iq',
       emailOfficial: 'mohanad.tech@rumaila.iq',
-      jobTitle: 'مسؤول الوحدة الفنية',
+      jobTitle: 'معاون رئيس مهندسين',
       motherName: 'خديجة مهدي',
       passportNumber: 'A56789012',
       unifiedCardNumber: '198756789012',
@@ -222,7 +222,7 @@ const INITIAL_DB = {
       phone: '07709012345',
       emailPersonal: 'sajjad.train@rumaila.iq',
       emailOfficial: 'sajjad.train@rumaila.iq',
-      jobTitle: 'مسؤول وحدة التدريب والتطوير',
+      jobTitle: 'رئيس ملاحظين',
       motherName: 'بتول حميد',
       passportNumber: 'A90123456',
       unifiedCardNumber: '198990123456',
@@ -239,7 +239,7 @@ const INITIAL_DB = {
       phone: '07700123456',
       emailPersonal: 'ahmed.hse@rumaila.iq',
       emailOfficial: 'ahmed.hse@rumaila.iq',
-      jobTitle: 'مسؤول وحدة الضمان الصحي والسلامة',
+      jobTitle: 'مهندس أقدم',
       motherName: 'أميرة جاسم',
       passportNumber: 'A01234567',
       unifiedCardNumber: '198601234567',
@@ -633,7 +633,7 @@ const INITIAL_DB = {
       password: '123456',
       employeeId: 'EMP-0000',
       fullName: 'المؤسس العام للمنظومة',
-      jobTitle: 'المؤسس والمدير العام للنظام',
+      jobTitle: 'رئيس مهندسين أقدم',
       phone: '07700000000',
       role: 'SUPER_ADMIN',
       status: 'APPROVED',
@@ -650,7 +650,7 @@ const INITIAL_DB = {
       password: '123456',
       employeeId: 'EMP-2024-001',
       fullName: 'م. أحمد عبد الحسين',
-      jobTitle: 'مدير قسم الإنتاج الجنوبي',
+      jobTitle: 'رئيس مهندسين أقدم',
       phone: '07701234567',
       role: 'DEPT_MANAGER',
       status: 'APPROVED',
@@ -667,7 +667,7 @@ const INITIAL_DB = {
       password: '123456',
       employeeId: 'EMP-2024-002',
       fullName: 'م. حيدر جاسم',
-      jobTitle: 'مسؤول الشعبة الأولى',
+      jobTitle: 'رئيس مهندسين',
       phone: '07702345678',
       role: 'SECTION_MANAGER',
       status: 'APPROVED',
@@ -684,7 +684,7 @@ const INITIAL_DB = {
       password: '123456',
       employeeId: 'EMP-2024-003',
       fullName: 'م. علي الركابي',
-      jobTitle: 'مسؤول الشعبة الثانية',
+      jobTitle: 'رئيس مهندسين',
       phone: '07703456789',
       role: 'SECTION_MANAGER',
       status: 'APPROVED',
@@ -718,7 +718,7 @@ const INITIAL_DB = {
       password: '123456',
       employeeId: 'EMP-2024-005',
       fullName: 'مهند فاضل العلي',
-      jobTitle: 'مسؤول الوحدة الفنية',
+      jobTitle: 'معاون رئيس مهندسين',
       phone: '07705678901',
       role: 'UNIT_MANAGER',
       status: 'APPROVED',
@@ -1121,7 +1121,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-2024-001',
           fullName: 'م. أحمد عبد الحسين',
-          jobTitle: 'مدير قسم الإنتاج الجنوبي',
+          jobTitle: 'رئيس مهندسين أقدم',
           phone: '07701234567',
           role: 'DEPT_MANAGER',
           status: 'APPROVED',
@@ -1138,7 +1138,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-2024-002',
           fullName: 'م. حيدر جاسم',
-          jobTitle: 'مسؤول الشعبة الأولى',
+          jobTitle: 'رئيس مهندسين',
           phone: '07702345678',
           role: 'SECTION_MANAGER',
           status: 'APPROVED',
@@ -1155,7 +1155,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-2024-003',
           fullName: 'م. علي الركابي',
-          jobTitle: 'مسؤول الشعبة الثانية',
+          jobTitle: 'رئيس مهندسين',
           phone: '07703456789',
           role: 'SECTION_MANAGER',
           status: 'APPROVED',
@@ -1189,7 +1189,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-2024-005',
           fullName: 'مهند فاضل العلي',
-          jobTitle: 'مسؤول الوحدة الفنية',
+          jobTitle: 'معاون رئيس مهندسين',
           phone: '07705678901',
           role: 'UNIT_MANAGER',
           status: 'APPROVED',
@@ -1224,7 +1224,7 @@ class StoreManager {
           password: '123456',
           employeeId: 'EMP-0000',
           fullName: 'المؤسس العام للمنظومة',
-          jobTitle: 'المؤسس والمدير العام للنظام',
+          jobTitle: 'رئيس مهندسين أقدم',
           phone: '07700000000',
           role: 'SUPER_ADMIN',
           status: 'APPROVED',
@@ -1316,6 +1316,45 @@ class StoreManager {
         modified = true;
       }
     }
+
+    // تطهير وتصحيح العناوين الوظيفية القانونية من أي مناصب أو أدوار إدارية (مثل: مدير قسم، مسؤول شعبة، إلخ)
+    const CIVIL_TITLE_MAP = {
+      'مدير قسم الإنتاج الجنوبي': 'رئيس مهندسين أقدم',
+      'مدير قسم': 'رئيس مهندسين أقدم',
+      'مسؤول الشعبة الأولى': 'رئيس مهندسين',
+      'مسؤول الشعبة الثانية': 'رئيس مهندسين',
+      'مسؤول شعبة': 'رئيس مهندسين',
+      'مسؤول الوحدة الفنية': 'معاون رئيس مهندسين',
+      'مسؤول وحدة': 'معاون رئيس مهندسين',
+      'المؤسس والمدير العام للنظام': 'رئيس مهندسين أقدم',
+      'مسؤول وحدة التدريب والتطوير': 'رئيس ملاحظين',
+      'مسؤول وحدة الضمان الصحي والسلامة': 'مهندس أقدم'
+    };
+    if (db.users && Array.isArray(db.users)) {
+      db.users.forEach(u => {
+        if (u && u.jobTitle && CIVIL_TITLE_MAP[u.jobTitle.trim()]) {
+          u.jobTitle = CIVIL_TITLE_MAP[u.jobTitle.trim()];
+          modified = true;
+        }
+        if (u && u.careerTitle && CIVIL_TITLE_MAP[u.careerTitle.trim()]) {
+          u.careerTitle = CIVIL_TITLE_MAP[u.careerTitle.trim()];
+          modified = true;
+        }
+      });
+    }
+    if (db.employeeMasterRecords && Array.isArray(db.employeeMasterRecords)) {
+      db.employeeMasterRecords.forEach(r => {
+        if (r && r.jobTitle && CIVIL_TITLE_MAP[r.jobTitle.trim()]) {
+          r.jobTitle = CIVIL_TITLE_MAP[r.jobTitle.trim()];
+          modified = true;
+        }
+        if (r && r.careerTitle && CIVIL_TITLE_MAP[r.careerTitle.trim()]) {
+          r.careerTitle = CIVIL_TITLE_MAP[r.careerTitle.trim()];
+          modified = true;
+        }
+      });
+    }
+
     if (modified) {
       localStorage.setItem(this.key, JSON.stringify(db));
     }
@@ -1522,13 +1561,19 @@ class StoreManager {
       db.systemSettings.shiftSettings = {
         startTime: '07:30',
         shiftDurationHours: 24,
-        referenceDate: '2026-01-01T07:30:00Z',
-        referenceShift: 'A',
+        referenceDate: '2026-09-11T07:30:00',
+        referenceShift: 'B',
         shifts: ['A', 'B', 'C', 'D'],
         autoRotate: true,
-        lastModifiedAt: '2026-01-01T08:00:00Z',
+        lastModifiedAt: '2026-09-11T07:30:00',
         lastModifiedBy: 'مدير القسم'
       };
+    } else {
+      if (db.systemSettings.shiftSettings.referenceDate === '2026-01-01T07:30:00Z' || !db.systemSettings.shiftSettings.referenceDate) {
+        db.systemSettings.shiftSettings.referenceDate = '2026-09-11T07:30:00';
+        db.systemSettings.shiftSettings.referenceShift = 'B';
+        db.systemSettings.shiftSettings.startTime = '07:30';
+      }
     }
     return db.systemSettings.shiftSettings;
   }
@@ -1578,27 +1623,60 @@ class StoreManager {
     const shifts = Array.isArray(settings.shifts) && settings.shifts.length ? settings.shifts : ['A', 'B', 'C', 'D'];
     const durationHours = Number(settings.shiftDurationHours) || 24;
     const msPerShift = durationHours * 60 * 60 * 1000;
+    const startTime = settings.startTime || '07:30';
 
-    const refDate = settings.referenceDate ? new Date(settings.referenceDate) : new Date('2026-01-01T07:30:00Z');
+    // Parse referenceDate and startTime locally without UTC 'Z' skew
+    let refYear = 2026, refMonth = 8, refDay = 11; // 0-indexed month: 8 is September
+    if (settings.referenceDate) {
+      const dStr = settings.referenceDate.includes('T') ? settings.referenceDate.split('T')[0] : settings.referenceDate;
+      const parts = dStr.split('-').map(Number);
+      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        refYear = parts[0];
+        refMonth = parts[1] - 1;
+        refDay = parts[2];
+      }
+    }
+    const [startH, startM] = startTime.split(':').map(Number);
+    const refDate = new Date(refYear, refMonth, refDay, isNaN(startH) ? 7 : startH, isNaN(startM) ? 30 : startM, 0, 0);
+
     const now = customDate instanceof Date ? customDate : new Date(customDate);
-    
     const diffMs = now.getTime() - refDate.getTime();
     const shiftCount = shifts.length;
+
+    const cycleIndex = Math.floor(diffMs / msPerShift);
+    const refShiftIdx = shifts.indexOf(settings.referenceShift || 'B');
+    const baseIdx = refShiftIdx !== -1 ? refShiftIdx : 1; // Default 'B'
     
-    let shiftIdx = Math.floor(diffMs / msPerShift) % shiftCount;
-    if (shiftIdx < 0) shiftIdx += shiftCount;
-
-    const refShiftIdx = shifts.indexOf(settings.referenceShift || 'A');
-    if (refShiftIdx !== -1) {
-      shiftIdx = (shiftIdx + refShiftIdx) % shiftCount;
-    }
-
+    const shiftIdx = ((cycleIndex + baseIdx) % shiftCount + shiftCount) % shiftCount;
     const currentShift = shifts[shiftIdx];
-    const startTime = settings.startTime || '07:30';
+
+    // Shift boundary timestamps
+    const shiftStart = new Date(refDate.getTime() + cycleIndex * msPerShift);
+    const shiftEnd = new Date(shiftStart.getTime() + msPerShift);
+
+    // Handover calculation (previous & next shifts)
+    const prevShiftIdx = (shiftIdx - 1 + shiftCount) % shiftCount;
+    const nextShiftIdx = (shiftIdx + 1) % shiftCount;
+    const handedOverFrom = shifts[prevShiftIdx];
+    const handoverTo = shifts[nextShiftIdx];
+
+    // Remaining time in current shift
+    const remainingMs = Math.max(0, shiftEnd.getTime() - now.getTime());
+    const remainingHours = Math.floor(remainingMs / (60 * 60 * 1000));
+    const remainingMinutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
+
+    // Formatted dates (YYYY/MM/DD)
+    const pad = (n) => String(n).padStart(2, '0');
+    const shiftStartDateStr = `${shiftStart.getFullYear()}/${pad(shiftStart.getMonth() + 1)}/${pad(shiftStart.getDate())}`;
+    const shiftEndDateStr = `${shiftEnd.getFullYear()}/${pad(shiftEnd.getMonth() + 1)}/${pad(shiftEnd.getDate())}`;
+
+    // Hours division for 24h cycle
+    const shiftDay1Hours = durationHours === 24 ? 16.5 : durationHours;
+    const shiftDay2Hours = durationHours === 24 ? 7.5 : 0;
 
     let periodDesc = `من ${startTime} (دورة ${durationHours} ساعة)`;
     if (durationHours === 24) {
-      periodDesc = `من ${startTime} ص حتى ${startTime} ص اليوم التالي`;
+      periodDesc = `من ${startTime} ص (${shiftStartDateStr}) حتى ${startTime} ص (${shiftEndDateStr})`;
     } else if (durationHours === 12) {
       periodDesc = `دورة 12 ساعة (تبدأ ${startTime})`;
     } else if (durationHours === 8) {
@@ -1612,7 +1690,20 @@ class StoreManager {
       durationHours: durationHours,
       period: periodDesc,
       status: 'نوبة تشغيلية جارية',
-      lastModifiedBy: settings.lastModifiedBy || 'مدير القسم'
+      lastModifiedBy: settings.lastModifiedBy || 'مدير القسم',
+      handedOverFrom,
+      handedOverFromName: `النوبة (${handedOverFrom})`,
+      handoverTo,
+      handoverToName: `النوبة (${handoverTo})`,
+      shiftStart,
+      shiftEnd,
+      shiftStartDateStr,
+      shiftEndDateStr,
+      shiftDay1Hours,
+      shiftDay2Hours,
+      remainingHours,
+      remainingMinutes,
+      handoverSummary: `استلمت من نوبة (${handedOverFrom}) الساعة ${startTime} ص - تسلّم لنوبة (${handoverTo}) الساعة ${startTime} ص (${shiftEndDateStr})`
     };
   }
 
@@ -2780,7 +2871,9 @@ class StoreManager {
           employeeId: userObj.employeeId || userObj.id || empId,
           fullName: userObj.fullName || userObj.name || 'منتسب',
           jobTitle: userObj.jobTitle || 'موظف',
-          role: userObj.role || 'EMPLOYEE',
+          role: userObj.role || ((window.rbac && typeof window.rbac.resolveDefaultRole === 'function')
+            ? window.rbac.resolveDefaultRole(userObj.jobTitle, userObj.role)
+            : ((userObj.jobTitle || '').toLowerCase().includes('سائق') ? 'DRIVER' : 'OPERATOR')),
           sectionId: userObj.sectionId || null,
           unitId: userObj.unitId || null,
           stationId: userObj.stationId || null,
@@ -2933,12 +3026,27 @@ class StoreManager {
     return { success: true, master };
   }
 
+  getStaff(deptId) {
+    const effectiveDeptId = typeof deptId === 'string' ? deptId : (deptId?.departmentId || 'dept-south-prod');
+    return this.getUnifiedEmployeeRoster({ departmentId: effectiveDeptId, role: 'SUPER_ADMIN', hasGlobalAccess: true });
+  }
+
+  getSectionStaff(sectionId, deptId) {
+    const all = this.getStaff(deptId);
+    return all.filter(e => e.sectionId === sectionId && !e.isArchived && e.status !== 'REJECTED');
+  }
+
   // --- Unified Employee Roster (دمج سجل الموظفين مع إدارة المستخدمين وطلبات القبول) ---
   getUnifiedEmployeeRoster(actorUser) {
     if (!actorUser) return [];
 
+    const effectiveActor = typeof actorUser === 'string'
+      ? { departmentId: actorUser, role: 'SUPER_ADMIN', hasGlobalAccess: true }
+      : actorUser;
+    const effectiveDeptId = effectiveActor.departmentId || 'dept-south-prod';
+
     const db = this.getDb();
-    const masterRecords = this.getEmployeeMasterRecords(actorUser.departmentId);
+    const masterRecords = this.getEmployeeMasterRecords(effectiveDeptId);
     const users = db.users || [];
 
     // Pre-calculate hash maps for instant O(1) lookups
@@ -2965,7 +3073,9 @@ class StoreManager {
       // Determine Unified Status
       let accountStatus = 'NO_ACCOUNT'; // موظف معتمد في السجل بدون حساب
       let accountStatusLabel = '⚪ بدون حساب مستخدم';
-      let role = 'EMPLOYEE';
+      let role = master.role || ((window.rbac && typeof window.rbac.resolveDefaultRole === 'function')
+        ? window.rbac.resolveDefaultRole(master.jobTitle, master.role)
+        : ((master.jobTitle || '').toLowerCase().includes('سائق') ? 'DRIVER' : 'OPERATOR'));
       let customPermissions = [];
       let userId = null;
       let userEmail = master.emailOfficial || master.emailPersonal || '';
@@ -4321,7 +4431,7 @@ class StoreManager {
           list = list.filter(ts => ts.stationId === actorUser.stationId || (ts.sectionId === actorUser.sectionId && !ts.stationId));
         } else if (actorUser.role === 'UNIT_MANAGER' && actorUser.unitId) {
           if (actorUser.sectionId) list = list.filter(ts => ts.sectionId === actorUser.sectionId);
-        } else if (actorUser.role === 'EMPLOYEE') {
+        } else if (['EMPLOYEE', 'DRIVER', 'AUTHORIZED_DRIVER', 'OPERATOR'].includes(actorUser.role)) {
           if (actorUser.sectionId) {
             list = list.filter(ts => ts.sectionId === actorUser.sectionId && ts.isPublished !== false);
           } else {

@@ -86,14 +86,14 @@ function renderUnitWorkspaceView(unitId) {
       </div>
     </div>
 
-    <!-- Sub-Tabs Header Navigation (كادر الوحدة أولاً) -->
+    <!-- Sub-Tabs Header Navigation (كادر الوحدة أولاً ثم البريد) -->
     <div class="tabs-header" style="margin-bottom: 1.5rem;">
       <button class="tab-btn ${activeSubTab === 'staff' ? 'active' : ''}" onclick="window.app.setUnitSubTab('staff')">👥 <span>كادر الوحدة</span> <span class="tab-count-badge">${unitStaff.length}</span></button>
+      <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setUnitSubTab('mail')">📬 <span>البريد</span></button>
       <button class="tab-btn ${activeSubTab === 'overview' ? 'active' : ''}" onclick="window.app.setUnitSubTab('overview')">📊 <span>المهام والمؤشرات العامة</span></button>
       <button class="tab-btn ${activeSubTab === 'notifs' ? 'active' : ''}" onclick="window.app.setUnitSubTab('notifs')">📢 <span>التبليغات والتوجيهات</span> <span class="tab-count-badge">${unitNotifs.length}</span></button>
       <button class="tab-btn ${activeSubTab === 'forms' ? 'active' : ''}" onclick="window.app.setUnitSubTab('forms')">📝 <span>استمارات وبيانات الوحدة</span></button>
       <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setUnitSubTab('documents')">📄 <span>الدراسات والتقارير الفنية</span> <span class="tab-count-badge">${unitDocs.length}</span></button>
-      <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setUnitSubTab('mail')">📬 <span>البريد</span></button>
     </div>
 
     ${activeSubTab === 'staff' ? renderUnitStaffTab(unit, unitStaff) : ''}
@@ -201,8 +201,28 @@ function renderUnitFormsTab(unit, user, unitRequests) {
                 return `
                   <div style="border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px; padding: 0.75rem 0.9rem; background: var(--md-sys-color-surface); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: var(--shadow-1);">
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
-                      <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(11, 87, 208, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
-                        ${isExcel ? '📊' : (isPdf ? '📕' : '📄')}
+                      <div style="width: 36px; height: 36px; border-radius: 8px; background: ${isExcel ? 'rgba(16,185,129,0.15)' : (isPdf ? 'rgba(239,68,68,0.15)' : 'rgba(37,99,235,0.15)')}; color: ${isExcel ? '#059669' : (isPdf ? '#dc2626' : '#2563eb')}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        ${isExcel ? `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="3" y1="15" x2="21" y2="15"></line>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                          </svg>
+                        ` : (isPdf ? `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M9 13h6"></path>
+                            <path d="M9 17h3"></path>
+                          </svg>
+                        ` : `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M8 13l1.5 4 1.5-4 1.5 4 1.5-4"></path>
+                          </svg>
+                        `)}
                       </div>
                       <div>
                         <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 2px;">
@@ -696,15 +716,15 @@ function renderUnitDocsTab(unit, docs, user) {
                   <div style="display: flex; align-items: center; gap: 0.35rem;">
                     <button class="btn-action-view" onclick="window.app.openViewDocumentModal('${d.id}')" title="معاينة المستند">معاينة</button>
                     <button class="btn-action-export" onclick="window.app.exportDocumentFile('${d.id}')" title="تصدير المستند">تصدير</button>
-                    <button class="btn-share-whatsapp" onclick="window.app.shareViaWhatsApp('${(d.title || '').replace(/'/g, "\\'")}')" title="مشاركة عبر واتساب">
-                      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.71 4.3 3.8.6.26 1.07.42 1.44.53.61.19 1.16.17 1.6-.1.49-.3 1.47-1.2 1.68-1.68.21-.48.21-.89.15-.98-.06-.09-.23-.15-.48-.27z"/>
+                    <button class="btn-circle-whatsapp btn-share-whatsapp" onclick="window.app.shareViaWhatsApp('${(d.title || '').replace(/'/g, "\\'")}')" title="مشاركة عبر واتساب">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="#ffffff">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                       </svg>
                     </button>
-                    <button class="btn-share-email" onclick="window.app.shareViaOutlook('${(d.title || '').replace(/'/g, "\\'")}')" title="مشاركة عبر البريد الإلكتروني">
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="btn-circle-email btn-share-email" onclick="window.app.shareViaOutlook('${(d.title || '').replace(/'/g, "\\'")}')" title="مشاركة عبر البريد الإلكتروني">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="2" y="4" width="20" height="16" rx="3"></rect>
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        <path d="M22 7l-10 7L2 7"></path>
                       </svg>
                     </button>
                   </div>

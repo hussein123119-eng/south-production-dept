@@ -179,10 +179,13 @@ function renderDeptManagementView() {
         </div>
       </div>
 
-      <!-- 6 Sub-Tabs Header Navigation (كادر القسم أولاً) -->
+      <!-- Sub-Tabs Header Navigation (كادر القسم أولاً ثم البريد) -->
       <div class="tabs-header" style="margin-bottom: 1.5rem;">
         <button class="tab-btn ${activeTab === 'staff' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('staff')">
           👥 <span>كادر القسم</span> <span class="tab-count-badge">${safeStaff.length}</span>
+        </button>
+        <button class="tab-btn ${activeTab === 'mail' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('mail')">
+          📬 <span>البريد</span>
         </button>
         <button class="tab-btn ${activeTab === 'notifs' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('notifs')">
           📢 <span>التبليغات الرسمية</span> <span class="tab-count-badge">${safeNotifs.length}</span>
@@ -198,9 +201,6 @@ function renderDeptManagementView() {
         </button>
         <button class="tab-btn ${activeTab === 'vehicles' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('vehicles')">
           🚘 <span>مرآب وعجلات القسم</span> <span class="tab-count-badge">${safeVehicles.length}</span>
-        </button>
-        <button class="tab-btn ${activeTab === 'mail' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('mail')">
-          📬 <span>البريد</span>
         </button>
       </div>
 
@@ -342,7 +342,7 @@ function renderDeptNotifsTab(notifs, actorUser, sections) {
 // ==========================================================================
 // 2. تبويب كادر ومستخدمي القسم (Department Staff & Users)
 // ==========================================================================
-function renderDeptStaffTab(staff, actorUser, sections) {
+function renderDeptStaffTableAndPagination(staff, actorUser, sections) {
   const safeSections = Array.isArray(sections) ? sections : [];
   const secMap = {};
   safeSections.forEach(s => { if (s && s.id) secMap[s.id] = s; });
@@ -355,29 +355,33 @@ function renderDeptStaffTab(staff, actorUser, sections) {
   const unitMap = {};
   units.forEach(u => { if (u && u.id) unitMap[u.id] = u; });
 
-  if (typeof window !== 'undefined') {
-    if (!window.app) window.app = {};
-    if (!window.app.deptStaffState) {
-      window.app.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
-    }
-  }
-
   const state = (typeof window !== 'undefined' && window.app && window.app.deptStaffState)
     ? window.app.deptStaffState
     : { page: 1, pageSize: 25, search: '', section: 'ALL' };
 
-  const q = (state.search || '').toLowerCase().trim();
+  // Multi-word whitespace token matching (preserves spaces and matches non-adjacent names)
+  const rawQ = (state.search || '').toLowerCase();
+  const searchTokens = rawQ.trim().split(/\s+/).filter(Boolean);
+
   const safeStaffList = Array.isArray(staff) ? staff : [];
   const filtered = safeStaffList.filter(emp => {
     if (state.section !== 'ALL') {
       if (state.section === 'NONE' && emp.sectionId) return false;
       if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
     }
-    if (q) {
+    if (searchTokens.length > 0) {
       const name = (emp.fullName || emp.name || '').toLowerCase();
       const empid = (emp.employeeId || '').toLowerCase();
-      const email = (emp.email || emp.userEmail || '').toLowerCase();
-      if (!name.includes(q) && !empid.includes(q) && !email.includes(q)) return false;
+      const email = (emp.email || emp.userEmail || emp.emailPersonal || '').toLowerCase();
+      const phone = (emp.phone || emp.mobile || '').toLowerCase();
+      const title = (emp.jobTitle || '').toLowerCase();
+      const st = staMap[emp.stationId];
+      const sec = secMap[emp.sectionId];
+      const un = unitMap[emp.unitId];
+      const locText = `${sec ? sec.name : ''} ${un ? un.name : ''} ${st ? st.name : ''}`.toLowerCase();
+      const haystack = `${name} ${empid} ${email} ${phone} ${title} ${locText}`;
+      const allMatch = searchTokens.every(token => haystack.includes(token));
+      if (!allMatch) return false;
     }
     return true;
   });
@@ -392,7 +396,226 @@ function renderDeptStaffTab(staff, actorUser, sections) {
   const pageItems = filtered.slice(startIdx, endIdx);
 
   return `
-    <div class="card">
+    <div class="table-container" style="overflow-x: auto;">
+      <table class="data-table" id="deptStaffTable" style="font-size: 0.88rem;">
+        <thead>
+          <tr>
+            <th style="min-width: 200px;">الاسم</th>
+            <th style="min-width: 120px;">الرقم الوظيفي</th>
+            <th style="min-width: 150px;">جهة الارتباط</th>
+            <th style="min-width: 130px;">العنوان الوظيفي</th>
+            <th style="min-width: 120px;">الدور</th>
+            <th style="min-width: 140px;">الهاتف / واتساب</th>
+            <th style="min-width: 190px; text-align: center;">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="deptStaffTableBody">
+          ${pageItems.length === 0 ? `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
+                <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">👥</div>
+                <h4>لا توجد نتائج مطابقة لبحث كادر القسم</h4>
+              </td>
+            </tr>
+          ` : pageItems.map(emp => {
+            const sec = secMap[emp.sectionId];
+            const un = unitMap[emp.unitId];
+            const st = staMap[emp.stationId];
+            const scopeText = sec ? sec.name : (un ? un.name : (st ? st.name : 'إدارة القسم'));
+            const roleInfo = (window.rbac && typeof window.rbac.getRoleInfo === 'function' && window.rbac.getRoleInfo(emp.role)) 
+              || { name: emp.role || 'منتسب', badgeClass: 'badge-secondary' };
+            const empPhone = emp.phone || emp.mobile || '';
+            const empEmail = emp.userEmail || emp.emailPersonal || emp.email || '';
+
+            // Check if employee is shift worker and get shift letter
+            const rawShift = emp.assignedShift || emp.shift || emp.workShift || emp.workSchedule || '';
+            const rawSchedule = String(emp.workShift || emp.workSchedule || '').trim();
+            const isMorning = rawSchedule === 'صباحي' || rawShift === 'صباحي' || String(emp.jobTitle || '').includes('صباحي');
+            const isShiftWorker = !isMorning && (
+              rawSchedule === 'مناوب' || 
+              emp.workShift === 'مناوب' || 
+              (rawShift && rawShift !== 'صباحي' && rawShift !== 'حقلي') ||
+              /[ABCDأبجد]/.test(String(rawShift)) ||
+              String(emp.jobTitle || '').includes('نوبة')
+            );
+
+            let shiftLetter = '';
+            if (isShiftWorker) {
+              const match = String(rawShift + ' ' + (emp.jobTitle || '')).match(/(?:نوبة\s*([ABCDأبجد])|([ABCDأبجد]))/i);
+              if (match) {
+                const rawChar = (match[1] || match[2] || '').toUpperCase();
+                if (rawChar === 'A' || rawChar === 'أ') shiftLetter = 'A';
+                else if (rawChar === 'B' || rawChar === 'ب') shiftLetter = 'B';
+                else if (rawChar === 'C' || rawChar === 'ج') shiftLetter = 'C';
+                else if (rawChar === 'D' || rawChar === 'د') shiftLetter = 'D';
+              }
+              if (!shiftLetter && (emp.workShift === 'مناوب' || isShiftWorker)) {
+                shiftLetter = 'A';
+              }
+            }
+
+            const currentActiveShiftLetter = (window.store && typeof window.store.getCurrentShiftInfo === 'function')
+              ? (window.store.getCurrentShiftInfo().currentShift || '').toUpperCase()
+              : '';
+            const isActiveShift = isShiftWorker && shiftLetter && (shiftLetter === currentActiveShiftLetter);
+
+            return `
+              <tr class="dept-staff-row"
+                  data-name="${(emp.fullName || '').toLowerCase()}"
+                  data-empid="${(emp.employeeId || '').toLowerCase()}"
+                  data-section="${emp.sectionId || 'NONE'}">
+                
+                <!-- 1. الاسم -->
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 0;">
+                    <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--md-sys-color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
+                      ${(emp.fullName || 'م').substring(0, 2)}
+                    </div>
+                    <div style="min-width: 0;">
+                      <strong style="font-size: 0.92rem; color: var(--md-sys-color-on-surface); white-space: nowrap; display: block;" title="${emp.fullName}">${emp.fullName}</strong>
+                      <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); white-space: nowrap;">${emp.email || emp.userEmail || emp.emailPersonal || emp.phone || 'كادر القسم'}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- 2. الرقم الوظيفي -->
+                <td style="font-family: monospace; font-weight: 700; white-space: nowrap;">
+                  <code>${emp.employeeId || '—'}</code>
+                </td>
+
+                <!-- 3. جهة الارتباط -->
+                <td>
+                  <div style="font-weight: 700; color: var(--md-sys-color-on-surface); white-space: nowrap;">${scopeText}</div>
+                  ${st ? `
+                    <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem;">
+                      <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span>
+                      ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>` : ''}
+                    </div>
+                  ` : (isShiftWorker && shiftLetter ? `
+                    <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap;">
+                      <span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>
+                    </div>
+                  ` : '')}
+                </td>
+
+                <!-- 4. العنوان الوظيفي -->
+                <td>
+                  <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف'}">
+                    ${emp.jobTitle || 'موظف'}
+                  </span>
+                </td>
+
+                <!-- 5. الدور -->
+                <td>
+                  <span class="badge ${roleInfo.badgeClass || 'badge-secondary'}" style="font-size: 0.78rem; max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${roleInfo.name || emp.role}">
+                    ${roleInfo.name || emp.role || 'منتسب'}
+                  </span>
+                </td>
+
+                <!-- 6. الهاتف / واتساب -->
+                <td>
+                  ${empPhone ? `
+                    <div style="direction: ltr; text-align: right; font-family: monospace; font-weight: 700; color: var(--md-sys-color-on-surface); font-size: 0.86rem; letter-spacing: 0.5px;">
+                      ${empPhone}
+                    </div>
+                  ` : '<span style="color: var(--md-sys-color-outline); font-size: 0.78rem;">غير مسجل</span>'}
+                </td>
+
+                <!-- 7. الإجراءات (الإضبارة والمراسلة) -->
+                <td style="text-align: center; white-space: nowrap;">
+                  <div style="display: flex; gap: 0.4rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <button class="btn-action-view" onclick="window.app.openMasterDossierModal('${emp.employeeId || ''}')" title="معاينة الإضبارة الموحدة" style="padding: 0.3rem 0.65rem;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                      <span>معاينة الإضبارة</span>
+                    </button>
+                    <button class="btn-circle-email btn-action-email" onclick="window.app.openDirectEmail('${empEmail}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="مراسلة عبر البريد الإلكتروني (${empEmail || 'غير مسجل'})">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                        <path d="M22 7l-10 7L2 7"></path>
+                      </svg>
+                    </button>
+                    <button class="btn-circle-whatsapp btn-action-whatsapp" onclick="window.app.openDirectWhatsApp('${empPhone}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="تواصل عبر واتساب (${empPhone || 'غير مسجل'})">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="#ffffff">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Department Staff Pagination Bar (تصميم كريستالي جذاب وعملي ومفعل) -->
+    <div class="pagination-bar-container" id="deptStaffPaginationBar">
+      <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+        <div class="pagination-info-badge">
+          <span>📊</span>
+          <span>عرض <strong>${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx}</strong> من إجمالي <strong>${filtered.length}</strong> موظف</span>
+        </div>
+        ${filtered.length !== safeStaffList.length ? `<span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-weight: 600;">(إجمالي كادر القسم: ${safeStaffList.length})</span>` : ''}
+      </div>
+
+      <div class="pagination-controls-wrapper">
+        <div class="pagination-size-group">
+          <span>عرض بالصفحة:</span>
+          <select class="pagination-size-select" onchange="window.app.setDeptStaffPageSize(this.value)">
+            <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
+            <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
+            <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
+            <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>عرض الكل</option>
+          </select>
+        </div>
+
+        <div class="pagination-nav-cluster">
+          <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">
+            <span>«</span>
+            <span style="font-size: 0.76rem;">الأولى</span>
+          </button>
+          <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">
+            <span>‹</span>
+            <span style="font-size: 0.76rem;">السابق</span>
+          </button>
+          <div class="pagination-page-indicator-pill" title="الصفحة الحالية من إجمالي الصفحات">
+            <span style="font-size: 0.75rem; opacity: 0.9;">صفحة</span>
+            <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${currentPage}</span>
+            <span style="font-size: 0.75rem; opacity: 0.85;">من</span>
+            <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${totalPages}</span>
+          </div>
+          <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">
+            <span style="font-size: 0.76rem;">التالي</span>
+            <span>›</span>
+          </button>
+          <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">
+            <span style="font-size: 0.76rem;">الأخيرة</span>
+            <span>»</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDeptStaffTab(staff, actorUser, sections) {
+  const safeSections = Array.isArray(sections) ? sections : [];
+
+  if (typeof window !== 'undefined') {
+    if (!window.app) window.app = {};
+    if (!window.app.deptStaffState) {
+      window.app.deptStaffState = { page: 1, pageSize: 25, search: '', section: 'ALL' };
+    }
+  }
+
+  const state = (typeof window !== 'undefined' && window.app && window.app.deptStaffState)
+    ? window.app.deptStaffState
+    : { page: 1, pageSize: 25, search: '', section: 'ALL' };
+
+  return `
+    <div class="card" id="deptStaffTabCard">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
         <div>
           <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin: 0 0 0.25rem 0;">
@@ -403,7 +626,7 @@ function renderDeptStaffTab(staff, actorUser, sections) {
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-          <input type="text" id="deptStaffSearchInput" class="form-control" style="width: 180px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" value="${state.search || ''}" placeholder="🔍 بحث بالاسم أو الرقم..." oninput="window.app.filterDeptStaff()">
+          <input type="text" id="deptStaffSearchInput" class="form-control" style="width: 180px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" value="${(state.search !== undefined ? state.search : '').replace(/"/g, '&quot;')}" placeholder="🔍 بحث بالاسم أو الرقم..." oninput="window.app.filterDeptStaff()">
           <select id="deptStaffSectionFilter" class="form-control" style="width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterDeptStaff()">
             <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة الشعب</option>
             ${safeSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
@@ -422,206 +645,8 @@ function renderDeptStaffTab(staff, actorUser, sections) {
         </div>
       </div>
 
-      <div class="table-container" style="overflow-x: auto;">
-        <table class="data-table" id="deptStaffTable" style="font-size: 0.88rem;">
-          <thead>
-            <tr>
-              <th style="min-width: 200px;">الاسم</th>
-              <th style="min-width: 120px;">الرقم الوظيفي</th>
-              <th style="min-width: 150px;">جهة الارتباط</th>
-              <th style="min-width: 130px;">العنوان الوظيفي</th>
-              <th style="min-width: 120px;">الدور</th>
-              <th style="min-width: 140px;">الهاتف / واتساب</th>
-              <th style="min-width: 190px; text-align: center;">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody id="deptStaffTableBody">
-            ${pageItems.length === 0 ? `
-              <tr>
-                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
-                  <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">👥</div>
-                  <h4>لا توجد نتائج مطابقة لبحث كادر القسم</h4>
-                </td>
-              </tr>
-            ` : pageItems.map(emp => {
-              const sec = secMap[emp.sectionId];
-              const un = unitMap[emp.unitId];
-              const st = staMap[emp.stationId];
-              const scopeText = sec ? sec.name : (un ? un.name : (st ? st.name : 'إدارة القسم'));
-              const roleInfo = (window.rbac && typeof window.rbac.getRoleInfo === 'function' && window.rbac.getRoleInfo(emp.role)) 
-                || { name: emp.role || 'منتسب', badgeClass: 'badge-secondary' };
-              const empPhone = emp.phone || emp.mobile || '';
-              const empEmail = emp.userEmail || emp.emailPersonal || emp.email || '';
-
-              // Check if employee is shift worker and get shift letter
-              const rawShift = emp.assignedShift || emp.shift || emp.workShift || emp.workSchedule || '';
-              const rawSchedule = String(emp.workShift || emp.workSchedule || '').trim();
-              const isMorning = rawSchedule === 'صباحي' || rawShift === 'صباحي' || String(emp.jobTitle || '').includes('صباحي');
-              const isShiftWorker = !isMorning && (
-                rawSchedule === 'مناوب' || 
-                emp.workShift === 'مناوب' || 
-                (rawShift && rawShift !== 'صباحي' && rawShift !== 'حقلي') ||
-                /[ABCDأبجد]/.test(String(rawShift)) ||
-                String(emp.jobTitle || '').includes('نوبة')
-              );
-
-              let shiftLetter = '';
-              if (isShiftWorker) {
-                const match = String(rawShift + ' ' + (emp.jobTitle || '')).match(/(?:نوبة\s*([ABCDأبجد])|([ABCDأبجد]))/i);
-                if (match) {
-                  const rawChar = (match[1] || match[2] || '').toUpperCase();
-                  if (rawChar === 'A' || rawChar === 'أ') shiftLetter = 'A';
-                  else if (rawChar === 'B' || rawChar === 'ب') shiftLetter = 'B';
-                  else if (rawChar === 'C' || rawChar === 'ج') shiftLetter = 'C';
-                  else if (rawChar === 'D' || rawChar === 'د') shiftLetter = 'D';
-                }
-                if (!shiftLetter && (emp.workShift === 'مناوب' || isShiftWorker)) {
-                  shiftLetter = 'A';
-                }
-              }
-
-              const currentActiveShiftLetter = (window.store && typeof window.store.getCurrentShiftInfo === 'function')
-                ? (window.store.getCurrentShiftInfo().currentShift || '').toUpperCase()
-                : '';
-              const isActiveShift = isShiftWorker && shiftLetter && (shiftLetter === currentActiveShiftLetter);
-
-              return `
-                <tr class="dept-staff-row"
-                    data-name="${(emp.fullName || '').toLowerCase()}"
-                    data-empid="${(emp.employeeId || '').toLowerCase()}"
-                    data-section="${emp.sectionId || 'NONE'}">
-                  
-                  <!-- 1. الاسم -->
-                  <td>
-                    <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 0;">
-                      <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--md-sys-color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
-                        ${(emp.fullName || 'م').substring(0, 2)}
-                      </div>
-                      <div style="min-width: 0;">
-                        <strong style="font-size: 0.92rem; color: var(--md-sys-color-on-surface); white-space: nowrap; display: block;" title="${emp.fullName}">${emp.fullName}</strong>
-                        <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); white-space: nowrap;">${emp.email || emp.userEmail || emp.emailPersonal || emp.phone || 'كادر القسم'}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <!-- 2. الرقم الوظيفي -->
-                  <td style="font-family: monospace; font-weight: 700; white-space: nowrap;">
-                    <code>${emp.employeeId || '—'}</code>
-                  </td>
-
-                  <!-- 3. جهة الارتباط -->
-                  <td>
-                    <div style="font-weight: 700; color: var(--md-sys-color-on-surface); white-space: nowrap;">${scopeText}</div>
-                    ${st ? `
-                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem;">
-                        <span style="font-weight: 700; color: var(--md-sys-color-primary);">${st.name}</span>
-                        ${isShiftWorker && shiftLetter ? `<span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>` : ''}
-                      </div>
-                    ` : (isShiftWorker && shiftLetter ? `
-                      <div class="roster-location-sub" style="font-size: 0.76rem; color: var(--md-sys-color-outline); margin-top: 2px; white-space: nowrap;">
-                        <span class="roster-shift-pill shift-${shiftLetter} ${isActiveShift ? 'active-working-shift' : ''}" title="${isActiveShift ? `🟢 النوبة العاملة حالياً (${shiftLetter})` : `نوبة الموظف: (${shiftLetter})`}">${isActiveShift ? '<span class="shift-mini-ping"></span>' : ''}${shiftLetter}</span>
-                      </div>
-                    ` : '')}
-                  </td>
-
-                  <!-- 4. العنوان الوظيفي -->
-                  <td>
-                    <span class="badge" style="background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); font-size: 0.82rem; font-weight: 600; max-width: 170px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${emp.jobTitle || 'موظف'}">
-                      ${emp.jobTitle || 'موظف'}
-                    </span>
-                  </td>
-
-                  <!-- 5. الدور -->
-                  <td>
-                    <span class="badge ${roleInfo.badgeClass || 'badge-secondary'}" style="font-size: 0.78rem; max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${roleInfo.name || emp.role}">
-                      ${roleInfo.name || emp.role || 'منتسب'}
-                    </span>
-                  </td>
-
-                  <!-- 6. الهاتف / واتساب -->
-                  <td>
-                    ${empPhone ? `
-                      <div style="direction: ltr; text-align: right; font-family: monospace; font-weight: 700; color: var(--md-sys-color-on-surface); font-size: 0.86rem; letter-spacing: 0.5px;">
-                        ${empPhone}
-                      </div>
-                    ` : '<span style="color: var(--md-sys-color-outline); font-size: 0.78rem;">غير مسجل</span>'}
-                  </td>
-
-                  <!-- 7. الإجراءات (الإضبارة والمراسلة) -->
-                  <td style="text-align: center; white-space: nowrap;">
-                    <div style="display: flex; gap: 0.4rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-                      <button class="btn-action-view" onclick="window.app.openMasterDossierModal('${emp.employeeId || ''}')" title="معاينة الإضبارة الموحدة" style="padding: 0.3rem 0.65rem;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>معاينة الإضبارة</span>
-                      </button>
-                      <button class="btn-circle-email btn-action-email" onclick="window.app.openDirectEmail('${empEmail}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="مراسلة عبر البريد الإلكتروني (${empEmail || 'غير مسجل'})">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="2" y="4" width="20" height="16" rx="3"></rect>
-                          <path d="M22 7l-10 7L2 7"></path>
-                        </svg>
-                      </button>
-                      <button class="btn-circle-whatsapp btn-action-whatsapp" onclick="window.app.openDirectWhatsApp('${empPhone}', '${(emp.fullName || '').replace(/'/g, "\\'")}')" title="تواصل عبر واتساب (${empPhone || 'غير مسجل'})">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="#ffffff">
-                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Department Staff Pagination Bar (تصميم كريستالي جذاب وعملي ومفعل) -->
-      <div class="pagination-bar-container">
-        <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-          <div class="pagination-info-badge">
-            <span>📊</span>
-            <span>عرض <strong>${filtered.length === 0 ? 0 : startIdx + 1} - ${endIdx}</strong> من إجمالي <strong>${filtered.length}</strong> موظف</span>
-          </div>
-          ${filtered.length !== safeStaffList.length ? `<span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-weight: 600;">(إجمالي كادر القسم: ${safeStaffList.length})</span>` : ''}
-        </div>
-
-        <div class="pagination-controls-wrapper">
-          <div class="pagination-size-group">
-            <span>عرض بالصفحة:</span>
-            <select class="pagination-size-select" onchange="window.app.setDeptStaffPageSize(this.value)">
-              <option value="25" ${state.pageSize === 25 || state.pageSize === '25' ? 'selected' : ''}>25</option>
-              <option value="50" ${state.pageSize === 50 || state.pageSize === '50' ? 'selected' : ''}>50</option>
-              <option value="100" ${state.pageSize === 100 || state.pageSize === '100' ? 'selected' : ''}>100</option>
-              <option value="ALL" ${state.pageSize === 'ALL' ? 'selected' : ''}>عرض الكل</option>
-            </select>
-          </div>
-
-          <div class="pagination-nav-cluster">
-            <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(1)" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة الأولى">
-              <span>«</span>
-              <span style="font-size: 0.76rem;">الأولى</span>
-            </button>
-            <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">
-              <span>‹</span>
-              <span style="font-size: 0.76rem;">السابق</span>
-            </button>
-            <div class="pagination-page-indicator-pill" title="الصفحة الحالية من إجمالي الصفحات">
-              <span style="font-size: 0.75rem; opacity: 0.9;">صفحة</span>
-              <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${currentPage}</span>
-              <span style="font-size: 0.75rem; opacity: 0.85;">من</span>
-              <span style="font-size: 0.92rem; font-family: monospace; font-weight: 900;">${totalPages}</span>
-            </div>
-            <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة التالية">
-              <span style="font-size: 0.76rem;">التالي</span>
-              <span>›</span>
-            </button>
-            <button class="pagination-action-btn" onclick="window.app.setDeptStaffPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} title="الصفحة الأخيرة">
-              <span style="font-size: 0.76rem;">الأخيرة</span>
-              <span>»</span>
-            </button>
-          </div>
-        </div>
+      <div id="deptStaffTableContainer">
+        ${renderDeptStaffTableAndPagination(staff, actorUser, sections)}
       </div>
     </div>
   `;
@@ -704,8 +729,30 @@ function renderDeptDocsTab(docs, actorUser, sections) {
               return `
                 <tr class="dept-doc-row" data-title="${(d.title || '').toLowerCase()}" data-category="${d.category || ''}">
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <span style="font-size: 1.2rem;">${d.category === 'EXCEL' ? '📊' : d.category === 'PDF' ? '📕' : '📄'}</span>
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                      <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:${d.category === 'EXCEL' ? 'rgba(16,185,129,0.15)' : (d.category === 'PDF' ? 'rgba(239,68,68,0.15)' : 'rgba(37,99,235,0.15)')}; color:${d.category === 'EXCEL' ? '#059669' : (d.category === 'PDF' ? '#dc2626' : '#2563eb')}; flex-shrink:0;">
+                        ${d.category === 'EXCEL' ? `
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="3" y1="15" x2="21" y2="15"></line>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                          </svg>
+                        ` : (d.category === 'PDF' ? `
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M9 13h6"></path>
+                            <path d="M9 17h3"></path>
+                          </svg>
+                        ` : `
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M8 13l1.5 4 1.5-4 1.5 4 1.5-4"></path>
+                          </svg>
+                        `)}
+                      </span>
                       <strong style="color: var(--md-sys-color-primary); cursor: pointer;" onclick="window.app.openDocumentViewModal('${d.id}')">
                         ${d.title || 'مستند'}
                       </strong>
@@ -767,89 +814,99 @@ function renderDeptInterviewsTab(requests, actorUser) {
   const isManager = ['DEPT_MANAGER', 'SUPER_ADMIN', 'SECTION_MANAGER'].includes(actorUser.role);
 
   return `
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+    <div class="card" style="border-radius: 20px; border: 1.2px solid rgba(56, 189, 248, 0.2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.35rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.85rem;">
         <div>
-          <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin: 0 0 0.25rem 0;">
-            🤝 طلبات المقابلة الرسمية (Interview Requests)
+          <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem;">
+            🤝 طلبات المقابلة الرسمية مع إدارة القسم
           </h4>
-          <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0;">
-            استعراض ومتابعة واتخاذ الإجراءات الإدارية بشأن طلبات المقابلات المقدمة من كوادر ومنتسبي الشعب والوحدات.
+          <p style="color: var(--md-sys-color-outline); font-size: 0.86rem; margin: 0;">
+            استعراض ومتابعة واتخاذ الإجراءات الإدارية وتثبيت مواعيد المقابلات المقدمة من كوادر ومنتسبي الشعب والوحدات.
           </p>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="window.app.openCreateInterviewRequestModal()" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 12px; padding: 0.55rem 1.15rem; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+            <span>➕</span> تقديم طلب مقابلة جديد
+          </button>
         </div>
       </div>
 
       <div style="display: grid; gap: 1rem;">
         ${requests.length === 0 ? `
-          <div style="text-align: center; padding: 3.5rem 1rem; color: var(--md-sys-color-outline); background: var(--md-sys-color-surface-variant); border-radius: var(--radius-md);">
-            <div style="font-size: 2.8rem; margin-bottom: 0.6rem;">🤝</div>
-            <h4 style="margin: 0 0 0.5rem 0; font-weight: 700;">لا توجد طلبات مقابلة حالياً</h4>
-            <p style="font-size: 0.88rem; max-width: 450px; margin: 0 auto;">
-              يتم استقبال طلبات المقابلات الرسمية المحالة من مساحات عمل الشعب والوحدات هنا للمعالجة والمتابعة من قبل إدارة القسم.
+          <div style="text-align: center; padding: 3.5rem 1rem; color: var(--md-sys-color-outline); background: var(--md-sys-color-surface-variant); border-radius: 16px; border: 1px dashed rgba(56, 189, 248, 0.3);">
+            <div style="font-size: 3rem; margin-bottom: 0.6rem;">🤝</div>
+            <h4 style="margin: 0 0 0.5rem 0; font-weight: 800; color: var(--md-sys-color-on-surface);">لا توجد طلبات مقابلة حالياً</h4>
+            <p style="font-size: 0.88rem; max-width: 480px; margin: 0 auto; line-height: 1.6;">
+              يتم استقبال طلبات المقابلات الرسمية المحالة من مساحات عمل الشعب والوحدات هنا للمعالجة وتحديد المواعيد من قبل إدارة القسم.
             </p>
           </div>
         ` : requests.map(req => {
           let statusBadge = 'badge';
           let statusLabel = req.status || 'جديد';
+          let borderColor = '#38bdf8';
 
           if (req.status === 'NEW') {
-            statusBadge = 'badge badge-primary'; statusLabel = 'جديد';
+            statusBadge = 'badge badge-primary'; statusLabel = 'جديد'; borderColor = '#38bdf8';
           } else if (req.status === 'UNDER_REVIEW') {
-            statusBadge = 'badge badge-warning'; statusLabel = 'قيد المراجعة';
+            statusBadge = 'badge badge-warning'; statusLabel = 'قيد المراجعة'; borderColor = '#f59e0b';
           } else if (req.status === 'ACCEPTED') {
-            statusBadge = 'badge badge-success'; statusLabel = 'مقبول';
+            statusBadge = 'badge badge-success'; statusLabel = 'مقبول ومحدد'; borderColor = '#10b981';
           } else if (req.status === 'REJECTED') {
-            statusBadge = 'badge badge-danger'; statusLabel = 'مرفوض';
+            statusBadge = 'badge badge-danger'; statusLabel = 'معتذر عنه'; borderColor = '#ef4444';
           } else if (req.status === 'POSTPONED') {
-            statusBadge = 'badge badge-secondary'; statusLabel = 'مؤجل';
+            statusBadge = 'badge badge-secondary'; statusLabel = 'مؤجل'; borderColor = '#a855f7';
           } else if (req.status === 'COMPLETED') {
-            statusBadge = 'badge badge-success'; statusLabel = 'مكتمل';
+            statusBadge = 'badge badge-success'; statusLabel = 'مكتمل وموثق'; borderColor = '#059669';
           }
 
           const priorityBadge = req.priority === 'URGENT' ? 'badge-danger' : req.priority === 'IMPORTANT' ? 'badge-warning' : 'badge-secondary';
-          const priorityLabel = req.priority === 'URGENT' ? 'عاجل' : req.priority === 'IMPORTANT' ? 'هام' : 'عادي';
+          const priorityLabel = req.priority === 'URGENT' ? '🔴 عاجل' : req.priority === 'IMPORTANT' ? '🟡 هام' : '🟢 عادي';
 
           return `
-            <div class="card" style="margin-bottom: 0; border: 1px solid var(--md-sys-color-surface-variant); border-right: 5px solid ${req.status === 'ACCEPTED' ? '#137333' : req.status === 'REJECTED' ? '#d93025' : '#f29900'}; padding: 1.2rem;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div class="card" style="margin-bottom: 0; border: 1.2px solid var(--md-sys-color-surface-variant); border-right: 5px solid ${borderColor}; border-radius: 16px; padding: 1.35rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); transition: transform 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.85rem; margin-bottom: 0.65rem;">
                 <div>
-                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-on-surface);">
+                  <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                    <h4 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--md-sys-color-on-surface);">
                       ${req.topic || 'طلب مقابلة'}
                     </h4>
-                    <span class="${statusBadge}">${statusLabel}</span>
-                    <span class="badge ${priorityBadge}">${priorityLabel}</span>
+                    <span class="${statusBadge}" style="border-radius: 8px; font-weight: 700; padding: 0.25rem 0.6rem;">${statusLabel}</span>
+                    <span class="badge ${priorityBadge}" style="border-radius: 8px; font-weight: 700; padding: 0.25rem 0.6rem;">${priorityLabel}</span>
                   </div>
-                  <div style="font-size: 0.82rem; color: var(--md-sys-color-outline);">
-                    مقدم الطلب: <strong>${req.applicantName || 'المنتسب'}</strong> (<code>${req.applicantEmployeeId || '—'}</code>) | ${req.applicantSection || 'إدارة القسم'} | التاريخ المقترح: <strong>${req.proposedDate || '—'}</strong>
+                  <div style="font-size: 0.84rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span>مقدم الطلب: <strong style="color: var(--md-sys-color-on-surface);">${req.applicantName || 'المنتسب'}</strong> (<code>${req.applicantEmployeeId || '—'}</code>)</span>
+                    <span>•</span>
+                    <span>🏛️ ${req.applicantSection || 'إدارة القسم'}</span>
+                    <span>•</span>
+                    <span>📅 التاريخ المقترح: <strong style="color: var(--md-sys-color-primary);">${req.proposedDate || '—'}</strong></span>
                   </div>
                 </div>
 
                 ${isManager ? `
-                  <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
-                    <button class="btn-action-accept" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'ACCEPTED')" title="قبول الموعد">
+                  <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                    <button class="btn-action-accept" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'ACCEPTED')" title="قبول وتثبيت الموعد" style="border-radius: 8px; padding: 0.35rem 0.75rem; font-weight: 700;">
                       ✓ قبول
                     </button>
-                    <button class="btn-action-postpone" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'POSTPONED')" title="تأجيل الموعد">
+                    <button class="btn-action-postpone" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'POSTPONED')" title="تأجيل الموعد" style="border-radius: 8px; padding: 0.35rem 0.75rem; font-weight: 700;">
                       ⏸️ تأجيل
                     </button>
-                    <button class="btn-action-decline" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'REJECTED')" title="الاعتذار عن الموعد">
+                    <button class="btn-action-decline" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'REJECTED')" title="الاعتذار عن الموعد" style="border-radius: 8px; padding: 0.35rem 0.75rem; font-weight: 700;">
                       ✗ اعتذار
                     </button>
-                    <button class="btn-action-complete" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'COMPLETED')" title="إتمام وتوثيق المقابلة">
+                    <button class="btn-action-complete" onclick="window.app.handleUpdateInterviewStatus('${req.id}', 'COMPLETED')" title="إتمام وتوثيق المقابلة" style="border-radius: 8px; padding: 0.35rem 0.75rem; font-weight: 700;">
                       ✅ إتمام
                     </button>
                   </div>
                 ` : ''}
               </div>
 
-              <div style="font-size: 0.85rem; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-surface-variant); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); margin-top: 0.4rem;">
+              <div style="font-size: 0.88rem; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-surface-variant); padding: 0.75rem 1rem; border-radius: 12px; margin-top: 0.5rem; line-height: 1.6; border: 1px solid rgba(0,0,0,0.04);">
                 ${req.details || ''}
               </div>
 
               ${req.notes ? `
-                <div style="font-size: 0.78rem; color: var(--md-sys-color-primary); margin-top: 0.4rem; font-weight: 600;">
-                  📝 ملاحظات الإدارة: ${req.notes} ${req.reviewedBy ? `(بواسطة: ${req.reviewedBy})` : ''}
+                <div style="font-size: 0.82rem; color: var(--md-sys-color-primary); margin-top: 0.55rem; font-weight: 700; background: rgba(56, 189, 248, 0.1); padding: 0.5rem 0.85rem; border-radius: 8px; border-right: 3px solid #38bdf8;">
+                  📝 ملاحظات وتوجيه الإدارة: ${req.notes} ${req.reviewedBy ? `(بواسطة: ${req.reviewedBy})` : ''}
                 </div>
               ` : ''}
             </div>
@@ -1196,8 +1253,28 @@ function renderDeptFormsTab(actorUser) {
                 return `
                   <div style="border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px; padding: 0.75rem 0.9rem; background: var(--md-sys-color-surface); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; box-shadow: var(--shadow-1);">
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
-                      <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(11, 87, 208, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
-                        ${isExcel ? '📊' : (isPdf ? '📕' : '📄')}
+                      <div style="width: 36px; height: 36px; border-radius: 8px; background: ${isExcel ? 'rgba(16,185,129,0.15)' : (isPdf ? 'rgba(239,68,68,0.15)' : 'rgba(37,99,235,0.15)')}; color: ${isExcel ? '#059669' : (isPdf ? '#dc2626' : '#2563eb')}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        ${isExcel ? `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="3" y1="15" x2="21" y2="15"></line>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                          </svg>
+                        ` : (isPdf ? `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M9 13h6"></path>
+                            <path d="M9 17h3"></path>
+                          </svg>
+                        ` : `
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M8 13l1.5 4 1.5-4 1.5 4 1.5-4"></path>
+                          </svg>
+                        `)}
                       </div>
                       <div>
                         <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 2px;">
@@ -1412,4 +1489,6 @@ function renderDeptFormsTab(actorUser) {
 // Global Export
 window.renderDeptManagementView = renderDeptManagementView;
 window.renderDeptFormsTab = renderDeptFormsTab;
+window.renderDeptStaffTab = renderDeptStaffTab;
+window.renderDeptStaffTableAndPagination = renderDeptStaffTableAndPagination;
 

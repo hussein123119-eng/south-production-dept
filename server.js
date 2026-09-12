@@ -30,10 +30,33 @@ const PORT = process.env.PORT || 3000;
 const DB_DIR = path.join(__dirname, 'database');
 const DB_FILE = path.join(DB_DIR, 'spd_production_db.json');
 const BACKUPS_DIR = path.join(DB_DIR, 'backups');
-const JWT_SECRET = process.env.JWT_SECRET || 'spd_production_secure_secret_key_2026';
+// 🔐 JWT Secret — يجب تعيين JWT_SECRET في ملف .env قبل الإنتاج
+// إذا لم يُعيَّن يُولَّد سر عشوائي لكل جلسة (لا يصلح للإنتاج متعدد الخوادم)
+let JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  JWT_SECRET = crypto.randomBytes(48).toString('hex');
+  console.warn('⚠️  [SECURITY] JWT_SECRET غير محدد في .env — تم توليد سر مؤقت عشوائي لهذه الجلسة فقط.');
+  console.warn('⚠️  [SECURITY] يرجى إضافة JWT_SECRET=<سر_قوي_عشوائي> في ملف .env للبيئة الإنتاجية.');
+}
 
-// Global OTP in-memory store
+// Global OTP in-memory store & periodic cleanup
 if (!global.activeOtps) global.activeOtps = new Map();
+if (!global.activeRegistrationOtps) global.activeRegistrationOtps = new Map();
+
+// Periodic cleanup of expired OTPs every 10 minutes (unref so it doesn't hold process)
+setInterval(() => {
+  const now = Date.now();
+  if (global.activeOtps) {
+    for (const [k, v] of global.activeOtps.entries()) {
+      if (v.expires && now > v.expires) global.activeOtps.delete(k);
+    }
+  }
+  if (global.activeRegistrationOtps) {
+    for (const [k, v] of global.activeRegistrationOtps.entries()) {
+      if (v.expires && now > v.expires) global.activeRegistrationOtps.delete(k);
+    }
+  }
+}, 10 * 60 * 1000).unref();
 
 // --- Official Email Service (Gmail SMTP & Nodemailer) ---
 function getMailTransporter() {
@@ -423,8 +446,13 @@ const server = http.createServer(async (req, res) => {
         }, req);
       }
 
-      // 2. Database Sync - GET (Fetch Full DB State)
+
+      // 2. Database Sync - GET (Fetch Full DB State) — 🔐 محمية بالتوكن
       if (pathname === '/api/db/sync' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) {
+          return sendJson(res, 401, { success: false, error: 'مطلوب تسجيل الدخول للوصول لقاعدة البيانات' }, req);
+        }
         return sendJson(res, 200, {
           success: true,
           timestamp: lastDbModified,
@@ -432,8 +460,13 @@ const server = http.createServer(async (req, res) => {
         }, req);
       }
 
-      // 3. Database Sync - POST (Save & Mutate Full DB State with Schema Validation)
+
+      // 3. Database Sync - POST (Save & Mutate Full DB State) — 🔐 محمية بالتوكن
       if (pathname === '/api/db/sync' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) {
+          return sendJson(res, 401, { success: false, error: 'مطلوب تسجيل الدخول لحفظ البيانات' }, req);
+        }
         const body = await parseJsonBody(req);
         if (body && typeof body === 'object') {
           const updatedDb = body.db || body;
@@ -469,8 +502,23 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
-      // 4. Bootstrap Initial Data
+
+      // 4. Bootstrap Initial Data — 🔐 يُعيد DB كامل فقط للمصادَق عليهم
       if (pathname === '/api/bootstrap' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) {
+          // مستخدم غير مسجّل: يُعاد فقط الإعدادات العامة بدون بيانات حساسة
+          return sendJson(res, 200, {
+            success: true,
+            db: {
+              systemSettings: memoryDb?.systemSettings || {},
+              departments: memoryDb?.departments || [],
+              sections: memoryDb?.sections || [],
+            },
+            systemSettings: memoryDb?.systemSettings || {},
+            timestamp: lastDbModified
+          });
+        }
         return sendJson(res, 200, {
           success: true,
           db: memoryDb,
@@ -478,6 +526,7 @@ const server = http.createServer(async (req, res) => {
           timestamp: lastDbModified
         });
       }
+
 
       // 5. Auth Login
       if (pathname === '/api/auth/login' && method === 'POST') {
@@ -557,24 +606,34 @@ const server = http.createServer(async (req, res) => {
         }, req);
       }
 
-      // 6. Backups Management
+      // 6. Backups Management — 🔐 للمصادَق عليهم فقط
       if (pathname === '/api/backups' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) return sendJson(res, 401, { success: false, error: 'غير مصرح' }, req);
         const files = fs.readdirSync(BACKUPS_DIR).filter(f => f.endsWith('.json'));
         return sendJson(res, 200, { success: true, backups: files });
       }
 
       if (pathname === '/api/backup/create' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) return sendJson(res, 401, { success: false, error: 'غير مصرح' }, req);
         const backupName = 'backup_' + new Date().toISOString().replace(/[:.]/g, '-') + '.json';
         fs.writeFileSync(path.join(BACKUPS_DIR, backupName), JSON.stringify(memoryDb, null, 2), 'utf8');
         return sendJson(res, 200, { success: true, backup: backupName });
       }
 
-      // 7. Founder Sovereign Portal Endpoints
+      // 7. Founder Sovereign Portal Endpoints — 🔐 للمؤسس (SUPER_ADMIN) فقط
       if (pathname === '/api/founder/broadcast' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) return sendJson(res, 401, { success: false, error: 'غير مصرح' }, req);
         return sendJson(res, 200, { success: true, broadcast: memoryDb.sovereignBroadcast || null });
       }
 
       if (pathname === '/api/founder/broadcast' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const body = await parseBody(req);
         memoryDb.sovereignBroadcast = body.message || null;
         persistDatabase();
@@ -582,6 +641,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (pathname === '/api/founder/whitelist' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const list = memoryDb.founderWhitelist || [
           { email: 'hussein123119@gmail.com', role: 'المؤسس الأعلى', date: '2026-09-01', isMaster: true }
         ];
@@ -589,6 +652,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (pathname === '/api/founder/whitelist' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const body = await parseBody(req);
         if (body.action === 'ADD' && body.email) {
           if (!memoryDb.founderWhitelist) {
@@ -618,13 +685,19 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
-      // Emergency Maintenance Control Endpoints
+      // Emergency Maintenance Control Endpoints — 🔐 للمؤسس (SUPER_ADMIN) فقط
       if (pathname === '/api/emergency/maintenance' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser) return sendJson(res, 401, { success: false, error: 'غير مصرح' }, req);
         const lock = memoryDb.emergencyMaintenance || { active: false, reason: '', updatedAt: null };
         return sendJson(res, 200, { success: true, lock });
       }
 
       if (pathname === '/api/emergency/maintenance' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const body = await parseJsonBody(req);
         memoryDb.emergencyMaintenance = {
           active: !!body.active,
@@ -636,7 +709,7 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { success: true, lock: memoryDb.emergencyMaintenance });
       }
 
-      // 8. Send Official OTP Email
+
       // 8. Send Official OTP Email
       if (pathname === '/api/auth/send-otp' && method === 'POST') {
         const body = await parseJsonBody(req);
@@ -933,9 +1006,18 @@ const server = http.createServer(async (req, res) => {
           return sendJson(res, 404, { success: false, error: 'المستخدم غير موجود' }, req);
         }
 
-        // Verify current password if user already has a password
-        if (u.password && currentPassword && !verifyPassword(currentPassword, u.password)) {
-          return sendJson(res, 401, { success: false, error: 'كلمة المرور الحالية غير صحيحة' }, req);
+        // 🔐 الحماية من الاستيلاء على الحساب (Account Takeover):
+        // التحقق الإلزامي من كلمة المرور الحالية أو وجود توكن مصادق عليه لنفس المستخدم
+        const tokenUser = verifyToken(req);
+        const isSelfToken = tokenUser && (tokenUser.id === u.id || tokenUser.role === 'SUPER_ADMIN');
+
+        if (u.password && !isSelfToken) {
+          if (!currentPassword) {
+            return sendJson(res, 400, { success: false, error: 'يرجى إدخال كلمة المرور الحالية' }, req);
+          }
+          if (!verifyPassword(currentPassword, u.password)) {
+            return sendJson(res, 401, { success: false, error: 'كلمة المرور الحالية غير صحيحة' }, req);
+          }
         }
 
         u.password = hashPassword(newPassword);
@@ -943,9 +1025,12 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { success: true, message: 'تم تحديث وتشفير كلمة المرور بنجاح في قاعدة البيانات' }, req);
       }
 
-      // 10. SMTP Configuration API
+      // 10. SMTP Configuration API — 🔐 للمؤسس (SUPER_ADMIN) فقط
       if (pathname === '/api/system/smtp-config' && method === 'GET') {
         const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const smtp = memoryDb?.systemSettings?.smtp || {};
         return sendJson(res, 200, {
           success: true,
@@ -958,6 +1043,9 @@ const server = http.createServer(async (req, res) => {
 
       if (pathname === '/api/system/smtp-config' && method === 'POST') {
         const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const body = await parseJsonBody(req);
         if (!memoryDb.systemSettings) memoryDb.systemSettings = {};
         memoryDb.systemSettings.smtp = {
@@ -970,8 +1058,13 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { success: true, message: 'تم حفظ إعدادات البريد بنجاح' }, req);
       }
 
-      // 11. Auth Provider Management API (Toggle between GMAIL_SMTP and FIREBASE_AUTH)
+
+      // 11. Auth Provider Management API — 🔐 للمؤسس (SUPER_ADMIN) فقط
       if (pathname === '/api/system/auth-provider' && method === 'GET') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const settings = memoryDb?.systemSettings || {};
         const activeProvider = settings.authProvider || 'GMAIL_SMTP';
         const smtp = settings.smtp || {};
@@ -1003,6 +1096,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (pathname === '/api/system/auth-provider' && method === 'POST') {
+        const tokenUser = verifyToken(req);
+        if (!tokenUser || tokenUser.role !== 'SUPER_ADMIN') {
+          return sendJson(res, 403, { success: false, error: 'هذه العملية حكر على المؤسس فقط' }, req);
+        }
         const body = await parseJsonBody(req);
         const provider = (body.provider || '').trim().toUpperCase();
         if (provider !== 'GMAIL_SMTP' && provider !== 'FIREBASE_AUTH') {
@@ -1020,6 +1117,7 @@ const server = http.createServer(async (req, res) => {
           message: `تم التبديل بنجاح إلى: ${providerName}`
         });
       }
+
 
       // 12. Test Connection for Auth Provider
       if (pathname === '/api/system/test-auth-provider' && method === 'POST') {

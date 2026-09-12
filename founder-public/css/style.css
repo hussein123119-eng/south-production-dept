@@ -134,42 +134,53 @@ html[data-theme="dark"],
 }
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  scrollbar-width: auto;
+  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(15, 23, 42, 0.2);
 }
 
 [data-theme="dark"] * {
-  scrollbar-color: rgba(0, 223, 216, 0.45) transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(15, 23, 42, 0.3);
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 11px;
+  height: 11px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.55);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
   transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background: rgba(203, 213, 225, 0.85);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: rgba(11, 20, 42, 0.4);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: rgba(0, 223, 216, 0.4);
-  border-radius: 10px;
-  box-shadow: 0 0 6px rgba(0, 223, 216, 0.2);
+  background: rgba(148, 163, 184, 0.55);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 223, 216, 0.75);
-  box-shadow: 0 0 10px rgba(0, 223, 216, 0.5);
+  background: rgba(203, 213, 225, 0.9);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 /* Dedicated, High-Contrast Futuristic Scrollbar for Sidebar */
@@ -2847,7 +2858,8 @@ body.sidebar-collapsed .nav-item-meta {
 
 /* 6.1 واتساب دائري (Circular WhatsApp Action Badge) */
 .btn-action-whatsapp,
-.btn-circle-whatsapp {
+.btn-circle-whatsapp,
+.btn-share-whatsapp {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2867,20 +2879,23 @@ body.sidebar-collapsed .nav-item-meta {
   text-decoration: none;
 }
 .btn-action-whatsapp:hover,
-.btn-circle-whatsapp:hover {
+.btn-circle-whatsapp:hover,
+.btn-share-whatsapp:hover {
   background: linear-gradient(135deg, #28e670 0%, #15a090 100%) !important;
   color: #ffffff !important;
   transform: translateY(-2px) scale(1.1);
   box-shadow: 0 4px 14px rgba(37, 211, 102, 0.55) !important;
 }
 .btn-action-whatsapp:active,
-.btn-circle-whatsapp:active {
+.btn-circle-whatsapp:active,
+.btn-share-whatsapp:active {
   transform: translateY(0) scale(0.95);
 }
 
 /* 6.2 إيميل دائري (Circular Email Action Badge) */
 .btn-action-email,
-.btn-circle-email {
+.btn-circle-email,
+.btn-share-email {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2900,15 +2915,31 @@ body.sidebar-collapsed .nav-item-meta {
   text-decoration: none;
 }
 .btn-action-email:hover,
-.btn-circle-email:hover {
+.btn-circle-email:hover,
+.btn-share-email:hover {
   background: linear-gradient(135deg, #0086ea 0%, #006bbd 100%) !important;
   color: #ffffff !important;
   transform: translateY(-2px) scale(1.1);
   box-shadow: 0 4px 14px rgba(0, 120, 212, 0.55) !important;
 }
 .btn-action-email:active,
-.btn-circle-email:active {
+.btn-circle-email:active,
+.btn-share-email:active {
   transform: translateY(0) scale(0.95);
+}
+
+/* فئات الحجم الأكبر لشريط عارض البريد وأشرطة الأدوات */
+.btn-circle-lg-whatsapp {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+}
+.btn-circle-lg-email {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
 }
 
 /* 7. سلة المحذوفات / حذف (Delete / Trash) */
@@ -3220,14 +3251,16 @@ body.sidebar-collapsed .nav-item-meta {
 }
 
 [data-theme="dark"] .btn-action-whatsapp,
-[data-theme="dark"] .btn-circle-whatsapp {
+[data-theme="dark"] .btn-circle-whatsapp,
+[data-theme="dark"] .btn-share-whatsapp {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   color: #ffffff !important;
   border: none !important;
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
 }
 [data-theme="dark"] .btn-action-whatsapp:hover,
-[data-theme="dark"] .btn-circle-whatsapp:hover {
+[data-theme="dark"] .btn-circle-whatsapp:hover,
+[data-theme="dark"] .btn-share-whatsapp:hover {
   background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
   color: #ffffff !important;
   box-shadow: 0 0 18px rgba(52, 211, 153, 0.8) !important;
@@ -3235,14 +3268,16 @@ body.sidebar-collapsed .nav-item-meta {
 }
 
 [data-theme="dark"] .btn-action-email,
-[data-theme="dark"] .btn-circle-email {
+[data-theme="dark"] .btn-circle-email,
+[data-theme="dark"] .btn-share-email {
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
   color: #ffffff !important;
   border: none !important;
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.45) !important;
 }
 [data-theme="dark"] .btn-action-email:hover,
-[data-theme="dark"] .btn-circle-email:hover {
+[data-theme="dark"] .btn-circle-email:hover,
+[data-theme="dark"] .btn-share-email:hover {
   background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
   color: #ffffff !important;
   box-shadow: 0 0 18px rgba(56, 189, 248, 0.8) !important;
@@ -3826,44 +3861,63 @@ body.sidebar-collapsed .nav-item-meta {
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 2.5rem 1.5rem;
   overflow-y: auto;
   flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  scrollbar-width: auto;
+  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(15, 23, 42, 0.2);
 }
 
-.modal-body::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.modal-body::-webkit-scrollbar,
+select::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
   display: block;
 }
 
-.modal-body::-webkit-scrollbar-track {
-  background: transparent;
+.modal-body::-webkit-scrollbar-track,
+select::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.25);
+  border-radius: 8px;
 }
 
-.modal-body::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 10px;
+.modal-body::-webkit-scrollbar-thumb,
+select::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.55);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
-.modal-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+.modal-body::-webkit-scrollbar-thumb:hover,
+select::-webkit-scrollbar-thumb:hover {
+  background: rgba(203, 213, 225, 0.85);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 [data-theme="dark"] .modal-body {
-  scrollbar-color: rgba(0, 223, 216, 0.35) transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(11, 20, 42, 0.4);
 }
 
-[data-theme="dark"] .modal-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 223, 216, 0.35);
-  box-shadow: 0 0 6px rgba(0, 223, 216, 0.2);
+[data-theme="dark"] .modal-body::-webkit-scrollbar-track,
+[data-theme="dark"] select::-webkit-scrollbar-track {
+  background: rgba(11, 20, 42, 0.45);
 }
 
-[data-theme="dark"] .modal-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 223, 216, 0.7);
-  box-shadow: 0 0 10px rgba(0, 223, 216, 0.4);
+[data-theme="dark"] .modal-body::-webkit-scrollbar-thumb,
+[data-theme="dark"] select::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.55);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-theme="dark"] .modal-body::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] select::-webkit-scrollbar-thumb:hover {
+  background: rgba(203, 213, 225, 0.9);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .modal-footer {
@@ -5747,6 +5801,61 @@ input[id*="Search"]:focus,
   .modal-dialog.modal-glass-card .modal-body {
     padding: 1rem !important;
   }
+}
+
+/* Glass Modal Elements Suite (v2.6.4 Luxury Glassmorphic System) */
+.btn-glass-pill {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  padding: 0.28rem 0.72rem !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  user-select: none !important;
+}
+
+.btn-glass-pill:hover {
+  background: rgba(56, 189, 248, 0.28) !important;
+  border-color: rgba(56, 189, 248, 0.65) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3) !important;
+}
+
+.modal-dialog.modal-glass-card .glass-input,
+.modal-dialog.modal-glass-card .glass-textarea {
+  background: rgba(8, 15, 30, 0.75) !important;
+  border: 1.2px solid rgba(56, 189, 248, 0.28) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.32) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.modal-dialog.modal-glass-card .glass-input:focus,
+.modal-dialog.modal-glass-card .glass-textarea:focus {
+  outline: none !important;
+  border-color: rgba(56, 189, 248, 0.75) !important;
+  background: rgba(13, 24, 46, 0.88) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.32), inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.modal-dialog.modal-glass-card .glass-input::placeholder,
+.modal-dialog.modal-glass-card .glass-textarea::placeholder {
+  color: #64748b !important;
+  font-size: 0.88rem !important;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.8)); }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
 /* ==============================================================================
@@ -9083,5 +9192,216 @@ body[data-theme="dark"],
   box-shadow: 0 0 25px rgba(0, 223, 216, 0.25);
 }
 
+/* ==========================================================================
+   Compact Rows & Driver Role Showcase (تحسين كثافة العرض وإبراز أدوار السائقين)
+   ========================================================================== */
+#unifiedRosterTable th {
+  padding: 0.55rem 0.85rem !important;
+  font-size: 0.84rem !important;
+}
+
+#unifiedRosterTable td {
+  padding: 0.45rem 0.85rem !important;
+  font-size: 0.84rem !important;
+}
+
+#unifiedRosterTable .badge {
+  padding: 0.22rem 0.55rem !important;
+  font-size: 0.76rem !important;
+}
+
+#unifiedRosterTable button {
+  padding: 0.25rem 0.65rem !important;
+  font-size: 0.78rem !important;
+}
+
+.quick-role-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+.role-mini-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.6) !important;
+}
+
+.role-mini-chip.selected {
+  box-shadow: 0 2px 6px rgba(56, 189, 248, 0.25);
+}
+
+/* ==========================================================================
+   Custom Downward Role Dropdown Menu & Thick Scrollbar (تفتح للأسفل بمسطرة سميكة)
+   ========================================================================== */
+.custom-role-dropdown-menu {
+  scrollbar-width: auto !important;
+  scrollbar-color: rgba(148, 163, 184, 0.65) rgba(15, 23, 42, 0.4) !important;
+}
+
+.custom-role-dropdown-menu::-webkit-scrollbar {
+  width: 11px !important;
+  height: 11px !important;
+  display: block !important;
+}
+
+.custom-role-dropdown-menu::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-radius: 8px !important;
+}
+
+.custom-role-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.65) !important;
+  border-radius: 8px !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+.custom-role-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(203, 213, 225, 0.95) !important;
+}
+
+.custom-role-menu-item:hover {
+  background: rgba(56, 189, 248, 0.12) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Luxury Attachment Pill Action Badges & Vector SVG Icons (أزرار المرفقات الفاخرة)
+   ========================================================================== */
+.pill-attachment-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  padding: 0.32rem 0.78rem !important;
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+}
+
+.pill-attachment-btn .pill-icon-box {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 6px !important;
+  flex-shrink: 0 !important;
+  transition: all 0.22s ease !important;
+}
+
+.pill-attachment-pdf {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.2)) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.38) !important;
+  color: #ef4444 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12) !important;
+}
+.pill-attachment-pdf .pill-icon-box {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #ef4444 !important;
+}
+.pill-attachment-pdf:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.pill-attachment-pdf:hover .pill-icon-box {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.pill-attachment-word {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(29, 78, 216, 0.2)) !important;
+  border: 1.5px solid rgba(37, 99, 235, 0.38) !important;
+  color: #2563eb !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12) !important;
+}
+.pill-attachment-word .pill-icon-box {
+  background: rgba(37, 99, 235, 0.18) !important;
+  color: #2563eb !important;
+}
+.pill-attachment-word:hover {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.pill-attachment-word:hover .pill-icon-box {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.pill-attachment-excel {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.2)) !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.38) !important;
+  color: #059669 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12) !important;
+}
+.pill-attachment-excel .pill-icon-box {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #059669 !important;
+}
+.pill-attachment-excel:hover {
+  background: #059669 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.pill-attachment-excel:hover .pill-icon-box {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.pill-attachment-image {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(11, 87, 208, 0.2)) !important;
+  border: 1.5px solid rgba(2, 132, 199, 0.38) !important;
+  color: #0284c7 !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12) !important;
+}
+.pill-attachment-image .pill-icon-box {
+  background: rgba(2, 132, 199, 0.18) !important;
+  color: #0284c7 !important;
+}
+.pill-attachment-image:hover {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.pill-attachment-image:hover .pill-icon-box {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.pill-attachment-other {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(109, 40, 217, 0.2)) !important;
+  border: 1.5px solid rgba(124, 58, 237, 0.38) !important;
+  color: #7c3aed !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12) !important;
+}
+.pill-attachment-other .pill-icon-box {
+  background: rgba(124, 58, 237, 0.18) !important;
+  color: #7c3aed !important;
+}
+.pill-attachment-other:hover {
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.pill-attachment-other:hover .pill-icon-box {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
 
 

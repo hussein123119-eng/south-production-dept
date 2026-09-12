@@ -103,12 +103,19 @@ const ROLES = {
     badgeClass: 'badge-info',
     desc: 'مشغل موقع أو محطة إنتاجية، متابعة العمليات التشغيلية الميدانية وتسجيل القراءات اليومية'
   },
-  EMPLOYEE: {
-    key: 'EMPLOYEE',
-    name: 'منتسب',
-    level: 10,
-    badgeClass: 'badge-success',
-    desc: 'صلاحيات الاستخدام والعمل الأساسية لمنتسبي القسم'
+  AUTHORIZED_DRIVER: {
+    key: 'AUTHORIZED_DRIVER',
+    name: 'سائق مخول',
+    level: 22,
+    badgeClass: 'badge-primary',
+    desc: 'سائق مخول رسمياً بإدارة وتوثيق حركة الآليات وبدء وإنهاء المهام الميدانية'
+  },
+  DRIVER: {
+    key: 'DRIVER',
+    name: 'سائق',
+    level: 15,
+    badgeClass: 'badge-info',
+    desc: 'سائق آلية أو مركبة، متابعة المهام الميدانية والتبليغات الرسمية'
   }
 };
 
@@ -392,7 +399,11 @@ class RBACService {
   }
 
   getRoleInfo(roleKey) {
-    return this.roles[roleKey] || this.roles.EMPLOYEE;
+    if (roleKey && this.roles[roleKey]) return this.roles[roleKey];
+    if (roleKey === 'EMPLOYEE') {
+      return { key: 'STAFF', name: 'كادر', level: 10, badgeClass: 'badge-secondary', desc: 'كادر القسم' };
+    }
+    return this.roles.DRIVER || { key: 'STAFF', name: 'كادر', level: 10, badgeClass: 'badge-secondary', desc: 'كادر القسم' };
   }
 
   getPermissionGroups() {
@@ -451,19 +462,23 @@ class RBACService {
     if (user.role === 'ADMIN_MANAGER') {
       roleBaseline = [
         'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD', 'FILES_PRINT', 'FILES_EXPORT', 'FILES_SHARE', 'FILES_SEND', 'FILES_PUBLISH', 'FILES_ARCHIVE',
-        'USERS_VIEW', 'USERS_ADD', 'USERS_EDIT', 'USERS_APPROVE',
-        'CAREER_VIEW_DATA', 'CAREER_ADD_INFO', 'CAREER_EDIT_INFO',
+        'USERS_VIEW', 'USERS_ADD', 'USERS_EDIT', 'USERS_APPROVE', 'USERS_DISABLE', 'USERS_ENABLE', 'USERS_ACCOUNT_MANAGE', 'USERS_CHANGE_EMP_ID', 'USERS_RESET_PASSWORD', 'USERS_IMPORT_ROSTER',
+        'ROLES_VIEW', 'ROLES_GRANT', 'ROLES_EDIT_ROLE', 'ROLES_CHANGE_SCOPE', 'ROLES_ASSIGN_SECTION_MGR', 'ROLES_ASSIGN_UNIT_MGR', 'ROLES_ASSIGN_STATION_MGR', 'ROLES_ASSIGN_ADMIN',
+        'CAREER_VIEW_DATA', 'CAREER_ADD_INFO', 'CAREER_EDIT_INFO', 'CAREER_TRANSFER_EMPLOYEE',
         'NOTIFS_VIEW', 'NOTIFS_CREATE', 'NOTIFS_EDIT', 'NOTIFS_PUBLISH', 'ANNOUNCEMENTS_PUBLISH',
         'TECH_STATUS_VIEW',
         'REQUESTS_VIEW', 'REQUESTS_CREATE', 'REQUESTS_REVIEW', 'REQUESTS_APPROVE', 'REQUESTS_REJECT', 'REQUESTS_EXPORT',
         'DEPT_VIEW', 'DEPT_MANAGE_STAFF', 'DEPT_MANAGE_INTERVIEWS', 'DEPT_MANAGE_NOTIFS', 'DEPT_MANAGE_DOCS', 'DEPT_MANAGE_FLEET',
         'SECTIONS_VIEW', 'UNITS_VIEW', 'STATIONS_VIEW', 'MANAGE_VEHICLES',
-        'REPORTS_VIEW', 'REPORTS_EXPORT', 'REPORTS_PRINT', 'REPORTS_EXCEL', 'VIEW_AUDIT_LOGS'
+        'REPORTS_VIEW', 'REPORTS_EXPORT', 'REPORTS_PRINT', 'REPORTS_EXCEL', 'VIEW_AUDIT_LOGS',
+        'SCOPE_ALL_SECTIONS', 'SCOPE_ALL_UNITS', 'SCOPE_ALL_STATIONS', 'SCOPE_DEPT_LEVEL_USERS', 'SCOPE_ALL_DOSSIERS'
       ].includes(resolvedPerm);
     } else if (user.role === 'SECTION_MANAGER' || user.role === 'DEPUTY_SECTION_MANAGER') {
       roleBaseline = [
-        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD', 'FILES_PRINT',
-        'USERS_VIEW', 'CAREER_VIEW_DATA', 'CAREER_ADD_INFO',
+        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD', 'FILES_PRINT', 'FILES_EXPORT', 'FILES_SHARE', 'FILES_ARCHIVE', 'FILES_RESTORE',
+        'USERS_VIEW', 'USERS_ADD', 'USERS_EDIT', 'USERS_APPROVE', 'USERS_MANAGE_EMPLOYEE_DATA',
+        'ROLES_VIEW', 'ROLES_GRANT', 'ROLES_EDIT_ROLE',
+        'CAREER_VIEW_DATA', 'CAREER_ADD_INFO',
         'NOTIFS_VIEW', 'NOTIFS_CREATE', 'SECTIONS_NOTIFS_CREATE',
         'TECH_STATUS_VIEW', 'TECH_STATUS_ADD', 'TECH_STATUS_EDIT', 'TECH_STATUS_DELETE', 'TECH_STATUS_PUBLISH', 'TECH_STATUS_ARCHIVE', 'MANAGE_TECHNICAL_STATUS',
         'REQUESTS_VIEW', 'REQUESTS_CREATE', 'REQUESTS_REVIEW', 'REQUESTS_APPROVE', 'REQUESTS_REJECT',
@@ -472,17 +487,19 @@ class RBACService {
       ].includes(resolvedPerm);
     } else if (user.role === 'UNIT_MANAGER') {
       roleBaseline = [
-        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD',
-        'USERS_VIEW', 'CAREER_VIEW_DATA',
+        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD', 'FILES_PRINT', 'FILES_EXPORT', 'FILES_SHARE', 'FILES_ARCHIVE', 'FILES_RESTORE',
+        'USERS_VIEW', 'ROLES_VIEW', 'ROLES_GRANT', 'ROLES_EDIT_ROLE',
+        'CAREER_VIEW_DATA',
         'NOTIFS_VIEW',
         'TECH_STATUS_VIEW',
         'REQUESTS_VIEW', 'REQUESTS_CREATE', 'REQUESTS_REVIEW', 'REQUESTS_APPROVE', 'REQUESTS_REJECT',
         'DEPT_VIEW', 'UNITS_VIEW', 'REPORTS_VIEW'
       ].includes(resolvedPerm);
-    } else if (user.role === 'STATION_MANAGER' || user.role === 'DEPUTY_STATION_MANAGER') {
+    } else if (user.role === 'STATION_MANAGER' || user.role === 'DEPUTY_STATION_MANAGER' || user.role === 'STATION_SUPERVISOR') {
       roleBaseline = [
         'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_DOWNLOAD',
-        'USERS_VIEW', 'CAREER_VIEW_DATA',
+        'USERS_VIEW', 'ROLES_VIEW', 'ROLES_GRANT', 'ROLES_EDIT_ROLE',
+        'CAREER_VIEW_DATA',
         'NOTIFS_VIEW',
         'TECH_STATUS_VIEW', 'TECH_STATUS_ADD', 'TECH_STATUS_EDIT', 'TECH_STATUS_PUBLISH', 'MANAGE_TECHNICAL_STATUS',
         'REQUESTS_VIEW', 'REQUESTS_CREATE',
@@ -492,6 +509,7 @@ class RBACService {
       roleBaseline = [
         'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_EDIT', 'FILES_DOWNLOAD', 'FILES_PRINT', 'FILES_EXPORT',
         'USERS_VIEW', 'USERS_ADD', 'USERS_EDIT', 'USERS_APPROVE',
+        'ROLES_VIEW', 'ROLES_GRANT', 'ROLES_EDIT_ROLE',
         'CAREER_VIEW_DATA', 'CAREER_ADD_INFO', 'CAREER_EDIT_INFO',
         'NOTIFS_VIEW', 'NOTIFS_CREATE', 'ANNOUNCEMENTS_PUBLISH',
         'TECH_STATUS_VIEW', 'TECH_STATUS_ADD', 'TECH_STATUS_EDIT', 'TECH_STATUS_PUBLISH',
@@ -517,6 +535,23 @@ class RBACService {
         'TECH_STATUS_VIEW', 'TECH_STATUS_ADD', 'TECH_STATUS_EDIT',
         'REQUESTS_VIEW', 'REQUESTS_CREATE',
         'STATIONS_VIEW'
+      ].includes(resolvedPerm);
+    } else if (user.role === 'AUTHORIZED_DRIVER') {
+      roleBaseline = [
+        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_DOWNLOAD',
+        'CAREER_VIEW_DATA',
+        'NOTIFS_VIEW',
+        'TECH_STATUS_VIEW',
+        'REQUESTS_VIEW', 'REQUESTS_CREATE',
+        'MANAGE_VEHICLES', 'STATIONS_VIEW'
+      ].includes(resolvedPerm);
+    } else if (user.role === 'DRIVER') {
+      roleBaseline = [
+        'FILES_VIEW', 'FILES_OPEN', 'FILES_UPLOAD', 'FILES_DOWNLOAD',
+        'CAREER_VIEW_DATA',
+        'NOTIFS_VIEW',
+        'TECH_STATUS_VIEW',
+        'REQUESTS_VIEW', 'REQUESTS_CREATE'
       ].includes(resolvedPerm);
     } else if (user.role === 'EMPLOYEE') {
       roleBaseline = [
@@ -561,6 +596,16 @@ class RBACService {
     if (!targetUser || !targetUser.role) return true;
     if (targetUser.role === 'SUPER_ADMIN') return false;
 
+    // DEPT_MANAGER and DEPUTY_DEPT_MANAGER have general department authority
+    if (actorUser.role === 'DEPT_MANAGER' || actorUser.role === 'DEPUTY_DEPT_MANAGER') {
+      return targetUser.role !== 'SUPER_ADMIN';
+    }
+
+    // ADMIN_MANAGER has general administrative delegation across the entire department
+    if (actorUser.role === 'ADMIN_MANAGER') {
+      return !['SUPER_ADMIN', 'DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER'].includes(targetUser.role);
+    }
+
     const actorLevel = this.getRoleInfo(actorUser.role).level;
     const targetLevel = this.getRoleInfo(targetUser.role).level;
 
@@ -572,7 +617,23 @@ class RBACService {
     // Scope check: If actor is restricted to section, target must be in same section
     if (actorUser.sectionId && targetUser.sectionId && actorUser.sectionId !== targetUser.sectionId) {
       const customPerms = Array.isArray(actorUser.customPermissions) ? actorUser.customPermissions : [];
-      if (!customPerms.includes('SCOPE_ALL_SECTIONS') && !customPerms.includes('ALL_SECTIONS_UNITS_ACCESS')) {
+      if (!customPerms.includes('SCOPE_ALL_SECTIONS') && !customPerms.includes('ALL_SECTIONS_UNITS_ACCESS') && !actorUser.hasGlobalAccess) {
+        return false;
+      }
+    }
+
+    // Scope check: If actor is restricted to unit, target must be in same unit
+    if (actorUser.unitId && targetUser.unitId && actorUser.unitId !== targetUser.unitId) {
+      const customPerms = Array.isArray(actorUser.customPermissions) ? actorUser.customPermissions : [];
+      if (!customPerms.includes('SCOPE_ALL_UNITS') && !customPerms.includes('ALL_SECTIONS_UNITS_ACCESS') && !actorUser.hasGlobalAccess) {
+        return false;
+      }
+    }
+
+    // Scope check: If actor is restricted to station, target must be in same station
+    if (actorUser.stationId && targetUser.stationId && actorUser.stationId !== targetUser.stationId) {
+      const customPerms = Array.isArray(actorUser.customPermissions) ? actorUser.customPermissions : [];
+      if (!customPerms.includes('SCOPE_ALL_STATIONS') && !customPerms.includes('ALL_SECTIONS_UNITS_ACCESS') && !actorUser.hasGlobalAccess) {
         return false;
       }
     }
@@ -586,6 +647,12 @@ class RBACService {
   canGrantRole(actorUser, roleKey) {
     if (!actorUser) return false;
     if (actorUser.role === 'SUPER_ADMIN') return true;
+    if (['DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER'].includes(actorUser.role)) {
+      return !['SUPER_ADMIN', 'DEPT_MANAGER'].includes(roleKey);
+    }
+    if (actorUser.role === 'ADMIN_MANAGER') {
+      return !['SUPER_ADMIN', 'DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER', 'ADMIN_MANAGER'].includes(roleKey);
+    }
 
     const actorLevel = this.getRoleInfo(actorUser.role).level;
     const targetRoleLevel = this.getRoleInfo(roleKey).level;
@@ -598,9 +665,36 @@ class RBACService {
    */
   canGrantPermission(actorUser, permissionKey) {
     if (!actorUser) return false;
-    if (['SUPER_ADMIN', 'DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER'].includes(actorUser.role)) return true;
+    if (['SUPER_ADMIN', 'DEPT_MANAGER', 'DEPUTY_DEPT_MANAGER', 'ADMIN_MANAGER'].includes(actorUser.role)) return true;
 
     return this.hasPermission(actorUser, permissionKey);
+  }
+
+  /**
+   * Auto-Role Resolver: Assigns role based on Job Title and default baseline
+   */
+  resolveDefaultRole(jobTitle = '', requestedRole = null) {
+    if (requestedRole && this.roles[requestedRole] && requestedRole !== 'EMPLOYEE') {
+      return requestedRole;
+    }
+    const t = (jobTitle || '').toLowerCase();
+    if (t.includes('سائق') || t.includes('آليات') || t.includes('مركبات')) {
+      return t.includes('مخول') ? 'AUTHORIZED_DRIVER' : 'DRIVER';
+    }
+    if (t.includes('مدير قسم')) return 'DEPT_MANAGER';
+    if (t.includes('وكيل مدير قسم')) return 'DEPUTY_DEPT_MANAGER';
+    if (t.includes('مدير إدارة') || t.includes('رئيس إدارة')) return 'ADMIN_MANAGER';
+    if (t.includes('مسؤول شعبة') || t.includes('رئيس شعبة')) return 'SECTION_MANAGER';
+    if (t.includes('وكيل شعبة') || t.includes('وكيل مسؤول شعبة')) return 'DEPUTY_SECTION_MANAGER';
+    if (t.includes('مسؤول وحدة') || t.includes('رئيس وحدة')) return 'UNIT_MANAGER';
+    if (t.includes('مسؤول موقع') || t.includes('مسؤول محطة')) return 'STATION_MANAGER';
+    if (t.includes('مشرف محطة') || t.includes('مشرف موقع')) return 'STATION_SUPERVISOR';
+    if (t.includes('مهندس مناوب')) return 'SHIFT_ENGINEER';
+    if (t.includes('مشرف نوبة') || t.includes('مسؤول نوبة')) return 'SHIFT_SUPERVISOR';
+    if (t.includes('إداري مخول')) return 'ADMINISTRATOR';
+
+    // Baseline lowest entry role is OPERATOR (مشغل)
+    return 'OPERATOR';
   }
 }
 

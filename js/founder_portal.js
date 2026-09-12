@@ -21,7 +21,7 @@ const FounderPortal = {
     {
       empId: 'EMP-0000',
       fullName: 'المؤسس العام للمنظومة',
-      jobTitle: 'المؤسس والمدير العام للنظام',
+      jobTitle: 'رئيس مهندسين أقدم',
       department: 'الإدارة العليا والقيادة المركزية',
       grade: '1',
       step: '10',

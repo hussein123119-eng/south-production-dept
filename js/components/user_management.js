@@ -119,7 +119,8 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
     { key: 'SHIFT_ENGINEER', name: 'مهندس مناوب' },
     { key: 'SHIFT_SUPERVISOR', name: 'مشرف نوبة' },
     { key: 'OPERATOR', name: 'مشغل' },
-    { key: 'EMPLOYEE', name: 'منتسب' }
+    { key: 'AUTHORIZED_DRIVER', name: 'سائق مخول' },
+    { key: 'DRIVER', name: 'سائق' }
   ];
 
   const secMap = {};
@@ -140,21 +141,24 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
     ? window.app.userRegistryState
     : { page: 1, pageSize: 25, search: '', section: 'ALL', status: 'ALL', role: 'ALL' };
 
-  const q = (state.search || '').toLowerCase().trim();
+  const rawQ = (state.search || '').toLowerCase();
+  const searchTokens = rawQ.trim().split(/\s+/).filter(Boolean);
   const filtered = roster.filter(emp => {
     if (state.section !== 'ALL') {
       if (state.section === 'NONE' && emp.sectionId) return false;
       if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
     }
     if (state.status !== 'ALL' && emp.accountStatus !== state.status) return false;
-    if (state.role !== 'ALL' && (emp.role || 'EMPLOYEE') !== state.role) return false;
-    if (q) {
+    if (state.role !== 'ALL' && (emp.role || '') !== state.role) return false;
+    if (searchTokens.length > 0) {
       const name = (emp.fullName || emp.name || '').toLowerCase();
       const empid = (emp.employeeId || '').toLowerCase();
       const email = (emp.userEmail || emp.emailPersonal || '').toLowerCase();
       const title = (emp.jobTitle || '').toLowerCase();
       const secName = (emp.sectionName || (secMap[emp.sectionId] ? secMap[emp.sectionId].name : '')).toLowerCase();
-      if (!name.includes(q) && !empid.includes(q) && !email.includes(q) && !title.includes(q) && !secName.includes(q)) return false;
+      const haystack = `${name} ${empid} ${email} ${title} ${secName}`;
+      const allMatch = searchTokens.every(t => haystack.includes(t));
+      if (!allMatch) return false;
     }
     return true;
   });
@@ -175,7 +179,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
         
         <!-- Search Input (شريط البحث الذكي بالاسم والرقم والعنوان الوظيفي) -->
         <div style="flex: 2.5; min-width: 240px;">
-          <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${state.search || ''}" placeholder="🔍 بحث بالاسم، الرقم الوظيفي، أو العنوان الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
+          <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${(state.search !== undefined ? state.search : '').replace(/"/g, '&quot;')}" placeholder="🔍 بحث بالاسم، الرقم الوظيفي، أو العنوان الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
         </div>
 
         <!-- Filter 1: Linked Scope / Section -->
@@ -265,7 +269,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
                     data-status="${emp.accountStatus}"
                     data-section="${emp.sectionId || 'NONE'}"
                     data-jobtitle="${(emp.jobTitle || '').toLowerCase()}"
-                    data-role="${emp.role || 'EMPLOYEE'}">
+                    data-role="${emp.role || ''}">
                   
                   <!-- 1. الاسم -->
                   <td>
@@ -309,12 +313,12 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
 
                   <!-- 5. الدور -->
                   <td>
-                    ${emp.hasAccount ? `
+                    ${emp.hasAccount && emp.role ? `
                       <span class="badge ${roleInfo.badgeClass}" style="font-size: 0.78rem; max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap;" title="${roleInfo.name}">
                         ${roleInfo.name}
                       </span>
                     ` : `
-                      <span class="badge badge-secondary" style="font-size: 0.75rem;">منتسب</span>
+                      <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: var(--md-sys-color-outline); font-size: 0.75rem; border: 1px dashed rgba(255, 255, 255, 0.2);">بدون حساب</span>
                     `}
                   </td>
 

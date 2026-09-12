@@ -82,7 +82,7 @@ class AuthService {
           password: '123456',
           employeeId: 'EMP-0000',
           fullName: 'المؤسس العام للمنظومة',
-          jobTitle: 'المؤسس والمدير العام للنظام',
+          jobTitle: 'رئيس مهندسين أقدم',
           phone: '07700000000',
           role: 'SUPER_ADMIN',
           status: 'APPROVED',
@@ -99,7 +99,7 @@ class AuthService {
           password: '123456',
           employeeId: 'EMP-2024-001',
           fullName: 'م. أحمد عبد الحسين',
-          jobTitle: 'مدير قسم الإنتاج الجنوبي',
+          jobTitle: 'رئيس مهندسين أقدم',
           phone: '07701234567',
           role: 'DEPT_MANAGER',
           status: 'APPROVED',
@@ -116,7 +116,7 @@ class AuthService {
           password: '123456',
           employeeId: 'EMP-2024-002',
           fullName: 'م. حيدر جاسم',
-          jobTitle: 'مسؤول الشعبة الأولى',
+          jobTitle: 'رئيس مهندسين',
           phone: '07702345678',
           role: 'SECTION_MANAGER',
           status: 'APPROVED',
@@ -133,7 +133,7 @@ class AuthService {
           password: '123456',
           employeeId: 'EMP-2024-003',
           fullName: 'م. علي الركابي',
-          jobTitle: 'مسؤول الشعبة الثانية',
+          jobTitle: 'رئيس مهندسين',
           phone: '07703456789',
           role: 'SECTION_MANAGER',
           status: 'APPROVED',
@@ -167,7 +167,7 @@ class AuthService {
           password: '123456',
           employeeId: 'EMP-2024-005',
           fullName: 'مهند فاضل العلي',
-          jobTitle: 'مسؤول الوحدة الفنية',
+          jobTitle: 'معاون رئيس مهندسين',
           phone: '07705678901',
           role: 'UNIT_MANAGER',
           status: 'APPROVED',
@@ -294,15 +294,15 @@ class AuthService {
         sectionId: null,
         unitId: null,
         stationId: null,
-        jobTitle: 'المؤسس والمدير العام للنظام'
+        jobTitle: 'رئيس مهندسين أقدم'
       };
     }
     const PRESET_STAFF_MAP = {
-      'EMP-2024-001': { fullName: 'م. أحمد عبد الحسين', jobTitle: 'مدير قسم الإنتاج الجنوبي', sectionId: null, unitId: null, stationId: null },
-      'EMP-2024-002': { fullName: 'م. حيدر جاسم', jobTitle: 'مسؤول الشعبة الأولى', sectionId: 'sec-1', unitId: null, stationId: null },
-      'EMP-2024-003': { fullName: 'م. علي الركابي', jobTitle: 'مسؤول الشعبة الثانية', sectionId: 'sec-2', unitId: null, stationId: null },
+      'EMP-2024-001': { fullName: 'م. أحمد عبد الحسين', jobTitle: 'رئيس مهندسين أقدم', sectionId: null, unitId: null, stationId: null },
+      'EMP-2024-002': { fullName: 'م. حيدر جاسم', jobTitle: 'رئيس مهندسين', sectionId: 'sec-1', unitId: null, stationId: null },
+      'EMP-2024-003': { fullName: 'م. علي الركابي', jobTitle: 'رئيس مهندسين', sectionId: 'sec-2', unitId: null, stationId: null },
       'EMP-2024-004': { fullName: 'عمار الساعدي', jobTitle: 'مشغل محطة إنتاجية أقدم', sectionId: 'sec-1', unitId: null, stationId: 'st-101' },
-      'EMP-2024-005': { fullName: 'مهند فاضل العلي', jobTitle: 'مسؤول الوحدة الفنية', sectionId: null, unitId: 'unit-1', stationId: null }
+      'EMP-2024-005': { fullName: 'مهند فاضل العلي', jobTitle: 'معاون رئيس مهندسين', sectionId: null, unitId: 'unit-1', stationId: null }
     };
     if (PRESET_STAFF_MAP[cleanId]) {
       return {
@@ -455,7 +455,9 @@ class AuthService {
       fullName: fullName || masterRecord.fullName || 'منتسب جديد',
       jobTitle: masterRecord.jobTitle || 'موظف تشغيل',
       phone: phone || masterRecord.phone || '',
-      role: 'EMPLOYEE',
+      role: (window.rbac && typeof window.rbac.resolveDefaultRole === 'function')
+        ? window.rbac.resolveDefaultRole(masterRecord.jobTitle, masterRecord.role)
+        : ((masterRecord.jobTitle || '').toLowerCase().includes('سائق') ? 'DRIVER' : 'OPERATOR'),
       status: initialStatus,
       profileCompleted: true,
       sectionId: masterRecord.sectionId || sectionId || null,
