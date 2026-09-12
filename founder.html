@@ -3,20 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة المؤسس والقيادة الإدارية السيادية | قسم الإنتاج الجنوبي</title>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' http://localhost:3000 http://localhost:8085 https://*.firebaseio.com https://*.googleapis.com; frame-src 'self' blob:; object-src 'none';">
-  <link rel="stylesheet" href="css/founder.css?v=139.38.0">
-
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/founder.css?v=139.48.0">
 </head>
 <body>
-  <div class="founder-wrapper">
-    <!-- الترويسة السيادية الفخمة -->
+  <div id="founderMainWrapper" class="founder-wrapper">
+    <!-- ======================================================================= -->
+    <!-- الترويسة السيادية الفخمة (Executive Sovereign Header) -->
+    <!-- ======================================================================= -->
     <header class="founder-header">
       <div class="brand-box">
-        <div class="brand-emblem">🛡️</div>
+        <div class="brand-emblem-wrapper">
+          <div class="brand-emblem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="url(#brandShieldGrad)" stroke="#38bdf8" />
+              <path d="M9 12l2 2 4-4" stroke="#fef08a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              <defs>
+                <linearGradient id="brandShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7" stop-opacity="0.8"/>
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0.8"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
         <div class="brand-text">
           <h1>بوابة المؤسس والقيادة الإدارية السيادية</h1>
           <div class="brand-subtitle-line">
@@ -27,44 +45,99 @@
       </div>
 
       <div class="header-actions">
-        <!-- هوية المؤسس -->
+        <!-- هوية المؤسس المعتمد -->
         <div class="founder-identity-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="7.5" cy="15.5" r="4.5" />
+            <path d="m21 3-9.5 9.5" />
+            <path d="m15.5 7.5 3 3" />
+            <path d="m18.5 4.5 2 2" />
+          </svg>
           <span>المؤسس المعتمد:</span>
           <strong id="activeUserEmailDisplay">hussein123119@gmail.com</strong>
         </div>
 
-        <!-- أزرار الإجراءات في صف أحادي واحد -->
+        <!-- أزرار الإجراءات السيادية السريعة -->
         <button class="btn-glass" onclick="FounderPortal.toggleFullscreen()" title="ملء الشاشة">
-          ⛶ ملء الشاشة
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <span>ملء الشاشة</span>
         </button>
+        
         <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.refreshData()" title="تحديث البيانات">
-          🔄 تحديث
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+          </svg>
+          <span>تحديث</span>
         </button>
+
         <a href="index.html" id="btnNavToMainApp" class="btn-glass" title="الرجوع للمنظومة العامة">
-          🏢 المنظومة العامة
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+            <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/>
+          </svg>
+          <span>المنظومة العامة</span>
         </a>
+
         <button class="btn-glass btn-glass-rose" onclick="FounderPortal.logout()" title="تسجيل الخروج">
-          🚪 خروج
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+          <span>خروج</span>
         </button>
       </div>
     </header>
 
-    <!-- شريط التبويبات الإدارية الخمسة العليا -->
+    <!-- ======================================================================= -->
+    <!-- شريط التبويبات القيادية الخمسة (Command Tabs Dock) -->
+    <!-- ======================================================================= -->
     <nav class="founder-nav-tabs">
       <button id="tabBtnControl" class="founder-tab-btn active" onclick="FounderPortal.switchTab('control')">
-        🛡️ مركز السيطرة والقرارات العليا
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <circle cx="12" cy="11" r="3"/>
+        </svg>
+        <span>مركز السيطرة والقرارات العليا</span>
       </button>
+
       <button id="tabBtnRoles" class="founder-tab-btn" onclick="FounderPortal.switchTab('roles')">
-        👥 الصلاحيات واعتماد المستخدمين
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>الصلاحيات واعتماد المستخدمين</span>
       </button>
+
       <button id="tabBtnDossiers" class="founder-tab-btn" onclick="FounderPortal.switchTab('dossiers')">
-        📁 مركز الإضابير والملاكات
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          <line x1="12" y1="11" x2="12" y2="17"/>
+          <line x1="9" y1="14" x2="15" y2="14"/>
+        </svg>
+        <span>مركز الإضابير والملاكات</span>
       </button>
+
       <button id="tabBtnForms" class="founder-tab-btn" onclick="FounderPortal.switchTab('forms')">
-        📝 الاستمارات الإدارية الجاهزة
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>الاستمارات الإدارية الجاهزة</span>
       </button>
+
       <button id="tabBtnPrint" class="founder-tab-btn" onclick="FounderPortal.switchTab('print')">
-        🖨️ مركز الطباعة والتقارير الرسمية
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        <span>مركز الطباعة والتقارير الرسمية</span>
       </button>
     </nav>
 
@@ -72,38 +145,74 @@
     <!-- التبويب 1: 🛡️ مركز السيطرة والقرارات العليا -->
     <!-- ======================================================================= -->
     <section id="panelControl" class="tab-content-panel active">
-      <!-- 4 بطاقات إحصائية إدارية عليا -->
+      <!-- 4 بطاقات إحصائية إدارية عليا ذات مظهر قيادي فاخر -->
       <div class="admin-metrics-grid">
-        <div class="admin-metric-card">
+        <div class="admin-metric-card" style="border-top-color: rgba(99, 102, 241, 0.7);">
           <div class="metric-info">
             <h3>إجمالي ملاكات وكوادر القسم</h3>
             <div class="metric-huge-num" id="metricTotalStaff">11</div>
+            <div class="metric-trend-badge" style="color: #c7d2fe;">
+              <span style="color: var(--indigo-light);">●</span> ملاكات مسجلة ومثبتة
+            </div>
           </div>
-          <div class="metric-icon-box">👥</div>
+          <div class="metric-icon-box" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
         </div>
 
-        <div class="admin-metric-card">
+        <div class="admin-metric-card" style="border-top-color: rgba(16, 185, 129, 0.7);">
           <div class="metric-info">
             <h3>الحسابات الإدارية المفعلة</h3>
-            <div class="metric-huge-num" id="metricActiveUsers" style="color: var(--emerald-primary);">10</div>
+            <div class="metric-huge-num" id="metricActiveUsers" style="color: var(--emerald-light);">10</div>
+            <div class="metric-trend-badge" style="color: #a7f3d0;">
+              <span style="color: var(--emerald-light);">●</span> موثقة ومعتمدة رسمياً
+            </div>
           </div>
-          <div class="metric-icon-box">✓</div>
+          <div class="metric-icon-box" style="box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
         </div>
 
-        <div class="admin-metric-card">
+        <div class="admin-metric-card" style="border-top-color: rgba(245, 158, 11, 0.7);">
           <div class="metric-info">
             <h3>طلبات التسجيل المعلقة</h3>
-            <div class="metric-huge-num" id="metricPendingUsers" style="color: var(--gold-primary);">1</div>
+            <div class="metric-huge-num" id="metricPendingUsers" style="color: var(--gold-light);">1</div>
+            <div class="metric-trend-badge" style="color: #fef08a;">
+              <span style="color: var(--gold-light); animation: pulse-ring 1.5s infinite;">●</span> بانتظار موافقة المؤسس
+            </div>
           </div>
-          <div class="metric-icon-box">⏳</div>
+          <div class="metric-icon-box" style="box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
         </div>
 
-        <div class="admin-metric-card">
+        <div class="admin-metric-card" style="border-top-color: rgba(56, 189, 248, 0.7);">
           <div class="metric-info">
             <h3>الآليات والمأموريات بالواجب</h3>
-            <div class="metric-huge-num" id="metricVehicles" style="color: var(--sky-primary);">2</div>
+            <div class="metric-huge-num" id="metricVehicles" style="color: var(--sky-light);">2</div>
+            <div class="metric-trend-badge" style="color: #bae6fd;">
+              <span style="color: var(--sky-light);">●</span> حركة ميدانية نشطة
+            </div>
           </div>
-          <div class="metric-icon-box">🚚</div>
+          <div class="metric-icon-box" style="box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"/>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -113,21 +222,37 @@
         <div class="glass-panel">
           <div class="panel-header-row">
             <h2 class="panel-title">
-              <span>📢</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/>
+                <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+                <circle cx="12" cy="12" r="2"/>
+                <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+                <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
+              </svg>
               <span>مركز البث والتعميم السيادي اللحظي</span>
             </h2>
-            <span style="font-size: 0.8rem; color: var(--gold-primary); font-weight: 700;">يظهر أعلى شاشات جميع الموظفين</span>
+            <span style="font-size: 0.8rem; color: var(--gold-light); font-weight: 800; background: rgba(245,158,11,0.12); padding: 0.25rem 0.6rem; border-radius: 8px; border: 1px solid rgba(245,158,11,0.3);">
+              يظهر أعلى شاشات كافة الموظفين
+            </span>
           </div>
-          <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.5;">
+          <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6;">
             يمكن للمؤسس كتابة تعميم رسمي عاجل يبث فوراً كشريط علوي متوهج في كافة حواسيب وهواتف منتسبي القسم.
           </p>
           <textarea id="broadcastInput" class="textarea-glass" placeholder="اكتب هنا نص التعميم أو التوجيه الإداري السيادي العاجل..."></textarea>
-          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
+          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem;">
             <button class="btn-glass btn-glass-emerald" onclick="FounderPortal.sendBroadcast()" style="flex: 1;">
-              📡 بث التعميم فوراً لكافة الموظفين
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              <span>بث التعميم فوراً لكافة الموظفين</span>
             </button>
             <button class="btn-glass btn-glass-rose" onclick="FounderPortal.clearBroadcast()">
-              🗑️ إلغاء التعميم النشط
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              <span>إلغاء التعميم</span>
             </button>
           </div>
         </div>
@@ -136,23 +261,36 @@
         <div class="glass-panel">
           <div class="panel-header-row">
             <h2 class="panel-title">
-              <span>📜</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
               <span>إصدار أمر إداري سيادي رسمي معتمد</span>
             </h2>
-            <span style="font-size: 0.8rem; color: var(--emerald-primary); font-weight: 700;">توثيق رسمي وأرشفة فورية</span>
+            <span style="font-size: 0.8rem; color: var(--emerald-light); font-weight: 800; background: rgba(16,185,129,0.12); padding: 0.25rem 0.6rem; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3);">
+              توثيق رسمي وأرشفة فورية
+            </span>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
               <input type="text" id="decreeSubjectInput" class="input-glass" placeholder="موضوع الأمر الإداري (مثال: إعادة توزيع مهام)">
               <input type="text" id="decreeRefInput" class="input-glass" placeholder="رقم الإشارة (مثال: ق.ج/2026/108)">
             </div>
             <textarea id="decreeContentInput" class="textarea-glass" placeholder="نص القرار والأمر الإداري الصادر..."></textarea>
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem;">
               <button class="btn-glass btn-glass-gold" onclick="FounderPortal.issueDecree()" style="flex: 1;">
-                ✍️ إصدار وتوثيق الأمر الإداري
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span>إصدار وتوثيق الأمر الإداري</span>
               </button>
               <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.previewCurrentDecree()">
-                👁️ معاينة وطباعة الكتاب
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>معاينة وطباعة الكتاب</span>
               </button>
             </div>
           </div>
@@ -163,21 +301,32 @@
       <div class="glass-panel">
         <div class="panel-header-row">
           <h2 class="panel-title">
-            <span>💾</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <rect x="9" y="8" width="6" height="6" rx="1"/>
+            </svg>
             <span>صندوق الأمان السيادي والنسخ الاحتياطي الشامل</span>
           </h2>
-          <span style="font-size: 0.82rem; color: var(--sky-primary); font-weight: 700;">حماية وتأمين قاعدة البيانات الحقيقية</span>
+          <span style="font-size: 0.82rem; color: var(--sky-light); font-weight: 800; background: rgba(56,189,248,0.12); padding: 0.25rem 0.6rem; border-radius: 8px; border: 1px solid rgba(56,189,248,0.3);">
+            حماية وتأمين قاعدة البيانات الحقيقية
+          </span>
         </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-          <p style="font-size: 0.88rem; color: var(--text-soft); max-width: 900px; line-height: 1.5;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.2rem;">
+          <p style="font-size: 0.88rem; color: var(--text-soft); max-width: 900px; line-height: 1.6;">
             توليد نقطة استعادة فورية لكافة سجلات القسم وملاكاته والكتب الصادرة والمستندات وحفظها في مجلد النسخ الاحتياطية الدائم بنقرة زر واحدة.
           </p>
-          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
+          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem;">
             <button class="btn-glass btn-glass-emerald" onclick="FounderPortal.takeInstantBackup()">
-              ⚡ أخذ نسخة احتياطية فورية للمنظومة
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span>أخذ نسخة احتياطية فورية للمنظومة</span>
             </button>
             <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.checkServerHealth()">
-              🩺 فحص صحة قاعدة البيانات والخادم
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+              <span>فحص صحة قاعدة البيانات والخادم</span>
             </button>
           </div>
         </div>
@@ -193,22 +342,31 @@
         <div class="glass-panel">
           <div class="panel-header-row">
             <h2 class="panel-title">
-              <span>🔑</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="7.5" cy="15.5" r="4.5" />
+                <path d="m21 3-9.5 9.5" />
+                <path d="m15.5 7.5 3 3" />
+                <path d="m18.5 4.5 2 2" />
+              </svg>
               <span>سجل المخولين بالوصول السيادي (عبر البريد الإلكتروني)</span>
             </h2>
-            <span style="font-size: 0.8rem; color: var(--sky-primary); font-weight: 700;">تحقق حساب غوغل الشخصي</span>
+            <span style="font-size: 0.8rem; color: var(--sky-light); font-weight: 800;">تحقق حساب Google</span>
           </div>
-          <p style="font-size: 0.85rem; color: var(--text-soft);">
+          <p style="font-size: 0.86rem; color: var(--text-soft); line-height: 1.5;">
             إضافة أي بريد إلكتروني لشخص يثق به المؤسس لمنحه حق الدخول أو سحب تفويضه فوراً.
           </p>
-          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem; background: rgba(9,20,38,0.7); padding: 0.65rem; border-radius: 12px; border: var(--glass-border-subtle);">
+          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem; background: rgba(9,20,38,0.7); padding: 0.75rem; border-radius: 14px; border: var(--border-subtle);">
             <input type="email" id="newAuthEmailInput" class="input-glass" placeholder="أدخل البريد الإلكتروني (Google Email)" style="flex: 1;">
             <select id="newAuthRoleSelect" class="select-glass">
               <option value="معاينة إشرافية">معاينة إشرافية</option>
               <option value="إدارة تنفيذية">إدارة تنفيذية</option>
             </select>
             <button class="btn-glass btn-glass-emerald" onclick="FounderPortal.addAuthorizedEmail()">
-              + منح التفويض
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>منح التفويض</span>
             </button>
           </div>
           <div class="table-responsive">
@@ -230,12 +388,15 @@
         <div class="glass-panel">
           <div class="panel-header-row">
             <h2 class="panel-title">
-              <span>⏳</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
               <span>طلبات الحسابات المعلقة قيد الاعتماد والموافقة</span>
             </h2>
             <span id="pendingCountBadge" class="badge-role dept-mgr">1 طلب معلق</span>
           </div>
-          <p style="font-size: 0.85rem; color: var(--text-soft);">
+          <p style="font-size: 0.86rem; color: var(--text-soft); line-height: 1.5;">
             تدقيق طلبات المنتسبين الجدد وقبولهم أو رفضهم ومنحهم الصلاحية الرسمية.
           </p>
           <div id="pendingRequestsContainer" style="display: flex; flex-direction: column; gap: 0.85rem;">
@@ -248,7 +409,10 @@
       <div class="glass-panel">
         <div class="panel-header-row">
           <h2 class="panel-title">
-            <span>🛡️</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
             <span>جدول إدارة الصلاحيات العليا لمنتسبي المنظومة</span>
           </h2>
           <span style="font-size: 0.84rem; color: var(--text-soft);">تعديل فوري للرتب مع حفظ مباشر في قاعدة البيانات</span>
@@ -279,11 +443,15 @@
       <div class="glass-panel">
         <div class="panel-header-row">
           <h2 class="panel-title">
-            <span>📁</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              <line x1="12" y1="11" x2="12" y2="17"/>
+              <line x1="9" y1="14" x2="15" y2="14"/>
+            </svg>
             <span>سجل إضابير الملاكات والبيانات الإدارية والوظيفية</span>
           </h2>
-          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
-            <input type="text" id="dossierSearchInput" class="input-glass" placeholder="بحث بالاسم أو الرقم الوظيفي..." oninput="FounderPortal.filterDossiers()" style="width: 260px;">
+          <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem;">
+            <input type="text" id="dossierSearchInput" class="input-glass" placeholder="بحث بالاسم أو الرقم الوظيفي..." oninput="FounderPortal.filterDossiers()" style="width: 280px;">
             <select id="dossierSectionFilter" class="select-glass" onchange="FounderPortal.filterDossiers()">
               <option value="ALL">كافة الشعب</option>
               <option value="الإنتاج">شعبة الإنتاج</option>
@@ -320,10 +488,15 @@
       <div class="glass-panel">
         <div class="panel-header-row">
           <h2 class="panel-title">
-            <span>📝</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
             <span>حزمة الاستمارات والنماذج الإدارية الجاهزة للمنظومة</span>
           </h2>
-          <span style="font-size: 0.84rem; color: var(--gold-primary); font-weight: 700;">جاهزة للمعاينة، التعبئة، والطباعة الرسمية</span>
+          <span style="font-size: 0.84rem; color: var(--gold-light); font-weight: 800;">جاهزة للمعاينة، التعبئة، والطباعة الرسمية</span>
         </div>
         <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6;">
           توفر هذه الحزمة استمارات إدارية قياسية معتمدة بقسم الإنتاج الجنوبي يمكن للمؤسس والإدارة استخدامها وطباعتها مباشرة، أو إضافة نماذج واستمارات جديدة وتعميمها على المنظومة.
@@ -334,22 +507,38 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">🏖️</div>
+                <div class="form-card-icon" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">استمارة طلب إجازة رسمية</div>
-                  <div style="font-size: 0.78rem; color: var(--sky-primary); font-weight: 700;">(اعتيادية / مرضية / دورية حقلية 14/14)</div>
+                  <div style="font-size: 0.78rem; color: var(--sky-light); font-weight: 700;">(اعتيادية / مرضية / دورية حقلية 14/14)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 النموذج الرسمي المعتمد لتقديم طلبات الإجازات لمنتسبي شعب ووحدات القسم مع حقول البديل وموافقة المسؤول المباشر.
               </p>
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
               <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.openFormModal('leave')" style="flex: 1;">
-                👁️ معاينة وتعبئة
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>معاينة وتعبئة</span>
               </button>
               <button class="btn-glass btn-glass-gold" onclick="FounderPortal.quickPrintForm('leave')">
-                🖨️ طباعة فورية
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>طباعة فورية</span>
               </button>
             </div>
           </div>
@@ -358,22 +547,38 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">🔄</div>
+                <div class="form-card-icon" style="background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">استمارة طلب نقل وتكليف داخلي</div>
-                  <div style="font-size: 0.78rem; color: var(--sky-primary); font-weight: 700;">(بين الشعب والوحدات والمحطات)</div>
+                  <div style="font-size: 0.78rem; color: var(--indigo-light); font-weight: 700;">(بين الشعب والوحدات والمحطات)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 الاستمارة المعتمدة لتنظيم حركة الملاكات وتغيير مواقع العمل والمحطات التشغيلية وتكليف الكوادر بالمهام النوعية.
               </p>
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
               <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.openFormModal('transfer')" style="flex: 1;">
-                👁️ معاينة وتعبئة
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>معاينة وتعبئة</span>
               </button>
               <button class="btn-glass btn-glass-gold" onclick="FounderPortal.quickPrintForm('transfer')">
-                🖨️ طباعة فورية
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>طباعة فورية</span>
               </button>
             </div>
           </div>
@@ -382,22 +587,38 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">🤝</div>
+                <div class="form-card-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">استمارة طلب مقابلة رسمية لمدير القسم</div>
-                  <div style="font-size: 0.78rem; color: var(--sky-primary); font-weight: 700;">(المقابلات الدورية والطلبات الخاصة)</div>
+                  <div style="font-size: 0.78rem; color: var(--emerald-light); font-weight: 700;">(المقابلات الدورية والطلبات الخاصة)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 استمارة توثيق وتحديد مواعيد المقابلات الرسمية للمنتسبين مع إدراج سبب المقابلة وتوصية وتوجيه مدير القسم وقراره.
               </p>
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
               <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.openFormModal('interview')" style="flex: 1;">
-                👁️ معاينة وتعبئة
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>معاينة وتعبئة</span>
               </button>
               <button class="btn-glass btn-glass-gold" onclick="FounderPortal.quickPrintForm('interview')">
-                🖨️ طباعة فورية
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>طباعة فورية</span>
               </button>
             </div>
           </div>
@@ -406,22 +627,38 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">📜</div>
+                <div class="form-card-icon" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">استمارة أمر إداري سيادي معتمد</div>
-                  <div style="font-size: 0.78rem; color: var(--sky-primary); font-weight: 700;">(بالصيغة الوزارية الرسمية الصادرة)</div>
+                  <div style="font-size: 0.78rem; color: var(--gold-light); font-weight: 700;">(بالصيغة الوزارية الرسمية الصادرة)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 نموذج رسمي مجهز بالترويسة المعتمدة والختم لإصدار وتوثيق الأوامر الإدارية والقرارات التنظيمية الموجهة للقسم.
               </p>
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.65rem;">
               <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.openFormModal('decree')" style="flex: 1;">
-                👁️ معاينة وتعبئة
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>معاينة وتعبئة</span>
               </button>
               <button class="btn-glass btn-glass-gold" onclick="FounderPortal.quickPrintForm('decree')">
-                🖨️ طباعة فورية
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>طباعة فورية</span>
               </button>
             </div>
           </div>
@@ -430,21 +667,30 @@
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 0.5rem 0;">
 
         <!-- إضافة فورمة إدارية جديدة للمنظومة -->
-        <div style="background: rgba(9, 20, 38, 0.7); border: var(--glass-border-subtle); border-radius: 16px; padding: 1.4rem;">
-          <h3 style="font-size: 1.1rem; color: var(--gold-primary); font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span>➕</span>
+        <div style="background: rgba(9, 20, 38, 0.7); border: var(--border-subtle); border-radius: 18px; padding: 1.5rem;">
+          <h3 style="font-size: 1.15rem; color: var(--gold-light); font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
             <span>استحداث وإضافة فورمة أو نموذج إداري جديد للمنظومة</span>
           </h3>
-          <p style="font-size: 0.84rem; color: var(--text-soft); margin-bottom: 1rem;">
+          <p style="font-size: 0.86rem; color: var(--text-soft); margin-bottom: 1.1rem;">
             تتيح هذه الخاصية للمؤسس إنشاء ونشر استمارة إدارية جديدة لتظهر وتعتمد فوراً في عموم المنظومة.
           </p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.95rem; margin-bottom: 0.95rem;">
             <input type="text" id="customFormTitleInput" class="input-glass" placeholder="عنوان الاستمارة الجديدة (مثال: استمارة صرف مواد واحتياجات)">
             <input type="text" id="customFormTargetInput" class="input-glass" placeholder="الجهة المستهدفة (مثال: كافة شعب القسم)">
           </div>
-          <textarea id="customFormFieldsInput" class="textarea-glass" placeholder="اكتب وصف الاستمارة وأبرز البنود المطلوبة فيها..." style="min-height: 75px; margin-bottom: 0.85rem;"></textarea>
+          <textarea id="customFormFieldsInput" class="textarea-glass" placeholder="اكتب وصف الاستمارة وأبرز البنود المطلوبة فيها..." style="min-height: 80px; margin-bottom: 0.95rem;"></textarea>
           <button class="btn-glass btn-glass-emerald" onclick="FounderPortal.addCustomFormTemplate()">
-            ✨ اعتماد وإضافة الاستمارة للمنظومة
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            <span>اعتماد وإضافة الاستمارة للمنظومة</span>
           </button>
         </div>
       </div>
@@ -457,10 +703,14 @@
       <div class="glass-panel">
         <div class="panel-header-row">
           <h2 class="panel-title">
-            <span>🖨️</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
             <span>مركز الطباعة الإدارية والاستخراج الرسمي المعتمد</span>
           </h2>
-          <span style="font-size: 0.84rem; color: var(--sky-primary); font-weight: 700;">كتب رسمية مختومة بالصيغة المعتمدة</span>
+          <span style="font-size: 0.84rem; color: var(--sky-light); font-weight: 800;">كتب رسمية مختومة بالصيغة المعتمدة</span>
         </div>
         <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6;">
           بنقرة زر واحدة، يقوم النظام بتوليد وتنسيق الكتاب الإداري الرسمي كاملاً مع الترويسة، جدول البيانات، حقول المصادقة، والختم الرسمي جاهزاً للطباعة الفورية على ورق A4 أو الحفظ الرقمي.
@@ -471,18 +721,29 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">👥</div>
+                <div class="form-card-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">موقف الملاكات والكوادر الشامل</div>
-                  <div style="font-size: 0.78rem; color: var(--emerald-primary); font-weight: 700;">(كشف رسمي بكافة منتسبي القسم وتوزيعهم)</div>
+                  <div style="font-size: 0.78rem; color: var(--emerald-light); font-weight: 700;">(كشف رسمي بكافة منتسبي القسم وتوزيعهم)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 طباعة جدول رسمي شامل يضم الأسماء الرباعية، الأرقام الوظيفية، الشعب والوحدات، وطبيعة الدوام المعتمدة للقسم.
               </p>
             </div>
             <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.printStaffManifest()">
-              🖨️ معاينة وطباعة الموقف الرسمي
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة وطباعة الموقف الرسمي</span>
             </button>
           </div>
 
@@ -490,18 +751,28 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">📈</div>
+                <div class="form-card-icon" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">جدول استحقاقات الترفيع والعلاوات القادمة</div>
-                  <div style="font-size: 0.78rem; color: var(--gold-primary); font-weight: 700;">(المستحقين للترفيع والترقية الوظيفية)</div>
+                  <div style="font-size: 0.78rem; color: var(--gold-light); font-weight: 700;">(المستحقين للترفيع والترقية الوظيفية)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 طباعة كشف تدقيقي للمنتسبين الذين استوفوا المدة القانونية للترقية أو الترفيع للدرجة والمرحلة التالية.
               </p>
             </div>
             <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.printPromotionsReport()">
-              🖨️ معاينة وطباعة كشف الترفيعات
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة وطباعة كشف الترفيعات</span>
             </button>
           </div>
 
@@ -509,18 +780,29 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">🚚</div>
+                <div class="form-card-icon" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"/>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                    <circle cx="5.5" cy="18.5" r="2.5"/>
+                    <circle cx="18.5" cy="18.5" r="2.5"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">كشف حركة الآليات والمأموريات الميدانية</div>
-                  <div style="font-size: 0.78rem; color: var(--sky-primary); font-weight: 700;">(موقف الأسطول والواجبات الميدانية)</div>
+                  <div style="font-size: 0.78rem; color: var(--sky-light); font-weight: 700;">(موقف الأسطول والواجبات الميدانية)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 طباعة الموقف الرسمي لحركة الآليات التابعة للقسم وسائقيها ومهامها الميدانية الحالية في حقل الرميلة.
               </p>
             </div>
             <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.printVehiclesReport()">
-              🖨️ معاينة وطباعة كشف الآليات
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة وطباعة كشف الآليات</span>
             </button>
           </div>
 
@@ -528,18 +810,29 @@
           <div class="form-suite-card">
             <div>
               <div class="form-card-head">
-                <div class="form-card-icon">🤝</div>
+                <div class="form-card-icon" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.35);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
                 <div>
                   <div class="form-card-title">سجل المقابلات الرسمية وقرارات الإدارة</div>
-                  <div style="font-size: 0.78rem; color: var(--rose-primary); font-weight: 700;">(جدول المقابلات وقرارات مدير القسم)</div>
+                  <div style="font-size: 0.78rem; color: var(--rose-light); font-weight: 700;">(جدول المقابلات وقرارات مدير القسم)</div>
                 </div>
               </div>
-              <p class="form-card-desc" style="margin-top: 0.8rem;">
+              <p class="form-card-desc" style="margin-top: 0.9rem;">
                 طباعة محضر رسمي موثق بالمقابلات المنجزة وتوجيهات الإدارة والقرارات الصادرة بشأن طلبات الكوادر.
               </p>
             </div>
             <button class="btn-glass btn-glass-cyan" onclick="FounderPortal.printInterviewsReport()">
-              🖨️ معاينة وطباعة سجل المقابلات
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة وطباعة سجل المقابلات</span>
             </button>
           </div>
         </div>
@@ -555,26 +848,28 @@
   <div id="dossierModal" class="modal-overlay" style="display: none;">
     <div class="modal-crystal-box" style="max-width: 650px;">
       <div class="panel-header-row">
-        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
-          <span>📁</span>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.6rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--sky-primary);">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
           <span>تعديل إضبارة المنتسب (البيانات الإدارية)</span>
         </h3>
-        <button class="btn-glass" onclick="FounderPortal.closeDossierModal()" style="height: 32px; padding: 0 0.7rem;">✕</button>
+        <button class="btn-glass" onclick="FounderPortal.closeDossierModal()" style="height: 34px; padding: 0 0.8rem;">✕</button>
       </div>
 
-      <form id="dossierEditForm" onsubmit="FounderPortal.saveDossier(event)" style="display: flex; flex-direction: column; gap: 0.9rem;">
+      <form id="dossierEditForm" onsubmit="FounderPortal.saveDossier(event)" style="display: flex; flex-direction: column; gap: 1rem;">
         <input type="hidden" id="editEmpId">
         <div>
-          <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">الاسم الرباعي الكامل:</label>
+          <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الاسم الرباعي الكامل:</label>
           <input type="text" id="editEmpName" class="input-glass" style="width: 100%;" required>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">الرقم الوظيفي:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الرقم الوظيفي:</label>
             <input type="text" id="editEmpCode" class="input-glass" style="width: 100%;" required>
           </div>
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">طبيعة الدوام:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">طبيعة الدوام:</label>
             <select id="editEmpShift" class="select-glass" style="width: 100%;">
               <option value="صباحي">صباحي (مستمر)</option>
               <option value="مناوب">مناوب (12 ساعة)</option>
@@ -582,9 +877,9 @@
             </select>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">الشعبة:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الشعبة:</label>
             <select id="editEmpSection" class="select-glass" style="width: 100%;">
               <option value="الإنتاج">شعبة الإنتاج</option>
               <option value="المعالجة والعمليات">شعبة المعالجة والعمليات</option>
@@ -593,24 +888,31 @@
             </select>
           </div>
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">سنوات الخدمة الوظيفية:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">سنوات الخدمة الوظيفية:</label>
             <input type="number" id="editEmpService" class="input-glass" style="width: 100%;" min="0" max="45" value="5">
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">الدرجة الوظيفية:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الدرجة الوظيفية:</label>
             <input type="text" id="editEmpGrade" class="input-glass" style="width: 100%;" placeholder="مثال: الخامسة">
           </div>
           <div>
-            <label style="font-size: 0.82rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.3rem;">المرحلة:</label>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">المرحلة:</label>
             <input type="text" id="editEmpStep" class="input-glass" style="width: 100%;" placeholder="مثال: الثانية">
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 0.65rem; margin-top: 0.5rem;">
+        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 0.75rem; margin-top: 0.6rem;">
           <button type="button" class="btn-glass" onclick="FounderPortal.closeDossierModal()">إلغاء</button>
-          <button type="submit" class="btn-glass btn-glass-emerald">💾 حفظ التعديلات في الإضبارة</button>
+          <button type="submit" class="btn-glass btn-glass-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            <span>حفظ التعديلات في الإضبارة</span>
+          </button>
         </div>
       </form>
     </div>
@@ -619,10 +921,23 @@
   <!-- 2. نافذة معاينة وطباعة الاستمارة الرسمية -->
   <div id="printPreviewModal" class="modal-overlay" style="display: none;">
     <div class="modal-crystal-box" style="max-width: 960px;">
-      <div class="panel-header-row" style="padding-bottom: 0.5rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff;">📄 معاينة المستند الإداري الرسمي قبل الطباعة</h3>
-        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.5rem;">
-          <button class="btn-glass btn-glass-gold" onclick="window.print()">🖨️ بدء الطباعة الآن</button>
+      <div class="panel-header-row" style="padding-bottom: 0.6rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--gold-primary);">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>معاينة المستند الإداري الرسمي قبل الطباعة</span>
+        </h3>
+        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.6rem;">
+          <button class="btn-glass btn-glass-gold" onclick="window.print()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            <span>بدء الطباعة الآن</span>
+          </button>
           <button class="btn-glass" onclick="FounderPortal.closePrintPreviewModal()">✕ إغلاق</button>
         </div>
       </div>
@@ -632,7 +947,7 @@
   </div>
 
   <!-- سكريبتات المنظومة والمحرك -->
-  <script src="js/store.js?v=139.38.0"></script>
-  <script src="js/founder_portal.js?v=139.38.0"></script>
+  <script src="js/store.js?v=139.48.0"></script>
+  <script src="js/founder_portal.js?v=139.48.0"></script>
 </body>
 </html>

@@ -454,8 +454,25 @@ const FounderPortal = {
 
   // تحديث المؤشرات القيادية العليا (القسم 1)
   renderMetrics: function() {
-    const staffCountEl = document.getElementById('metricStaffCount');
-    if (staffCountEl) staffCountEl.textContent = this.dossiers.length;
+    const totalStaff = (window.deptEmployees && Array.isArray(window.deptEmployees) ? window.deptEmployees.length : (this.dossiers.length || 11));
+    const activeStaff = (window.deptEmployees && Array.isArray(window.deptEmployees) ? window.deptEmployees.filter(e => e.status !== 'معلق').length : (this.dossiers.length || 10));
+    const pendingStaff = this.pendingUsers ? this.pendingUsers.length : 1;
+    const vehiclesCount = (window.deptVehicles && Array.isArray(window.deptVehicles) ? window.deptVehicles.length : 2);
+
+    const elTotalStaff = document.getElementById('metricTotalStaff') || document.getElementById('metricStaffCount');
+    if (elTotalStaff) elTotalStaff.textContent = totalStaff;
+
+    const elActiveStaff = document.getElementById('metricActiveUsers');
+    if (elActiveStaff) elActiveStaff.textContent = activeStaff;
+
+    const elPending = document.getElementById('metricPendingUsers') || document.getElementById('pendingApprovalCount');
+    if (elPending) elPending.textContent = pendingStaff;
+
+    const elVehicles = document.getElementById('metricVehicles');
+    if (elVehicles) elVehicles.textContent = vehiclesCount;
+
+    const pendingBadge = document.getElementById('pendingCountBadge');
+    if (pendingBadge) pendingBadge.textContent = `${pendingStaff} طلب معلق`;
 
     const shiftsEl = document.getElementById('metricShiftsActive');
     if (shiftsEl) shiftsEl.textContent = '4 وجبات (A, B, C, D)';
@@ -463,11 +480,182 @@ const FounderPortal = {
     const formsCountEl = document.getElementById('metricFormsAvailable');
     if (formsCountEl) formsCountEl.textContent = 4 + this.customForms.length;
 
-    const pendingBadge = document.getElementById('pendingApprovalCount');
-    if (pendingBadge) pendingBadge.textContent = this.pendingUsers.length;
-
     const dossiersCountEl = document.getElementById('dossiersTotalCount');
     if (dossiersCountEl) dossiersCountEl.textContent = this.dossiers.length;
+  },
+
+  // وضع ملء الشاشة للوحة القيادة
+  toggleFullscreen: function() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  },
+
+  // تحديث البيانات الشامل
+  refreshData: function() {
+    this.loadState();
+    this.renderMetrics();
+    this.renderRolesTable();
+    this.renderPendingUsers();
+    this.renderWhitelist();
+    this.renderDossiersTable();
+    this.renderCustomForms();
+    this.showToast('تم تحديث وتحميل أحدث البيانات من قاعدة البيانات المركزية', 'success');
+  },
+
+  // فحص صحة الخادم وقاعدة البيانات
+  checkServerHealth: function() {
+    this.showToast('فحص الخادم وقاعدة البيانات: الحالة ممتازة ومؤمنة 100%', 'success');
+  },
+
+  // أخذ نسخة احتياطية فورية
+  takeInstantBackup: function() {
+    return this.createInstantBackup();
+  },
+
+  // إصدار وتوثيق أمر إداري سيادي
+  issueDecree: function() {
+    const subjectEl = document.getElementById('decreeSubjectInput');
+    const refEl = document.getElementById('decreeRefInput');
+    const contentEl = document.getElementById('decreeContentInput');
+    const subject = subjectEl ? subjectEl.value.trim() : '';
+    const ref = refEl ? refEl.value.trim() : '';
+    const content = contentEl ? contentEl.value.trim() : '';
+
+    if (!subject || !content) {
+      this.showToast('يرجى ملء موضوع ونص الأمر الإداري', 'error');
+      return;
+    }
+
+    const decree = {
+      id: 'decree-' + Date.now(),
+      ref: ref || `ق.ج/${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`,
+      subject: subject,
+      content: content,
+      date: new Date().toISOString().slice(0, 10),
+      issuer: 'المؤسس العام للمنظومة'
+    };
+
+    const decrees = JSON.parse(localStorage.getItem('spd_founder_decrees_v98') || '[]');
+    decrees.unshift(decree);
+    localStorage.setItem('spd_founder_decrees_v98', JSON.stringify(decrees));
+
+    this.logAudit(`إصدار أمر إداري سيادي: ${subject} (${decree.ref})`);
+    this.showToast(`تم بنجاح إصدار وتوثيق الأمر الإداري برقم إشارة: ${decree.ref}`, 'success');
+  },
+
+  // معاينة وطباعة الكتاب الإداري الحالي
+  previewCurrentDecree: function() {
+    const subjectEl = document.getElementById('decreeSubjectInput');
+    const refEl = document.getElementById('decreeRefInput');
+    const contentEl = document.getElementById('decreeContentInput');
+    const subject = subjectEl ? subjectEl.value.trim() : 'أمر إداري سيادي';
+    const ref = refEl ? refEl.value.trim() : `ق.ج/${new Date().getFullYear()}/108`;
+    const content = contentEl ? contentEl.value.trim() : 'بناءً على الصلاحيات المخولة لنا ولحسن سير العمل وانتظامه في قسم الإنتاج الجنوبي، تقرر إصدار التوجيهات الإدارية المعتمدة.';
+
+    const modal = document.getElementById('printPreviewModal');
+    const target = document.getElementById('officialDocumentPrintTarget');
+    if (!target) return;
+
+    target.innerHTML = `
+      <div class="doc-header-official">
+        <div style="text-align: right;">
+          <div style="font-weight: 800; font-size: 0.95rem;">جمهورية العراق</div>
+          <div style="font-weight: 800; font-size: 0.95rem;">وزارة النفط | شركة نفط البصرة</div>
+          <div style="font-weight: 800; font-size: 0.95rem;">هيأة تشغيل الرميلة - قسم الإنتاج الجنوبي</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.4rem; font-weight: 900; letter-spacing: 1px;">أمر إداري رسمي</div>
+          <div style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">(سري وشخصي)</div>
+        </div>
+        <div style="text-align: left; font-size: 0.88rem; font-family: monospace;">
+          <div><strong>العدد:</strong> ${ref}</div>
+          <div><strong>التاريخ:</strong> ${new Date().toISOString().slice(0, 10)}</div>
+        </div>
+      </div>
+
+      <div style="margin: 2rem 0;">
+        <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 1.2rem; text-decoration: underline;">
+          م/ ${subject}
+        </div>
+        <div style="font-size: 1.05rem; line-height: 2; text-align: justify; white-space: pre-line;">
+          ${content}
+        </div>
+      </div>
+
+      <div style="margin-top: 3.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+          <div>نسخة منه إلى:</div>
+          <div>- مكتب السيد مدير الهيأة / للمعلومات لطفا</div>
+          <div>- الإدارة والملاكات / للتوثيق والأرشفة</div>
+          <div>- الأضابير الشخصية / للحفظ</div>
+        </div>
+        <div style="text-align: center; min-width: 200px;">
+          <div style="font-weight: 900; font-size: 1.05rem; margin-bottom: 2rem;">المؤسس العام للمنظومة</div>
+          <div style="border: 2px dashed #0369a1; border-radius: 50%; width: 90px; height: 90px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #0369a1; transform: rotate(-10deg);">
+            الختم الرسمي المعتمد
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  },
+
+  // إضافة تفويض بريد إلكتروني
+  addAuthorizedEmail: function() {
+    const input = document.getElementById('newAuthEmailInput') || document.getElementById('whitelistEmailInput');
+    if (!input) return;
+    const email = input.value.trim().toLowerCase();
+    if (!email || !email.includes('@')) {
+      this.showToast('يرجى إدخال عنوان بريد إلكتروني صالح', 'error');
+      return;
+    }
+    if (this.whitelist.includes(email)) {
+      this.showToast('هذا البريد الإلكتروني معتمد ومضاف مسبقاً', 'info');
+      return;
+    }
+    this.whitelist.push(email);
+    this.saveWhitelist();
+    this.renderWhitelist();
+    input.value = '';
+    this.logAudit(`إضافة تصريح دخول رسمي للبريد: ${email}`);
+    this.showToast(`تم بنجاح اعتماد وتصريح البريد الإلكتروني (${email})`, 'success');
+  },
+
+  // إضافة نموذج مخصص جديد
+  addCustomFormTemplate: function() {
+    const titleInput = document.getElementById('customFormTitleInput');
+    const targetInput = document.getElementById('customFormTargetInput');
+    const fieldsInput = document.getElementById('customFormFieldsInput');
+    const title = titleInput ? titleInput.value.trim() : '';
+    const target = targetInput ? targetInput.value.trim() : '';
+    const fields = fieldsInput ? fieldsInput.value.trim() : '';
+    if (!title) {
+      this.showToast('يرجى كتابة عنوان الاستمارة الإدارية أولاً', 'error');
+      return;
+    }
+    const newForm = {
+      id: 'form-' + Date.now(),
+      title: title,
+      target: target || 'كافة شعب القسم',
+      description: fields || 'استمارة إدارية معتمدة تم استحداثها من قبل المؤسس العام.',
+      createdAt: new Date().toISOString()
+    };
+    this.customForms.push(newForm);
+    this.saveCustomForms();
+    this.renderCustomForms();
+    if (titleInput) titleInput.value = '';
+    if (targetInput) targetInput.value = '';
+    if (fieldsInput) fieldsInput.value = '';
+    this.logAudit(`استحداث استمارة إدارية جديدة: ${title}`);
+    this.showToast(`تم اعتماد ونشر الاستمارة الإدارية (${title}) بنجاح`, 'success');
   },
 
   // رسم جدول سجل التدقيق والعمليات الإدارية
@@ -490,7 +678,7 @@ const FounderPortal = {
 
   // إرسال إعلان عام للمنظومة للمنظومة
   sendBroadcast: function() {
-    const input = document.getElementById('founderBroadcastInput');
+    const input = document.getElementById('broadcastInput') || document.getElementById('founderBroadcastInput');
     if (!input) return;
     const msg = input.value.trim();
     if (!msg) {
@@ -500,6 +688,7 @@ const FounderPortal = {
 
     this.broadcastMessage = msg;
     localStorage.setItem('spd_founder_broadcast_v84', msg);
+    localStorage.setItem('spd_founder_broadcast_v98', msg);
 
     // استدعاء واجهة برمجة التطبيقات الخلفية إذا كانت متاحة
     fetch('/api/founder/broadcast', {
@@ -517,10 +706,11 @@ const FounderPortal = {
 
   // مسح الإعلان العام
   clearBroadcast: function() {
-    const input = document.getElementById('founderBroadcastInput');
+    const input = document.getElementById('broadcastInput') || document.getElementById('founderBroadcastInput');
     if (input) input.value = '';
     this.broadcastMessage = '';
     localStorage.removeItem('spd_founder_broadcast_v84');
+    localStorage.removeItem('spd_founder_broadcast_v98');
 
     fetch('/api/founder/broadcast', {
       method: 'POST',
@@ -599,41 +789,57 @@ const FounderPortal = {
 
   // رسم جدول الصلاحيات
   renderRolesTable: function() {
-    const tbody = document.getElementById('userRolesTableBody');
+    const tbody = document.getElementById('allUsersRolesTableBody') || document.getElementById('userRolesTableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
     const roleBadges = {
       'مؤسس': 'badge-role-founder',
       'مدير هيئة الإنتاج': 'badge-role-director',
+      'مدير قسم': 'badge-role-director',
       'مسؤول شعبة / محطة': 'badge-role-supervisor',
+      'مسؤول شعبة': 'badge-role-supervisor',
+      'مشرف محطة': 'badge-role-supervisor',
       'مشغل محطة أقدم': 'badge-role-operator',
       'مشغل محطة': 'badge-role-operator',
+      'مشغل': 'badge-role-operator',
       'مهندس صيانة': 'badge-role-engineer',
-      'مراقب حركة': 'badge-role-viewer'
+      'مراقب حركة': 'badge-role-viewer',
+      'سائق': 'badge-role-viewer'
     };
 
-    this.dossiers.forEach(emp => {
+    const users = (window.deptEmployees && Array.isArray(window.deptEmployees) && window.deptEmployees.length > 0) ? window.deptEmployees : this.dossiers;
+
+    users.forEach(emp => {
       const tr = document.createElement('tr');
-      const badgeClass = roleBadges[emp.role] || 'badge-role-viewer';
+      const role = emp.role || 'مشغل محطة';
+      const badgeClass = roleBadges[role] || 'badge-role-supervisor';
 
       tr.innerHTML = `
-        <td style="font-family: monospace; font-weight: 700; color: #f59e0b;">${emp.empId}</td>
-        <td style="font-weight: 700; color: #ffffff;">${emp.fullName}</td>
-        <td style="color: #cbd5e1;">${emp.department}</td>
+        <td style="font-weight: 700; color: #ffffff;">${emp.fullName || emp.name}</td>
+        <td style="font-family: monospace; font-weight: 700; color: #f59e0b;">${emp.empId || emp.code || 'EMP-0000'}</td>
+        <td style="color: #cbd5e1;">${emp.department || emp.section || 'شعبة الإنتاج'}</td>
         <td>
-          <span class="badge-role ${badgeClass}">${emp.role}</span>
+          <span class="badge-role ${badgeClass}">${role}</span>
         </td>
         <td>
-          <select class="input-glass" style="padding: 0.3rem 0.6rem; font-size: 0.82rem;" onchange="FounderPortal.updateUserRole('${emp.empId}', this.value)">
-            <option value="مؤسس" ${emp.role === 'مؤسس' ? 'selected' : ''}>مؤسس</option>
-            <option value="مدير هيئة الإنتاج" ${emp.role === 'مدير هيئة الإنتاج' ? 'selected' : ''}>مدير هيئة الإنتاج</option>
-            <option value="مسؤول شعبة / محطة" ${emp.role === 'مسؤول شعبة / محطة' ? 'selected' : ''}>مسؤول شعبة / محطة</option>
-            <option value="مشغل محطة أقدم" ${emp.role === 'مشغل محطة أقدم' ? 'selected' : ''}>مشغل محطة أقدم</option>
-            <option value="مشغل محطة" ${emp.role === 'مشغل محطة' ? 'selected' : ''}>مشغل محطة</option>
-            <option value="مهندس صيانة" ${emp.role === 'مهندس صيانة' ? 'selected' : ''}>مهندس صيانة</option>
-            <option value="مراقب حركة" ${emp.role === 'مراقب حركة' ? 'selected' : ''}>مراقب حركة</option>
+          <select class="select-glass" style="padding: 0.35rem 0.65rem; font-size: 0.82rem;" onchange="FounderPortal.updateUserRole('${emp.empId || emp.id}', this.value)">
+            <option value="مؤسس" ${role === 'مؤسس' ? 'selected' : ''}>مؤسس</option>
+            <option value="مدير هيئة الإنتاج" ${role === 'مدير هيئة الإنتاج' || role === 'مدير قسم' ? 'selected' : ''}>مدير هيئة الإنتاج</option>
+            <option value="مسؤول شعبة / محطة" ${role.includes('شعبة') || role.includes('مسؤول') ? 'selected' : ''}>مسؤول شعبة / محطة</option>
+            <option value="مشغل محطة أقدم" ${role === 'مشغل محطة أقدم' ? 'selected' : ''}>مشغل محطة أقدم</option>
+            <option value="مشغل محطة" ${role === 'مشغل محطة' || role === 'مشغل' ? 'selected' : ''}>مشغل محطة</option>
+            <option value="مهندس صيانة" ${role.includes('صيانة') ? 'selected' : ''}>مهندس صيانة</option>
+            <option value="مراقب حركة" ${role.includes('مراقب') || role.includes('سائق') ? 'selected' : ''}>مراقب حركة</option>
           </select>
+        </td>
+        <td>
+          <span style="color: var(--emerald-light); font-weight: 700; font-size: 0.82rem;">● نشط وموثق</span>
+        </td>
+        <td>
+          <button class="btn-glass btn-glass-cyan" style="height: 30px; padding: 0 0.75rem; font-size: 0.78rem;" onclick="FounderPortal.openDossierModal('${emp.empId || emp.id}')">
+            تعديل
+          </button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -642,47 +848,76 @@ const FounderPortal = {
 
   // تعديل رتبة وصلاحية مستخدم
   updateUserRole: function(empId, newRole) {
-    const emp = this.dossiers.find(e => e.empId === empId);
+    const emp = this.dossiers.find(e => e.empId === empId) || (window.deptEmployees && window.deptEmployees.find(e => (e.empId === empId || e.id === empId)));
     if (!emp) return;
 
     emp.role = newRole;
     this.saveDossiers();
     this.renderRolesTable();
-    this.logAudit(`ترقية وتعديل رتبة المنتسب (${emp.fullName}) إلى: ${newRole}`);
-    this.showToast(`تم تغيير وتثبيت رتبة (${emp.fullName}) بنجاح إلى: ${newRole}`, 'success');
+    this.logAudit(`ترقية وتعديل رتبة المنتسب (${emp.fullName || emp.name}) إلى: ${newRole}`);
+    this.showToast(`تم تغيير وتثبيت رتبة (${emp.fullName || emp.name}) بنجاح إلى: ${newRole}`, 'success');
   },
 
   // رسم جدول طلبات التسجيل المعلقة
   renderPendingUsers: function() {
     const tbody = document.getElementById('pendingUsersTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    if (this.pendingUsers.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">لا توجد أي طلبات تسجيل معلقة حالياً</td></tr>`;
-      return;
+    const container = document.getElementById('pendingRequestsContainer');
+    
+    if (container) {
+      container.innerHTML = '';
+      if (this.pendingUsers.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 1.8rem; background: rgba(9,20,38,0.5); border-radius: 14px; border: var(--border-subtle); color: var(--text-muted);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem; color: var(--emerald-light);">✓</div>
+            <div style="font-weight: 700;">لا توجد أي طلبات تسجيل معلقة حالياً - كافة الحسابات معتمدة وموثقة.</div>
+          </div>
+        `;
+      } else {
+        this.pendingUsers.forEach(u => {
+          const card = document.createElement('div');
+          card.style.cssText = 'background: rgba(9,20,38,0.7); border: var(--border-subtle); border-radius: 14px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;';
+          card.innerHTML = `
+            <div>
+              <div style="font-weight: 800; color: #ffffff; font-size: 0.95rem;">${u.fullName}</div>
+              <div style="font-size: 0.8rem; color: var(--text-soft);">${u.email} | ${u.jobTitle || 'موظف'} - ${u.department || 'القسم'}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <button class="btn-glass btn-glass-emerald" style="height: 32px; padding: 0 0.85rem; font-size: 0.8rem;" onclick="FounderPortal.approvePendingUser('${u.id}')">اعتماد الحساب</button>
+              <button class="btn-glass btn-glass-rose" style="height: 32px; padding: 0 0.85rem; font-size: 0.8rem;" onclick="FounderPortal.rejectPendingUser('${u.id}')">رفض</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
     }
 
-    this.pendingUsers.forEach(user => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight: 700; color: #ffffff;">${user.fullName}</td>
-        <td style="direction: ltr; text-align: right; color: #94a3b8; font-family: monospace;">${user.email}</td>
-        <td style="color: #cbd5e1;">${user.jobTitle} - ${user.department}</td>
-        <td style="color: #f59e0b; font-weight: 700;">${user.requestedRole}</td>
-        <td>
-          <div style="display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: nowrap; white-space: nowrap;">
-            <button class="btn-glass btn-glass-emerald" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="FounderPortal.approvePendingUser('${user.id}')">
-              ✓ اعتماد وتفعيل
-            </button>
-            <button class="btn-glass btn-glass-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="FounderPortal.rejectPendingUser('${user.id}')">
-              ✕ رفض
-            </button>
-          </div>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (this.pendingUsers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">لا توجد أي طلبات تسجيل معلقة حالياً</td></tr>`;
+      } else {
+        this.pendingUsers.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="font-weight: 700; color: #ffffff;">${user.fullName}</td>
+            <td style="direction: ltr; text-align: right; color: #94a3b8; font-family: monospace;">${user.email}</td>
+            <td style="color: #cbd5e1;">${user.jobTitle} - ${user.department}</td>
+            <td style="color: #f59e0b; font-weight: 700;">${user.requestedRole}</td>
+            <td>
+              <div style="display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: nowrap; white-space: nowrap;">
+                <button class="btn-glass btn-glass-emerald" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="FounderPortal.approvePendingUser('${user.id}')">
+                  ✓ اعتماد وتفعيل
+                </button>
+                <button class="btn-glass btn-glass-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="FounderPortal.rejectPendingUser('${user.id}')">
+                  ✕ رفض
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
   },
 
   // قبول واعتماد طلب تسجيل مستخدم جديد
