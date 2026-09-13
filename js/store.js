@@ -4575,6 +4575,8 @@ class StoreManager {
     if (opStatus === 'PARTIAL') label = '🟡 قيد المتابعة';
     if (opStatus === 'STOPPED') label = '🔴 حرجة / متوقفة';
 
+    const isSent = data.isSentToSection !== undefined ? !!data.isSentToSection : true;
+
     const newRecord = {
       id: 'ts-' + Date.now(),
       departmentId: actorUser ? (actorUser.departmentId || 'dept-south-prod') : 'dept-south-prod',
@@ -4595,6 +4597,10 @@ class StoreManager {
       extraFields: data.extraFields || {},
       isPublished: data.isPublished !== false,
       isArchived: false,
+      isSentToSection: isSent,
+      sentToSectionAt: isSent ? (data.sentToSectionAt || new Date().toISOString()) : null,
+      sentToSectionById: isSent ? (actorUser ? actorUser.id : 'system') : null,
+      sentToSectionByName: isSent ? (actorUser ? actorUser.fullName : 'مسؤول الموقع') : null,
       createdById: actorUser ? actorUser.id : 'system',
       createdByName: actorUser ? actorUser.fullName : 'مسؤول الموقع',
       createdByEmployeeId: actorUser ? actorUser.employeeId : 'EMP-0000',
@@ -4684,6 +4690,54 @@ class StoreManager {
         'UPDATE_TECHNICAL_STATUS',
         'TECHNICAL_STATUS',
         `تم تعديل الموقف الفني (${statusId}) لشعبة [${updated.sectionName}] - موقع [${updated.stationName}].`
+      );
+    }
+
+    return { success: true, technicalStatus: updated };
+  }
+
+  forwardTechnicalStatusToSection(statusId, actorUser) {
+    const db = this.getDb();
+    if (!db.technicalStatusReports) db.technicalStatusReports = [];
+    const item = db.technicalStatusReports.find(ts => ts.id === statusId);
+    if (!item) return { success: false, error: 'سجل الموقف الفني غير موجود.' };
+
+    const station = item.stationId ? this.getStationById(item.stationId) : null;
+    const sec = item.sectionId ? this.getSectionById(item.sectionId) : null;
+    const nowIso = new Date().toISOString();
+
+    const history = Array.isArray(item.history) ? [...item.history] : [];
+    history.push({
+      action: 'FORWARD_TO_SECTION',
+      userId: actorUser ? actorUser.id : 'system',
+      userName: actorUser ? actorUser.fullName : 'مسؤول الموقع',
+      userRole: actorUser ? (actorUser.role === 'STATION_MANAGER' ? 'مسؤول الموقع' : actorUser.jobTitle) : 'مسؤول الموقع',
+      timestamp: nowIso,
+      details: `إرسال وتوجيه الموقف الفني التشغيلي لمحطة [${station ? station.name : item.stationName}] إلى إدارة شعبة [${sec ? sec.name : item.sectionName}].`
+    });
+
+    const updated = {
+      ...item,
+      isSentToSection: true,
+      sentToSectionAt: nowIso,
+      sentToSectionById: actorUser ? actorUser.id : 'system',
+      sentToSectionByName: actorUser ? actorUser.fullName : 'مسؤول الموقع',
+      history,
+      updatedAt: nowIso
+    };
+
+    const idx = db.technicalStatusReports.findIndex(ts => ts.id === statusId);
+    db.technicalStatusReports[idx] = updated;
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'FORWARD_TECHNICAL_STATUS_TO_SECTION',
+        'TECHNICAL_STATUS',
+        `تم إرسال وتوجيه الموقف الفني لمحطة [${updated.stationName}] إلى شعبة [${updated.sectionName}].`
       );
     }
 

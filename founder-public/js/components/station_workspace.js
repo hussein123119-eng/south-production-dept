@@ -46,6 +46,10 @@ function renderStationWorkspaceView(stationId) {
   const isSpecializedSection = (station.sectionId === 'sec-3' || station.sectionId === 'sec-4');
   let activeSubTab = (window.app && window.app.currentStationSubTab) || 'staff';
 
+  const stationTechStatuses = (window.store && typeof window.store.getTechnicalStatuses === 'function')
+    ? window.store.getTechnicalStatuses(station.departmentId || 'dept-south-prod', { stationId: station.id }, user)
+    : [];
+
   return `
     <div style="margin-bottom: 1.5rem;">
       <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem;">
@@ -119,6 +123,11 @@ function renderStationWorkspaceView(stationId) {
                 onclick="window.app.setStationSubTab('mail')">
           📬 <span>البريد</span>
         </button>
+        <button class="tab-btn ${activeSubTab === 'tech_status' ? 'active' : ''}" 
+                onclick="window.app.setStationSubTab('tech_status')">
+          ⚙️ <span>الموقف الفني</span> 
+          <span class="tab-count-badge">${stationTechStatuses.length}</span>
+        </button>
         <button class="tab-btn ${(activeSubTab === 'reports' || activeSubTab === 'documents') ? 'active' : ''}" 
                 onclick="window.app.setStationSubTab('reports')">
           📄 <span>التقارير الفنية والمستندات</span> 
@@ -131,6 +140,7 @@ function renderStationWorkspaceView(stationId) {
         </button>
       </div>
 
+      ${activeSubTab === 'tech_status' ? (typeof window.renderStationTechnicalStatusTab === 'function' ? window.renderStationTechnicalStatusTab(station, section, user) : '') : ''}
       ${(activeSubTab === 'reports' || activeSubTab === 'documents') ? renderSpecializedStationReportsTab(station, section, stationDocs, user) : ''}
       ${activeSubTab === 'notifs' ? renderSpecializedStationNotifsTab(station, section, relevantNotifs, user) : ''}
       ${activeSubTab === 'staff' ? renderSpecializedStationStaffTab(station, section, stationStaffList) : ''}
@@ -140,11 +150,13 @@ function renderStationWorkspaceView(stationId) {
       <div class="tabs-header" style="margin-bottom: 1.5rem;">
         <button class="tab-btn ${activeSubTab === 'staff' ? 'active' : ''}" onclick="window.app.setStationSubTab('staff')">👥 <span>الكوادر العاملة</span> <span class="tab-count-badge">${stationStaffList.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setStationSubTab('mail')">📬 <span>البريد</span></button>
+        <button class="tab-btn ${activeSubTab === 'tech_status' ? 'active' : ''}" onclick="window.app.setStationSubTab('tech_status')">⚙️ <span>الموقف الفني</span> <span class="tab-count-badge">${stationTechStatuses.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'overview' ? 'active' : ''}" onclick="window.app.setStationSubTab('overview')">📊 <span>نظرة عامة والتقارير</span></button>
         <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setStationSubTab('documents')">📄 <span>الوثائق والمستندات</span> <span class="tab-count-badge">${stationDocs.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'technical' ? 'active' : ''}" onclick="window.app.setStationSubTab('technical')">⚙️ <span>البيانات الفنية والتشغيل</span></button>
       </div>
 
+      ${activeSubTab === 'tech_status' ? (typeof window.renderStationTechnicalStatusTab === 'function' ? window.renderStationTechnicalStatusTab(station, section, user) : '') : ''}
       ${activeSubTab === 'overview' ? renderStationOverviewTab(station, section, stationDocs, stationStaffList, user) : ''}
       ${activeSubTab === 'documents' ? renderStationDocsTab(station, stationDocs, user) : ''}
       ${activeSubTab === 'staff' ? renderStationStaffTab(station, stationStaffList) : ''}

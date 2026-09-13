@@ -10303,6 +10303,45 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     });
   }
 
+  filterStationTechStatus() {
+    const q = (document.getElementById('stationTechSearchInput')?.value || '').toLowerCase().trim();
+    const statusFilter = document.getElementById('stationTechStatusFilter')?.value || 'ALL';
+    const forwardFilter = document.getElementById('stationTechForwardFilter')?.value || 'ALL';
+
+    const rows = document.querySelectorAll('.station-tech-row');
+    rows.forEach(r => {
+      const desc = r.getAttribute('data-desc') || '';
+      const actions = r.getAttribute('data-actions') || '';
+      const notes = r.getAttribute('data-notes') || '';
+      const eq = r.getAttribute('data-eq') || '';
+      const status = r.getAttribute('data-status') || '';
+      const forward = r.getAttribute('data-forward') || '';
+
+      const matchesSearch = !q || desc.includes(q) || actions.includes(q) || notes.includes(q) || eq.includes(q);
+      const matchesStatus = statusFilter === 'ALL' || status === statusFilter;
+      const matchesForward = forwardFilter === 'ALL' || forward === forwardFilter;
+
+      if (matchesSearch && matchesStatus && matchesForward) {
+        r.style.display = '';
+      } else {
+        r.style.display = 'none';
+      }
+    });
+  }
+
+  forwardTechStatusToSection(statusId, stationId = null) {
+    const actorUser = window.auth.getCurrentUser();
+    const res = window.store.forwardTechnicalStatusToSection(statusId, actorUser);
+    if (res && res.success) {
+      const stName = res.technicalStatus?.stationName || 'المحطة';
+      const secName = res.technicalStatus?.sectionName || 'الشعبة';
+      alert(`📤 تم إرسال وتوجيه الموقف الفني لمحطة [${stName}] إلى إدارة شعبة [${secName}] بنجاح.`);
+      this.render();
+    } else {
+      alert(res?.error || 'حدث خطأ أثناء إرسال الموقف الفني للشعبة.');
+    }
+  }
+
   updateTechModalStationDropdown() {
     const actorUser = window.auth.getCurrentUser();
     const secSelect = document.getElementById('newTechSection');
@@ -10429,13 +10468,20 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
             </div>
           </div>
 
-          <!-- بطاقة 3: الملاحظات والتوصيات -->
+          <!-- بطاقة 3: الملاحظات والتوصيات وخيار الإرسال للشعبة -->
           <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group" style="margin-bottom: 0.75rem;">
               <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">
                 💡 الملاحظات والتوصيات الفنية اللاحقة
               </label>
               <input type="text" id="newTechNotes" class="form-control" placeholder="أي متطلبات لقطع الغيار، توصيات للوجبة القادمة، أو متابعات مع إدارة هيأة الرميلة..." style="font-weight: 600;" />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding-top: 0.5rem; border-top: 1px dashed var(--md-sys-color-surface-variant);">
+              <input type="checkbox" id="newTechSendToSection" style="width: 18px; height: 18px; accent-color: #059669; cursor: pointer;" checked />
+              <label for="newTechSendToSection" style="font-weight: 800; font-size: 0.86rem; color: #047857; cursor: pointer; margin: 0;">
+                📤 إرسال وتوجيه الموقف الفني فوراً إلى إدارة الشعبة التابع لها الموقع
+              </label>
             </div>
           </div>
 
@@ -10443,7 +10489,7 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--md-sys-color-surface-variant); padding-top: 1.15rem; flex-wrap: wrap; gap: 0.75rem;">
             <div style="font-size: 0.82rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.4rem;">
               <span>🛡️</span>
-              <span>يتم تحديث لوحة الموقف الفني والتشغيلي للمحطات آلياً بعد الاعتماد.</span>
+              <span>يتم تحديث لوحة الموقف الفني والتشغيلي للمحطات والشعب آلياً بعد الاعتماد.</span>
             </div>
             <div style="display: flex; gap: 0.65rem; align-items: center;">
               <button type="button" class="btn btn-outline" onclick="window.app.closeModal()" style="padding: 0.55rem 1.35rem; font-weight: 700; border-radius: 8px;">
@@ -10472,6 +10518,8 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const description = document.getElementById('newTechDesc').value.trim();
     const actionsTaken = document.getElementById('newTechActions').value.trim();
     const notes = document.getElementById('newTechNotes').value.trim();
+    const sendCheckbox = document.getElementById('newTechSendToSection');
+    const isSentToSection = sendCheckbox ? sendCheckbox.checked : true;
 
     window.store.addTechnicalStatus({
       sectionId,
@@ -10481,7 +10529,8 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
       equipmentTopic,
       description,
       actionsTaken,
-      notes
+      notes,
+      isSentToSection
     }, actorUser);
 
     alert('تم تسجيل واعتماد الموقف الفني بنجاح وتحديث اللوحة الرئيسية.');
@@ -10655,6 +10704,19 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
             <div style="font-size: 0.8rem; color: var(--md-sys-color-outline); margin-top: 2px;">
               تاريخ الموقف: <strong>${s.recordDate || '—'}</strong> | تم التسجيل بواسطة: <strong>${s.createdByName || 'مسؤول الموقع'}</strong>
             </div>
+            ${s.stationId ? `
+              <div style="margin-top: 5px;">
+                ${s.isSentToSection ? `
+                  <span class="badge badge-success" style="font-size: 0.76rem; padding: 0.2rem 0.55rem;">
+                    📤 تم الإرسال لإدارة الشعبة (${s.sentToSectionAt ? new Date(s.sentToSectionAt).toLocaleString('ar-IQ') : 'نعم'})
+                  </span>
+                ` : `
+                  <span class="badge badge-warning" style="font-size: 0.76rem; padding: 0.2rem 0.55rem;">
+                    📝 مسودة محلية بالمحطة (لم تُرسل للشعبة بعد)
+                  </span>
+                `}
+              </div>
+            ` : ''}
           </div>
           <span class="badge ${badgeClass}" style="font-size: 0.9rem; padding: 0.35rem 0.75rem;">
             ${labelText}

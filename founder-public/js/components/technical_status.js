@@ -140,6 +140,15 @@ function renderSectionTechnicalStatusTab(section, user) {
 
                   <td>
                     <strong>${s.stationName || 'الموقع المركزي'}</strong>
+                    ${s.stationId ? `
+                      <div style="margin-top: 3px;">
+                        ${s.isSentToSection ? `
+                          <span class="badge badge-info" style="font-size: 0.72rem; padding: 0.15rem 0.45rem; font-weight: 750;" title="تم إرساله رسمياً من المحطة للشعبة">📥 وارد من المحطة</span>
+                        ` : `
+                          <span class="badge badge-neutral" style="font-size: 0.72rem; padding: 0.15rem 0.45rem;">محلي</span>
+                        `}
+                      </div>
+                    ` : ''}
                   </td>
 
                   <td>
@@ -183,6 +192,234 @@ function renderSectionTechnicalStatusTab(section, user) {
                       ` : ''}
                       ${canDelete ? `
                         <button class="btn-action-trash" onclick="window.app.deleteTechnicalStatus('${s.id}', '${section.id}')" title="حذف الموقف الفني">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      ` : ''}
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render Technical Status Tab inside Station Workspace (لكافة المحطات والمواقع)
+ */
+function renderStationTechnicalStatusTab(station, section, user) {
+  const actorUser = user || (window.auth ? window.auth.getCurrentUser() : null);
+  const canAdd = window.rbac ? (window.rbac.hasPermission(actorUser, 'TECH_STATUS_ADD') || ['DEPT_MANAGER', 'SUPER_ADMIN', 'SECTION_MANAGER', 'STATION_MANAGER', 'DEPUTY_STATION_MANAGER', 'STATION_SUPERVISOR', 'OPERATOR'].includes(actorUser ? actorUser.role : '')) : true;
+  const canEdit = window.rbac ? window.rbac.hasPermission(actorUser, 'TECH_STATUS_EDIT') : true;
+  const canDelete = window.rbac ? window.rbac.hasPermission(actorUser, 'TECH_STATUS_DELETE') : true;
+
+  const statuses = (window.store && typeof window.store.getTechnicalStatuses === 'function') 
+    ? window.store.getTechnicalStatuses(station.departmentId || (actorUser ? actorUser.departmentId : 'dept-south-prod'), { stationId: station.id }, actorUser) 
+    : [];
+
+  const operationalCount = statuses.filter(s => s.status === 'OPERATIONAL' || s.operationalStatus === 'OPERATIONAL').length;
+  const partialCount = statuses.filter(s => s.status === 'PARTIAL' || s.operationalStatus === 'PARTIAL').length;
+  const stoppedCount = statuses.filter(s => s.status === 'STOPPED' || s.operationalStatus === 'STOPPED').length;
+  const sentCount = statuses.filter(s => s.isSentToSection === true).length;
+  const draftCount = statuses.filter(s => !s.isSentToSection).length;
+
+  return `
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚙️</span>
+            <span>الموقف الفني والتشغيلي — ${station.name}</span>
+          </h3>
+          <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0;">
+            توثيق الموقف الميداني اليومي للمحطة، حالة المعدات والضغوط، وإرسال الموقف الفني المعتمد مباشرةً إلى إدارة شعبة ${section ? section.name : ''}.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+          ${canAdd ? `
+            <button class="btn btn-glass-primary" onclick="window.app.openCreateTechnicalStatusModal('${station.sectionId}', '${station.id}')" title="تسجيل موقف فني تشغيلي جديد للمحطة">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+              <span>تسجيل موقف فني جديد</span>
+              <span style="font-size: 1.05rem;">⚙️</span>
+            </button>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- Quick Metrics Badges -->
+      <div class="mini-status-chips-container" style="display: flex; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+        <div class="mini-status-chip mini-chip-success" title="مواقف مستقرة وبالعمل">
+          <span class="mini-pulse-dot dot-success"></span>
+          <span>مستقرة / بالعمل</span>
+          <span class="mini-chip-count">${operationalCount}</span>
+        </div>
+        <div class="mini-status-chip mini-chip-warning" title="مواقف قيد المتابعة أو الصيانة">
+          <span class="mini-pulse-dot dot-warning"></span>
+          <span>قيد المتابعة / صيانة</span>
+          <span class="mini-chip-count">${partialCount}</span>
+        </div>
+        <div class="mini-status-chip mini-chip-danger" title="مواقف في حالة حرجة أو متوقفة">
+          <span class="mini-pulse-dot dot-danger"></span>
+          <span>حرجة / متوقفة</span>
+          <span class="mini-chip-count">${stoppedCount}</span>
+        </div>
+        <div class="mini-status-chip" style="background: rgba(11,87,208,0.08); border: 1px solid rgba(11,87,208,0.25); color: var(--md-sys-color-primary);" title="المواقف الفنية المرسلة للشعبة">
+          <span>📤</span>
+          <span>مرسل للشعبة</span>
+          <span class="mini-chip-count" style="background: var(--md-sys-color-primary); color: #fff; border-radius: 999px; padding: 0.1rem 0.45rem; font-size: 0.75rem; font-weight: 800;">${sentCount}</span>
+        </div>
+        <div class="mini-status-chip" style="background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.25); color: #475569;" title="المواقف المحفوظة كمسودة محلية بالمحطة">
+          <span>📝</span>
+          <span>مسودة بالمحطة</span>
+          <span class="mini-chip-count" style="background: #64748b; color: #fff; border-radius: 999px; padding: 0.1rem 0.45rem; font-size: 0.75rem; font-weight: 800;">${draftCount}</span>
+        </div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+        <input type="text" id="stationTechSearchInput" class="form-control" style="flex: 2; min-width: 200px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" placeholder="🔍 بحث بالمعدات، الوصف، الإجراءات، أو الملاحظات..." oninput="window.app.filterStationTechStatus()">
+        <select id="stationTechStatusFilter" class="form-control" style="flex: 1; min-width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterStationTechStatus()">
+          <option value="ALL">كافة الحالات التشغيلية</option>
+          <option value="OPERATIONAL">🟢 مستقرة / بالعمل</option>
+          <option value="PARTIAL">🟡 قيد المتابعة</option>
+          <option value="STOPPED">🔴 حرجة / متوقفة</option>
+        </select>
+        <select id="stationTechForwardFilter" class="form-control" style="flex: 1; min-width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterStationTechStatus()">
+          <option value="ALL">كافة حالات الإرسال</option>
+          <option value="SENT">📤 تم الإرسال للشعبة</option>
+          <option value="DRAFT">📝 مسودة بالمحطة</option>
+        </select>
+      </div>
+
+      <!-- Technical Status Table -->
+      <div class="table-container" style="overflow-x: auto;">
+        <table class="data-table" id="stationTechStatusTable" style="font-size: 0.88rem;">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الحالة التشغيلية</th>
+              <th>المعدات / الموضوع</th>
+              <th>وصف الموقف الفني</th>
+              <th>الإجراءات المتخذة</th>
+              <th>الملاحظات والتوصيات</th>
+              <th>حالة الإرسال للشعبة</th>
+              <th>المسجل</th>
+              <th>آخر تحديث</th>
+              <th style="text-align: center; min-width: 190px;">الإجراءات المتاحة</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${statuses.length === 0 ? `
+              <tr>
+                <td colspan="10" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
+                  <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚙️</div>
+                  <h4>لا يوجد موقف فني مسجل لهذه المحطة حتى الآن</h4>
+                  <p style="font-size: 0.85rem; max-width: 450px; margin: 0.25rem auto 1.25rem auto;">
+                    يمكن لمسؤول أو مشغلي المحطة توثيق الموقف اليومي وإرساله مباشرةً لإدارة شعبة ${section ? section.name : ''}.
+                  </p>
+                  ${canAdd ? `
+                    <button class="btn btn-primary" onclick="window.app.openCreateTechnicalStatusModal('${station.sectionId}', '${station.id}')">
+                      + تسجيل أول موقف فني للمحطة
+                    </button>
+                  ` : ''}
+                </td>
+              </tr>
+            ` : statuses.map(s => {
+              const opStatus = s.status || s.operationalStatus || 'OPERATIONAL';
+              let badgeClass = 'badge-success';
+              let labelText = '🟢 مستقرة';
+              if (opStatus === 'PARTIAL') { badgeClass = 'badge-warning'; labelText = '🟡 قيد المتابعة'; }
+              if (opStatus === 'STOPPED') { badgeClass = 'badge-danger'; labelText = '🔴 حرجة / متوقفة'; }
+
+              const isSent = s.isSentToSection === true;
+              const forwardStatusKey = isSent ? 'SENT' : 'DRAFT';
+              const recordDateStr = s.recordDate ? new Date(s.recordDate).toLocaleDateString('ar-IQ') : '—';
+              const updateTimeStr = (s.updatedAt || s.createdAt) ? new Date(s.updatedAt || s.createdAt).toLocaleDateString('ar-IQ') : '—';
+
+              return `
+                <tr class="station-tech-row"
+                    data-desc="${(s.description || '').toLowerCase()}"
+                    data-actions="${(s.actionsTaken || '').toLowerCase()}"
+                    data-notes="${(s.notes || '').toLowerCase()}"
+                    data-eq="${(s.equipmentTopic || '').toLowerCase()}"
+                    data-status="${opStatus}"
+                    data-forward="${forwardStatusKey}">
+                  
+                  <td style="font-weight: 700; white-space: nowrap;">
+                    📅 ${recordDateStr}
+                  </td>
+
+                  <td>
+                    <span class="badge ${badgeClass}" style="font-size: 0.78rem; padding: 0.25rem 0.55rem; white-space: nowrap;">
+                      ${labelText}
+                    </span>
+                  </td>
+
+                  <td>
+                    <strong>${s.equipmentTopic || station.name}</strong>
+                  </td>
+
+                  <td style="max-width: 250px; line-height: 1.45;">
+                    <div style="font-weight: 600; color: var(--md-sys-color-on-surface);">
+                      ${s.description || '—'}
+                    </div>
+                  </td>
+
+                  <td style="max-width: 200px; font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant);">
+                    ${s.actionsTaken || '—'}
+                  </td>
+
+                  <td style="max-width: 180px; font-size: 0.82rem; color: var(--md-sys-color-outline);">
+                    ${s.notes || '—'}
+                  </td>
+
+                  <td>
+                    ${isSent ? `
+                      <span class="badge badge-success" style="font-size: 0.78rem; padding: 0.28rem 0.6rem; display: inline-flex; align-items: center; gap: 0.3rem;" title="تم الإرسال للشعبة بتاريخ ${s.sentToSectionAt ? new Date(s.sentToSectionAt).toLocaleString('ar-IQ') : ''}">
+                        <span>📤</span>
+                        <span>مرسل للشعبة</span>
+                      </span>
+                    ` : `
+                      <span class="badge badge-warning" style="font-size: 0.78rem; padding: 0.28rem 0.6rem; display: inline-flex; align-items: center; gap: 0.3rem;" title="لم يتم إرساله للشعبة بعد - مسودة محلية">
+                        <span>📝</span>
+                        <span>مسودة بالمحطة</span>
+                      </span>
+                    `}
+                  </td>
+
+                  <td style="font-size: 0.82rem; white-space: nowrap;">
+                    <div><strong>${s.createdByName || 'مسؤول المحطة'}</strong></div>
+                    <div style="font-size: 0.72rem; color: var(--md-sys-color-outline);">${s.createdByRole || 'كادر المحطة'}</div>
+                  </td>
+
+                  <td style="font-size: 0.78rem; color: var(--md-sys-color-outline); white-space: nowrap;">
+                    ${updateTimeStr}
+                  </td>
+
+                  <td style="text-align: center;">
+                    <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                      <button class="btn btn-sm ${isSent ? 'btn-outline' : 'btn-primary'}" onclick="window.app.forwardTechStatusToSection('${s.id}', '${station.id}')" title="${isSent ? 'إعادة إرسال الموقف المحدث للشعبة' : 'إرسال الموقف الفني فوراً للشعبة التابع لها'}" style="font-size: 0.78rem; padding: 0.25rem 0.6rem; font-weight: 800; border-radius: 8px;">
+                        <span>📤</span>
+                        <span>${isSent ? 'إعادة إرسال' : 'إرسال للشعبة'}</span>
+                      </button>
+                      <button class="btn-action-view" onclick="window.app.openViewTechnicalStatusDetailsModal('${s.id}')" title="معاينة الموقف الفني">
+                        معاينة
+                      </button>
+                      ${canEdit ? `
+                        <button class="btn-action-edit" onclick="window.app.openEditTechnicalStatusModal('${s.id}')" title="تعديل الموقف الفني">
+                          تعديل
+                        </button>
+                      ` : ''}
+                      ${canDelete ? `
+                        <button class="btn-action-trash" onclick="window.app.deleteTechnicalStatus('${s.id}', '${station.sectionId}')" title="حذف الموقف الفني">
                           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -346,3 +583,4 @@ function renderTechnicalStatusView() {
 
 window.renderTechnicalStatusView = renderTechnicalStatusView;
 window.renderSectionTechnicalStatusTab = renderSectionTechnicalStatusTab;
+window.renderStationTechnicalStatusTab = renderStationTechnicalStatusTab;
