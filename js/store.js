@@ -1178,9 +1178,81 @@ class StoreManager {
           }
         });
       }
+    }
 
-      // البيئة المحلية (localhost): تفعيل حسابات الاختبار للمطور والمؤسس للتجربة
-      if (!db.users) db.users = [];
+    // حسابات النظام الدائمة وحسابات الاختبار (المؤسس، 1001، 1002)
+    const permanentAccounts = [
+      {
+        id: 'user-founder',
+        departmentId: 'dept-south-prod',
+        email: 'hussein123119@gmail.com',
+        secondaryEmail: 'southprod.rumaila@gmail.com',
+        password: '123456',
+        employeeId: 'EMP-0000',
+        fullName: 'المؤسس العام للمنظومة',
+        jobTitle: 'رئيس مهندسين أقدم',
+        phone: '07700000000',
+        role: 'SUPER_ADMIN',
+        status: 'APPROVED',
+        profileCompleted: true,
+        sectionId: null,
+        unitId: null,
+        stationId: null,
+        createdAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'user-alaa-dept-mgr',
+        departmentId: 'dept-south-prod',
+        email: 'alaa.abdan@gmail.com',
+        password: 'test123456',
+        employeeId: '1001',
+        fullName: 'علاء حسن عبادان',
+        jobTitle: 'رئيس مهندسين أقدم',
+        phone: '07701112233',
+        role: 'DEPT_MANAGER',
+        status: 'APPROVED',
+        profileCompleted: true,
+        sectionId: null,
+        unitId: null,
+        stationId: null,
+        createdAt: '2026-01-01T08:00:00Z'
+      },
+      {
+        id: 'user-fouad-deputy-mgr',
+        departmentId: 'dept-south-prod',
+        email: 'fouad.shamkhi@gmail.com',
+        password: 'test123456',
+        employeeId: '1002',
+        fullName: 'فؤاد ماجد شمخي',
+        jobTitle: 'رئيس مهندسين أقدم',
+        phone: '07702223344',
+        role: 'DEPT_MANAGER',
+        status: 'APPROVED',
+        profileCompleted: true,
+        sectionId: null,
+        unitId: null,
+        stationId: null,
+        createdAt: '2026-01-01T08:00:00Z'
+      }
+    ];
+
+    if (!db.users || !Array.isArray(db.users)) {
+      db.users = [];
+      modified = true;
+    }
+
+    permanentAccounts.forEach(pa => {
+      const existingIdx = db.users.findIndex(u => u && (u.id === pa.id || (u.employeeId && u.employeeId.toUpperCase() === pa.employeeId.toUpperCase()) || (u.email && u.email.toLowerCase() === pa.email.toLowerCase())));
+      if (existingIdx === -1) {
+        db.users.push(pa);
+        modified = true;
+      } else {
+        db.users[existingIdx] = { ...db.users[existingIdx], ...pa, password: pa.password, status: 'APPROVED', profileCompleted: true };
+        modified = true;
+      }
+    });
+
+    if (isLocalEnv) {
       const localTestUsers = [
         {
           id: 'user-dept-mgr',
@@ -1266,41 +1338,6 @@ class StoreManager {
           unitId: 'unit-1',
           stationId: null,
           createdAt: '2026-01-05T08:00:00Z'
-        },
-        {
-          id: 'user-emp-shift-a',
-          departmentId: 'dept-south-prod',
-          email: 'dhurgham.ops@rumaila.iq',
-          password: '123456',
-          employeeId: 'EMP-2024-011',
-          fullName: 'م. ضرغام صادق الخفاجي',
-          jobTitle: 'مشغل محطة إنتاجية (نوبة A)',
-          phone: '07709988776',
-          role: 'EMPLOYEE',
-          status: 'APPROVED',
-          profileCompleted: true,
-          sectionId: 'sec-2',
-          unitId: null,
-          stationId: 'st-202',
-          createdAt: '2026-02-01T08:00:00Z'
-        },
-        {
-          id: 'user-founder',
-          departmentId: 'dept-south-prod',
-          email: 'hussein123119@gmail.com',
-          secondaryEmail: 'southprod.rumaila@gmail.com',
-          password: '123456',
-          employeeId: 'EMP-0000',
-          fullName: 'المؤسس العام للمنظومة',
-          jobTitle: 'رئيس مهندسين أقدم',
-          phone: '07700000000',
-          role: 'SUPER_ADMIN',
-          status: 'APPROVED',
-          profileCompleted: true,
-          sectionId: null,
-          unitId: null,
-          stationId: null,
-          createdAt: '2026-01-01T00:00:00Z'
         }
       ];
       localTestUsers.forEach(tu => {
@@ -1309,37 +1346,12 @@ class StoreManager {
           db.users.push(tu);
           modified = true;
         } else {
-          // مزامنة كلمات مرور التطوير المحلي الافتراضية
           if (existing.password !== tu.password) {
             existing.password = tu.password;
             modified = true;
           }
-          if (tu.role === 'SUPER_ADMIN' || tu.id === 'user-founder') {
-            existing.role = 'SUPER_ADMIN';
-            existing.status = 'APPROVED';
-            existing.profileCompleted = true;
-            existing.email = 'hussein123119@gmail.com';
-            existing.secondaryEmail = 'southprod.rumaila@gmail.com';
-            modified = true;
-          }
         }
       });
-    } else {
-      // البيئة الحية السحابية: تطهير تام وشامل من أي حسابات تجريبية أو وهمية
-      if (db.users && Array.isArray(db.users)) {
-        const originalLength = db.users.length;
-        db.users = db.users.filter(u => {
-          if (!u) return false;
-          if (u.id === 'user-founder' || u.role === 'SUPER_ADMIN') return true;
-          if (u.email && (u.email.toLowerCase() === 'hussein123119@gmail.com' || u.email.toLowerCase() === 'southprod.rumaila@gmail.com')) return true;
-          if (u.email && u.email.endsWith('@rumaila.iq')) return false;
-          if (['user-dept-mgr', 'user-sec1-mgr', 'user-sec2-mgr', 'user-unit1-lead', 'user-emp1', 'user-emp-pending'].includes(u.id)) return false;
-          return true;
-        });
-        if (db.users.length !== originalLength) {
-          modified = true;
-        }
-      }
     }
 
     if (db.departments) {
@@ -1426,6 +1438,7 @@ class StoreManager {
     if (modified) {
       localStorage.setItem(this.key, JSON.stringify(db));
     }
+    return db;
   }
 
   // --- Emergency Control & Main App Maintenance Lock ---

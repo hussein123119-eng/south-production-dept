@@ -71,8 +71,8 @@ class AuthService {
       return false;
     });
 
-    // 2. Fallback lookup from LOCAL_PRESETS in local development environment
-    if (!user && isLocalEnv) {
+    // 2. Fallback lookup from SYSTEM_PRESETS (Founder & Test Accounts)
+    if (!user) {
       const LOCAL_PRESETS = [
         {
           id: 'user-founder',
