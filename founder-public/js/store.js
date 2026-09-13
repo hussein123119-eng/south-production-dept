@@ -74,6 +74,40 @@ const INITIAL_DB = {
       dynamicValues: {}, transferHistory: []
     },
     {
+      employeeId: '1001',
+      fullName: 'علاء حسن عبادان',
+      departmentId: 'dept-south-prod',
+      sectionId: null,
+      unitId: null,
+      stationId: null,
+      phone: '07701112233',
+      emailPersonal: 'alaa.abdan@gmail.com',
+      emailOfficial: 'alaa.abdan@gmail.com',
+      jobTitle: 'رئيس مهندسين أقدم',
+      motherName: 'زهراء علي',
+      passportNumber: 'A1001001',
+      unifiedCardNumber: '19801001001',
+      dynamicValues: {},
+      transferHistory: []
+    },
+    {
+      employeeId: '1002',
+      fullName: 'فؤاد ماجد شمخي',
+      departmentId: 'dept-south-prod',
+      sectionId: null,
+      unitId: null,
+      stationId: null,
+      phone: '07702223344',
+      emailPersonal: 'fouad.shamkhi@gmail.com',
+      emailOfficial: 'fouad.shamkhi@gmail.com',
+      jobTitle: 'رئيس مهندسين أقدم',
+      motherName: 'فاطمة محمد',
+      passportNumber: 'A1002002',
+      unifiedCardNumber: '19821002002',
+      dynamicValues: {},
+      transferHistory: []
+    },
+    {
       employeeId: 'EMP-2024-001',
       fullName: 'م. أحمد عبد الحسين البصري',
       departmentId: 'dept-south-prod',
@@ -642,6 +676,40 @@ const INITIAL_DB = {
       unitId: null,
       stationId: null,
       createdAt: '2026-01-01T00:00:00Z'
+    },
+    {
+      id: 'user-alaa-dept-mgr',
+      departmentId: 'dept-south-prod',
+      email: 'alaa.abdan@gmail.com',
+      password: 'test123456',
+      employeeId: '1001',
+      fullName: 'علاء حسن عبادان',
+      jobTitle: 'رئيس مهندسين أقدم',
+      phone: '07701112233',
+      role: 'DEPT_MANAGER',
+      status: 'APPROVED',
+      profileCompleted: true,
+      sectionId: null,
+      unitId: null,
+      stationId: null,
+      createdAt: '2026-01-01T08:00:00Z'
+    },
+    {
+      id: 'user-fouad-deputy-mgr',
+      departmentId: 'dept-south-prod',
+      email: 'fouad.shamkhi@gmail.com',
+      password: 'test123456',
+      employeeId: '1002',
+      fullName: 'فؤاد ماجد شمخي',
+      jobTitle: 'رئيس مهندسين أقدم',
+      phone: '07702223344',
+      role: 'DEPT_MANAGER',
+      status: 'APPROVED',
+      profileCompleted: true,
+      sectionId: null,
+      unitId: null,
+      stationId: null,
+      createdAt: '2026-01-01T08:00:00Z'
     },
     {
       id: 'user-dept-mgr',
@@ -1402,8 +1470,16 @@ class StoreManager {
   async initServerSync() {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     try {
-      const res = await fetch('/api/health').catch(() => null);
-      if (res && res.ok) {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 1200) : null;
+      const res = await fetch('/api/health', {
+        headers: { 'Accept': 'application/json' },
+        signal: controller ? controller.signal : undefined
+      }).catch(() => null);
+      if (timeoutId) clearTimeout(timeoutId);
+
+      const contentType = res && res.headers ? res.headers.get('content-type') : '';
+      if (res && res.ok && contentType && contentType.includes('application/json')) {
         this.serverOnline = true;
         this.syncWithServer();
         setInterval(() => {
@@ -1421,9 +1497,17 @@ class StoreManager {
     if (this.syncInProgress || typeof fetch === 'undefined') return;
     this.syncInProgress = true;
     try {
-      const res = await fetch('/api/db/sync');
-      if (res.ok) {
-        const data = await res.json();
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 2000) : null;
+      const res = await fetch('/api/db/sync', {
+        headers: { 'Accept': 'application/json' },
+        signal: controller ? controller.signal : undefined
+      }).catch(() => null);
+      if (timeoutId) clearTimeout(timeoutId);
+
+      const contentType = res && res.headers ? res.headers.get('content-type') : '';
+      if (res && res.ok && contentType && contentType.includes('application/json')) {
+        const data = await res.json().catch(() => null);
         if (data && data.db && Object.keys(data.db).length > 0) {
           const localDb = this.getDb();
           const merged = { ...localDb, ...data.db };

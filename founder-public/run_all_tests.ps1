@@ -22,7 +22,8 @@ $tests = @(
   "js/test_civil_service_job_titles.js",
   "js/test_document_archive.js",
   "js/test_mail_attachment_icons.js",
-  "js/test_founder_theme_modes.js"
+  "js/test_founder_theme_modes.js",
+  "js/test_test_accounts_login.js"
 )
 
 $failed = 0
@@ -39,7 +40,7 @@ foreach ($t in $tests) {
 
 if ($failed -eq 0) {
   Write-Host "=====================================================" -ForegroundColor Green
-  Write-Host "ALL 24 REGRESSION TEST SUITES PASSED 100% PERFECTLY!" -ForegroundColor Green
+  Write-Host "ALL 25 REGRESSION TEST SUITES PASSED 100% PERFECTLY!" -ForegroundColor Green
   Write-Host "=====================================================" -ForegroundColor Green
 } else {
   Write-Host "$failed tests failed!" -ForegroundColor Red
