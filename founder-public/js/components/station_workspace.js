@@ -522,13 +522,13 @@ function renderSpecializedStationStaffTab(station, section, stationStaffList) {
           <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
             👥 إجمالي الكادر: ${stationStaffList.length} موظف وفني
           </span>
-          <button class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal({ stationId: '${station.id}', sectionId: '${station.sectionId || ''}', scopeType: 'STATION' })" title="أداة التصدير والطباعة المخصصة لبيانات كادر ${station.name} (Excel, Word, PDF)" style="padding: 0.35rem 0.85rem; font-size: 0.84rem;">
+          <button class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal({ stationId: '${station.id}', sectionId: '${station.sectionId || ''}', scopeType: 'STATION' })" title="اضبارة المحطة المركزية - تصدير وطباعة بيانات كادر ${station.name} (Excel, Word, PDF)" style="padding: 0.35rem 0.85rem; font-size: 0.84rem;">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>تصدير وطباعة مخصصة</span>
+            <span>اضبارة المحطة المركزية</span>
             <span style="font-size: 0.95rem;">⚡</span>
           </button>
         </div>
@@ -725,13 +725,13 @@ function renderStationStaffTab(station, stationStaff) {
           <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
             👥 كادر المحطة: ${stationStaff.length} موظف
           </span>
-          <button class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal({ stationId: '${station.id}', sectionId: '${station.sectionId || ''}', scopeType: 'STATION' })" title="أداة التصدير والطباعة المخصصة لبيانات كادر ${station.name} (Excel, Word, PDF)" style="padding: 0.35rem 0.85rem; font-size: 0.84rem;">
+          <button class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal({ stationId: '${station.id}', sectionId: '${station.sectionId || ''}', scopeType: 'STATION' })" title="اضبارة المحطة المركزية - تصدير وطباعة بيانات كادر ${station.name} (Excel, Word, PDF)" style="padding: 0.35rem 0.85rem; font-size: 0.84rem;">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>تصدير وطباعة مخصصة</span>
+            <span>اضبارة المحطة المركزية</span>
             <span style="font-size: 0.95rem;">⚡</span>
           </button>
         </div>

@@ -9828,17 +9828,17 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
       `;
     }
 
-    this.showModal(`📥 أداة التصدير والطباعة المخصصة لبيانات الكادر (${modalTitleScope})`, `
+    this.showModal(`📂 أضبارة الكادر المركزية - التصدير والطباعة (${modalTitleScope})`, `
       <div style="direction: rtl; display: flex; flex-direction: column; min-height: 100%;">
         <div style="flex: 1 1 auto; padding-bottom: 0.5rem;">
         
         <!-- Header Banner -->
         <div class="custom-export-banner">
           <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #ffffff;">
-            ⚡ أداة استخراج وتصدير وطباعة بيانات الكادر (${modalTitleScope})
+            ⚡ أضبارة الكادر المركزية - استخراج وتصدير وطباعة البيانات (${modalTitleScope})
           </h3>
           <p style="margin: 4px 0 0 0; font-size: 0.84rem; opacity: 0.92; line-height: 1.5; color: rgba(255, 255, 255, 0.92);">
-            تتيح لك هذه الأداة استخراج وتصدير وطباعة بيانات الكادر في نطاق <strong>(${modalTitleScope})</strong>، واختيار الحقول والمعلومات المطلوبة بدقة، وتصديرها بصيغة <strong>Excel</strong> أو <strong>Word</strong> أو <strong>PDF / طباعة رسمية</strong>.
+            تتيح لك هذه المنظومة استخراج وتصدير وطباعة بيانات أضبارة الكادر في نطاق <strong>(${modalTitleScope})</strong>، واختيار الحقول والمعلومات المطلوبة بدقة، وتصديرها بصيغة <strong>Excel</strong> أو <strong>Word</strong> أو <strong>PDF / طباعة رسمية</strong>.
           </p>
         </div>
 

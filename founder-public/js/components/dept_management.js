@@ -633,13 +633,13 @@ function renderDeptStaffTab(staff, actorUser, sections) {
           </select>
           
           <!-- Custom Data Export & Print Tool Button -->
-          <button type="button" class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal()" title="أداة التصدير والطباعة المخصصة لبيانات كادر القسم (PDF, Word, Excel)" style="padding: 0.38rem 0.9rem; font-size: 0.85rem;">
+          <button type="button" class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal()" title="أضبارة القسم المركزية - تصدير وطباعة بيانات كادر القسم (PDF, Word, Excel)" style="padding: 0.38rem 0.9rem; font-size: 0.85rem;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>📥 تصدير وطباعة مخصصة</span>
+            <span>أضبارة القسم المركزية</span>
             <span style="font-size: 0.95rem;">⚡</span>
           </button>
         </div>
