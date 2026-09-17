@@ -186,13 +186,17 @@ const updatePayload = {
     operatingCount: 4,
     dieselBackupStatus: 'ضاغطة الديزل الاحتياطية مفحوصة وجاهزة بنسبة 100% بنظام الإقلاع التلقائي.'
   },
+  stationCode: 'ST-101-MOD',
   customFields: [
     { id: 'cf-test-1', label: 'وحدة تجفيف الغاز الطبيعي (TEG)', value: 'وحدتان عاملتان', unit: 'نقطة الندى -15 مئوي' },
     { id: 'cf-test-2', label: 'منظومة الحماية الكاثودية للخطوط', value: 'تعمل بكفاءة 98%', unit: 'جهد الحماية -1.15 فولت' }
   ]
 };
 
-const updatedProfile = window.store.updateStationTechnicalProfile('st-101', updatePayload, actorUser);
+const updateRes = window.store.updateStationTechnicalProfile('st-101', updatePayload, actorUser);
+const updatedProfile = updateRes.technicalProfile || updateRes;
+const targetStation = window.store.getDb().stations.find(s => s.id === 'st-101');
+assert(targetStation && targetStation.code === 'ST-101-MOD', 'تحديث رمز المحطة الكودي المعتمد بنجاح إلى ST-101-MOD');
 assert(updatedProfile.wells.operating === 32, 'تحديث عدد الآبار العاملة بنجاح إلى 32');
 assert(updatedProfile.wells.stopped === 4, 'تحديث عدد الآبار المتوقفة بنجاح إلى 4');
 assert(updatedProfile.wells.total === 36, 'احتساب إجمالي الآبار تلقائياً إلى 36 بئر بدقة');
@@ -248,13 +252,22 @@ assert(typeof window.app.addCustomTechnicalFieldRow === 'function', 'دالة ad
 assert(typeof window.app.removeCustomTechnicalFieldRow === 'function', 'دالة removeCustomTechnicalFieldRow متوفرة في AppController');
 assert(typeof window.app.handleSaveStationTechnicalProfile === 'function', 'دالة handleSaveStationTechnicalProfile متوفرة في AppController');
 
+// التحقق من كود نافذة التعديل في app.js
+const appFileCode = fs.readFileSync(appPath, 'utf8');
+assert(appFileCode.includes('techStationCode'), 'توفر حقل تعديل رمز المحطة الكودي techStationCode في app.js');
+assert(appFileCode.includes('tech-modal-scrollable-body'), 'توفر حاوية التمرير المتطورة tech-modal-scrollable-body في app.js');
+assert(appFileCode.includes('tech-modal-footer'), 'توفر شريط الأزرار المثبت tech-modal-footer في app.js');
+
 console.log('\n--- 5. التحقق من كلاسات وتنسيقات CSS في style.css ---');
 const stylePath = path.join(__dirname, '..', 'css', 'style.css');
 const styleContent = fs.readFileSync(stylePath, 'utf8');
 assert(styleContent.includes('.tech-modal-overlay'), 'توفر كلاس .tech-modal-overlay في style.css');
+assert(styleContent.includes('.tech-modal-scrollable-body'), 'توفر كلاس مسطرة التمرير المتطورة .tech-modal-scrollable-body في style.css');
+assert(styleContent.includes('.tech-modal-scrollable-body::-webkit-scrollbar'), 'توفر مسطرة التمرير الفاخرة::-webkit-scrollbar في style.css');
 assert(styleContent.includes('.tech-bank-row'), 'توفر كلاس .tech-bank-row لصفوف الضفاف في style.css');
 assert(styleContent.includes('.tech-custom-row'), 'توفر كلاس .tech-custom-row لصفوف المعايير المخصصة في style.css');
 assert(styleContent.includes('[data-theme="light"] .tech-bank-row') || styleContent.includes('[data-theme="light"] .tech-custom-row'), 'توفر قواعد المظهر الفاتح لصفوف المعايير الفنية');
+assert(styleContent.includes('[data-theme="light"] .tech-modal-scrollable-body'), 'توفر قواعد مسطرة التمرير الفاخرة للوضع الفاتح');
 
 console.log('\n----------------------------------------------------------------------');
 console.log(`النتيجة الإجمالية: ${passedTests} ناجح | 0 راسب من أصل ${totalTests}`);

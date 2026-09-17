@@ -14954,32 +14954,45 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
         <div class="tech-modal-card sec-notif-modal-card">
           
           <!-- Executive Royal Banner Header -->
-          <div class="tech-modal-header" style="padding: 1.4rem 1.85rem; border-bottom: 2px solid #f59e0b; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #091e42 0%, #0f3d75 50%, #0369a1 100%); border-radius: 20px 20px 0 0; color: #ffffff;">
+          <div class="tech-modal-header" style="flex-shrink: 0; padding: 1.25rem 1.85rem; border-bottom: 2px solid #f59e0b; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #091e42 0%, #0f3d75 50%, #0369a1 100%); border-radius: 20px 20px 0 0; color: #ffffff; z-index: 10;">
             <div style="display: flex; align-items: center; gap: 0.9rem;">
               <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
                 ⚙️
               </div>
               <div>
-                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 3px;">
-                  <h3 style="margin: 0; font-size: 1.3rem; font-weight: 900; color: #ffffff; letter-spacing: -0.2px;">
+                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 3px; flex-wrap: wrap;">
+                  <h3 style="margin: 0; font-size: 1.28rem; font-weight: 900; color: #ffffff; letter-spacing: -0.2px;">
                     تحديث المواصفات والبيانات الفنية والتشغيلية المعتمدة
                   </h3>
                   <span style="background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b; color: #fef08a; font-size: 0.74rem; font-weight: 800; padding: 2px 10px; border-radius: 999px;">
                     سجل هندسي موقعي
                   </span>
                 </div>
-                <p style="margin: 0; font-size: 0.86rem; color: #cbd5e1; display: flex; align-items: center; gap: 0.45rem;">
-                  <span>الموقع الميداني:</span>
-                  <strong style="color: #ffffff; font-weight: 800;">${station.name}</strong>
-                  <span style="opacity: 0.75; font-family: monospace;">(${station.code || station.id})</span>
-                </p>
+                
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 4px;">
+                  <span style="font-size: 0.86rem; color: #cbd5e1;">الموقع الميداني:</span>
+                  <strong style="color: #ffffff; font-weight: 850; font-size: 0.96rem;">${station.name}</strong>
+                  
+                  <!-- Editable Station Code Badge & Input (رمز المحطة قابل للتعديل) -->
+                  <div class="tech-station-code-badge" style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(0, 0, 0, 0.35); border: 1.5px solid #f59e0b; padding: 2px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.35);">
+                    <label for="techStationCode" style="margin: 0; font-size: 0.75rem; color: #fef08a; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                      <span>🏷️</span>
+                      <span>رمز المحطة:</span>
+                    </label>
+                    <input type="text" id="techStationCode" name="stationCode" value="${station.code || station.id || ''}" placeholder="مثال: ST-CTR" required title="رمز المحطة قابل للتعديل الفوري والحفظ" style="width: 105px; height: 26px; padding: 2px 6px; font-family: monospace; font-weight: 900; font-size: 0.88rem; text-align: center; text-transform: uppercase; background: rgba(255, 255, 255, 0.18); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 6px; outline: none; transition: all 0.2s ease;">
+                    <span style="font-size: 0.75rem; color: #fde68a;" title="حقل كودي قابل للتعديل">✏️</span>
+                  </div>
+                </div>
               </div>
             </div>
             <button type="button" class="btn-close" onclick="window.app.closeEditStationTechnicalModal()" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;" title="إغلاق">✕</button>
           </div>
 
           <!-- Form Body -->
-          <form id="editStationTechnicalForm" onsubmit="window.app.handleSaveStationTechnicalProfile(event, '${stationId}')" style="padding: 1.6rem 1.85rem; display: flex; flex-direction: column; gap: 1.4rem;">
+          <form id="editStationTechnicalForm" onsubmit="window.app.handleSaveStationTechnicalProfile(event, '${stationId}')" style="display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden; margin: 0;">
+            
+            <!-- Advanced Scrollable Body with Luxury Custom Scrollbar (مسطرة تمرير متطورة وفاخرة) -->
+            <div class="tech-modal-scrollable-body" style="flex: 1 1 auto; overflow-y: auto; padding: 1.5rem 1.85rem; display: flex; flex-direction: column; gap: 1.4rem;">
             
             <!-- 1. قطاع الآبار والدمامات ومجمعات الإنتاج -->
             <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
@@ -15322,10 +15335,13 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
               </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid var(--md-sys-color-surface-variant); flex-wrap: wrap; gap: 1rem;">
-              <span style="font-size: 0.82rem; color: var(--md-sys-color-outline);">
-                💡 يتم تثبيت التعديلات فوراً وتوثيق اسم المسؤول وتوقيت الحفظ في السجل التدقيقي للمحطة.
+            </div> <!-- /tech-modal-scrollable-body -->
+
+            <!-- Pinned Executive Footer (Always visible at bottom) -->
+            <div class="tech-modal-footer" style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.85rem; border-top: 2px solid var(--md-sys-color-surface-variant); background: var(--md-sys-color-surface, #0f172a); border-radius: 0 0 20px 20px; flex-wrap: wrap; gap: 1rem; z-index: 10; box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);">
+              <span style="font-size: 0.82rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.4rem;">
+                <span>💡</span>
+                <span>يتم تثبيت التعديلات فوراً وتحديث رمز المحطة والمواصفات بالسجل التدقيقي.</span>
               </span>
               <div style="display: flex; gap: 0.75rem;">
                 <button type="button" class="btn btn-outline" onclick="window.app.closeEditStationTechnicalModal()" style="padding: 0.65rem 1.6rem; font-weight: 750; border-radius: 10px;">
@@ -15422,6 +15438,9 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
   handleSaveStationTechnicalProfile(e, stationId) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
 
+    // 0. Station Code (رمز المحطة الكودي المعتمد - قابل للتعديل)
+    const stationCode = (document.getElementById('techStationCode')?.value || '').trim();
+
     // 1. Wells
     const wellsOperating = Number(document.getElementById('techWellsOperating')?.value || 0);
     const wellsStopped = Number(document.getElementById('techWellsStopped')?.value || 0);
@@ -15486,6 +15505,7 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     });
 
     const payload = {
+      stationCode,
       wells: {
         operating: wellsOperating,
         stopped: wellsStopped,
@@ -15534,7 +15554,7 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     window.store.updateStationTechnicalProfile(stationId, payload, actorUser);
 
     this.closeEditStationTechnicalModal();
-    alert('✅ تم حفظ وتثبيت المواصفات والبيانات الفنية للمحطة بنجاح.');
+    alert('✅ تم حفظ وتثبيت رمز المحطة والمواصفات الفنية المعتمدة بنجاح.');
 
     if (typeof this.render === 'function') {
       this.render();

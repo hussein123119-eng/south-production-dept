@@ -4093,9 +4093,18 @@ class StoreManager {
     const station = db.stations[idx];
     const current = station.technicalProfile || this.getDefaultStationTechnicalProfile(station);
 
+    // Support editing station code directly from technical profile update
+    if (profileData.stationCode && typeof profileData.stationCode === 'string') {
+      const trimmedCode = profileData.stationCode.trim();
+      if (trimmedCode) {
+        station.code = trimmedCode;
+      }
+    }
+
     const updatedProfile = {
       ...current,
       ...profileData,
+      stationCode: station.code,
       lastUpdated: new Date().toISOString(),
       updatedBy: actorUser ? actorUser.id : 'unknown',
       updatedByName: actorUser ? (actorUser.fullName || actorUser.name || 'مسؤول الموقع') : 'مسؤول الموقع'
@@ -5560,6 +5569,17 @@ class StoreManager {
       updatedBy: actorUser ? actorUser.id : (current.updatedBy || 'user-st-mgr'),
       updatedByName: actorUser ? actorUser.fullName : (current.updatedByName || 'مسؤول الموقع')
     };
+
+    // Support updating station code directly from technical profile payload
+    if (profileData.stationCode && typeof profileData.stationCode === 'string') {
+      const trimmedCode = profileData.stationCode.trim();
+      if (trimmedCode) {
+        if (station) {
+          station.code = trimmedCode;
+        }
+        updated.stationCode = trimmedCode;
+      }
+    }
 
     if (updated.wells) {
       const op = Number(updated.wells.operating || 0);
