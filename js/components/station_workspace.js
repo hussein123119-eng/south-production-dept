@@ -138,7 +138,7 @@ function renderStationWorkspaceView(stationId) {
         </button>
         <button class="tab-btn ${activeSubTab === 'notifs' ? 'active' : ''}" 
                 onclick="window.app.setStationSubTab('notifs')">
-          📢 <span>التبليغات والتعميمات</span> 
+          📢 <span>التبليغات</span> 
           <span class="tab-count-badge">${totalStationNotifsCount}</span>
         </button>
         <button class="tab-btn ${(activeSubTab === 'reports' || activeSubTab === 'documents') ? 'active' : ''}" 
@@ -159,7 +159,7 @@ function renderStationWorkspaceView(stationId) {
         <button class="tab-btn ${activeSubTab === 'staff' ? 'active' : ''}" onclick="window.app.setStationSubTab('staff')">👥 <span>الكوادر العاملة</span> <span class="tab-count-badge">${stationStaffList.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'mail' ? 'active' : ''}" onclick="window.app.setStationSubTab('mail')">📬 <span>البريد</span></button>
         <button class="tab-btn ${activeSubTab === 'tech_status' ? 'active' : ''}" onclick="window.app.setStationSubTab('tech_status')">⚙️ <span>الموقف الفني</span> <span class="tab-count-badge">${stationTechStatuses.length}</span></button>
-        <button class="tab-btn ${activeSubTab === 'notifs' ? 'active' : ''}" onclick="window.app.setStationSubTab('notifs')">📢 <span>التبليغات والتعميمات</span> <span class="tab-count-badge">${totalStationNotifsCount}</span></button>
+        <button class="tab-btn ${activeSubTab === 'notifs' ? 'active' : ''}" onclick="window.app.setStationSubTab('notifs')">📢 <span>التبليغات</span> <span class="tab-count-badge">${totalStationNotifsCount}</span></button>
         <button class="tab-btn ${activeSubTab === 'documents' ? 'active' : ''}" onclick="window.app.setStationSubTab('documents')">📄 <span>الوثائق والمستندات</span> <span class="tab-count-badge">${stationDocs.length}</span></button>
         <button class="tab-btn ${activeSubTab === 'technical' ? 'active' : ''}" onclick="window.app.setStationSubTab('technical')">⚙️ <span>البيانات الفنية والتشغيل</span></button>
       </div>
@@ -286,7 +286,7 @@ function renderSpecializedStationReportsTab(station, section, stationDocs, user)
 }
 
 // ==========================================================================
-// 2. تبويب التبليغات والتعميمات (الواردة من الشعبة والصادرة من المحطة)
+// 2. تبويب التبليغات (الواردة من الشعبة والصادرة من المحطة)
 // ==========================================================================
 function renderStationNotificationsTab(station, section, relevantSectionNotifs = [], stationIssuedNotifs = [], user = {}) {
   const canPublishStation = ['SUPER_ADMIN', 'DEPT_MANAGER', 'SECTION_MANAGER', 'STATION_MANAGER', 'DEPUTY_STATION_MANAGER', 'STATION_SUPERVISOR', 'ADMINISTRATOR'].includes(user.role) ||

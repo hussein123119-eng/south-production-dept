@@ -211,7 +211,7 @@ assert(sectionWorkspaceHtml.includes('تم التعميم على المحطات'
 // --------------------------------------------------------------------------
 // 3. فحص واجهة مساحة عمل المحطات القياسية (Standard Station Workspace)
 // --------------------------------------------------------------------------
-console.log('\n--- 3. التحقق من تبويب التبليغات والتعميمات في مساحة عمل المحطات القياسية ---');
+console.log('\n--- 3. التحقق من تبويب التبليغات في مساحة عمل المحطات القياسية ---');
 
 global.window.auth.getCurrentUser = () => stationStaffUser;
 global.window.app.currentStationSubTab = 'notifs';
@@ -220,7 +220,7 @@ global.window.app.currentStationNotifSubTab = 'section';
 const standardStationHtml = global.window.renderStationWorkspaceView('st-101');
 
 // Main Tab Verification
-assert(standardStationHtml.includes('التبليغات والتعميمات'), 'ظهور تبويب (التبليغات والتعميمات) في التبويبات الرئيسية للمحطة');
+assert(standardStationHtml.includes('التبليغات'), 'ظهور تبويب (التبليغات) في التبويبات الرئيسية للمحطة');
 assert(standardStationHtml.includes('التبليغات الواردة من الشعبة'), 'ظهور التبويب الفرعي الأول: (التبليغات الواردة من الشعبة)');
 assert(standardStationHtml.includes('التبليغات الصادرة من المحطة'), 'ظهور التبويب الفرعي الثاني: (التبليغات الصادرة من المحطة)');
 
@@ -251,7 +251,7 @@ if (!db.stations.some(s => s.id === specializedStation.id)) {
 
 global.window.app.currentStationSubTab = 'notifs';
 const specStationHtml = global.window.renderStationWorkspaceView(specializedStation.id);
-assert(specStationHtml.includes('التبليغات والتعميمات'), 'ظهور تبويب التبليغات والتعميمات في المحطات التخصصية');
+assert(specStationHtml.includes('التبليغات'), 'ظهور تبويب التبليغات في المحطات التخصصية');
 assert(specStationHtml.includes('التبليغات الواردة من الشعبة'), 'توفر التبويب الفرعي للتبليغات الواردة في المحطات التخصصية');
 assert(specStationHtml.includes('التبليغات الصادرة من المحطة'), 'توفر التبويب الفرعي للتبليغات الصادرة في المحطات التخصصية');
 
