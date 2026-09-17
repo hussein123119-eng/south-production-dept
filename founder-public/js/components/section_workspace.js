@@ -1040,184 +1040,212 @@ function renderSectionNotificationsTab(section, sectionNotifs, deptNotifs = [], 
   const canPublish = ['SECTION_MANAGER', 'DEPT_MANAGER', 'SUPER_ADMIN', 'ADMINISTRATOR', 'DEPUTY_SECTION_MANAGER'].includes(user.role) ||
                      (user.sectionId === section.id && ['SECTION_MANAGER', 'DEPUTY_SECTION_MANAGER'].includes(user.role));
 
+  const activeNotifSubTab = (window.app && window.app.currentSectionNotifSubTab) || 'dept';
+
   return `
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
       
-      <!-- القسم الأول: توجيهات وتبليغات إدارة القسم الرسمية -->
-      <div class="card" style="border-top: 4px solid var(--md-sys-color-primary);">
-        <div class="card-header" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.85rem; margin-bottom: 1rem;">
-          <div>
-            <h3 class="card-title" style="font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary);">
-              🏛️ توجيهات وتبليغات إدارة القسم الرسمية الصادرة للشعبة
-            </h3>
-            <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0.25rem 0 0 0;">
-              التعاميم والتوجيهات الصادرة من السيد مدير القسم وإدارة القسم الموجهة لـ (${section.name}) أو المعممة على كافة الشعب.
-            </p>
-          </div>
-          <span class="badge badge-info" style="font-weight: 800; font-size: 0.85rem;">${deptNotifs.length} تبليغات معتمدة</span>
-        </div>
-
-        ${deptNotifs.length === 0 ? `
-          <div style="text-align: center; padding: 2rem 1rem; color: var(--md-sys-color-outline); background: var(--md-sys-color-background); border-radius: var(--radius-md);">
-            <div style="font-size: 2rem; margin-bottom: 0.35rem;">📭</div>
-            <div style="font-weight: 700;">لا توجد تعاميم نشطة حالياً من إدارة القسم موجهة لهذه الشعبة.</div>
-          </div>
-        ` : `
-          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            ${deptNotifs.map(n => {
-              const notifNum = n.number || n.id || 'ت-2026/001';
-              const formattedDate = new Date(n.publishDate || n.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-              const isUrgent = n.importance === 'URGENT' || n.priority === 'URGENT';
-              const isHigh = n.importance === 'HIGH' || n.priority === 'HIGH';
-              const priorityBadge = isUrgent 
-                ? '<span class="badge badge-danger" style="font-weight: 800;">🚨 عاجل جداً</span>' 
-                : (isHigh ? '<span class="badge badge-warning" style="font-weight: 800;">⚠️ هام</span>' : '<span class="badge badge-info">ℹ️ اعتيادي</span>');
-              
-              const scopeBadge = n.targetScope === 'ALL_SECTIONS' || !n.targetSectionId
-                ? '<span class="badge badge-primary" style="font-size: 0.78rem;">🌐 تعميم لكافة شعب ووحدات القسم</span>'
-                : `<span class="badge badge-secondary" style="font-size: 0.78rem;">🏢 موجه حصرياً لـ: ${section.name}</span>`;
-
-              return `
-                <div style="border: 1.5px solid rgba(11, 87, 208, 0.2); border-right: 5px solid var(--md-sys-color-primary); border-radius: var(--radius-md); padding: 1.15rem; background: linear-gradient(135deg, rgba(11, 87, 208, 0.02) 0%, rgba(2, 132, 199, 0.04) 100%); box-shadow: var(--shadow-1);">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.65rem;">
-                    <div>
-                      <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.35rem;">
-                        ${priorityBadge}
-                        ${scopeBadge}
-                        <span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-family: monospace;">
-                          📅 ${formattedDate}
-                        </span>
-                      </div>
-                      <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--md-sys-color-primary);">
-                        ${n.title}
-                      </h4>
-                    </div>
-                    <div style="display: flex; gap: 0.35rem; align-items: center;">
-                      <button class="btn-action-view" onclick="window.app.openViewOfficialNotificationModal('${n.id}')" title="معاينة تفاصيل التوجيه">
-                        معاينة التوجيه
-                      </button>
-                      <button class="btn-action-print" onclick="window.app.printOfficialNotification('${n.id}')" title="طباعة التبليغ الرسمي">
-                        طباعة
-                      </button>
-                    </div>
-                  </div>
-                  <div style="font-size: 0.92rem; line-height: 1.7; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-surface); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.65rem; white-space: pre-wrap; border: 1px solid var(--md-sys-color-surface-variant);">
-                    ${n.content || n.body || ''}
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--md-sys-color-outline);">
-                    <div>✍️ <strong>المسؤول المُصدِر:</strong> ${n.createdByName || n.sender || 'إدارة القسم'}</div>
-                    <div>🆔 كود التبليغ: <code style="font-weight: 700;">${notifNum}</code></div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `}
+      <!-- Sub-Tabs Navigation for Section Notifications -->
+      <div class="tabs-header" style="margin-bottom: 0.5rem;">
+        <button class="tab-btn ${activeNotifSubTab === 'dept' ? 'active' : ''}" onclick="window.app.setSectionNotifSubTab('dept')" title="التبليغات والتعاميم الواردة من إدارة القسم">
+          🏛️ <span>التبليغات الواردة من القسم</span> <span class="tab-count-badge">${deptNotifs.length}</span>
+        </button>
+        <button class="tab-btn ${activeNotifSubTab === 'section' ? 'active' : ''}" onclick="window.app.setSectionNotifSubTab('section')" title="التبليغات والتوجيهات الصادرة من مسؤول الشعبة إلى المحطات">
+          📢 <span>التبليغات الصادرة من الشعبة</span> <span class="tab-count-badge">${sectionNotifs.length}</span>
+        </button>
       </div>
 
-      <!-- القسم الثاني: تبليغات وتوجيهات مسؤول الشعبة إلى المحطات التابعة -->
-      <div class="card">
-        <div class="card-header" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 1rem; margin-bottom: 1.25rem;">
-          <div>
-            <h3 class="card-title" style="font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary);">
-              📢 تبليغات وتوجيهات مسؤول الشعبة إلى المحطات (${section.name})
-            </h3>
-            <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0.25rem 0 0 0;">
-              توجيهات وتعليمات تشغيلية وإدارية صادرة من مسؤول الشعبة موجهة حصرياً إلى المحطات التابعة للشعبة.
-            </p>
+      ${activeNotifSubTab === 'dept' ? `
+        <!-- التبويب الفرعي الأول: التبليغات الواردة من القسم -->
+        <div class="card" style="border-top: 4px solid var(--md-sys-color-primary);">
+          <div class="card-header" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.85rem; margin-bottom: 1rem;">
+            <div>
+              <h3 class="card-title" style="font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary);">
+                🏛️ توجيهات وتبليغات إدارة القسم الرسمية الصادرة للشعبة
+              </h3>
+              <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0.25rem 0 0 0;">
+                التعاميم والتوجيهات الصادرة من السيد مدير القسم وإدارة القسم الموجهة لـ (${section.name}) أو المعممة على كافة الشعب.
+              </p>
+            </div>
+            <span class="badge badge-info" style="font-weight: 800; font-size: 0.85rem;">${deptNotifs.length} تبليغات معتمدة</span>
           </div>
-          ${canPublish ? `
-            <button class="btn btn-glass-amber" onclick="window.app.openCreateSectionNotificationModal('${section.id}')" title="إصدار تبليغ وتوجيه لمحطات الشعبة">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 5v14M5 12h14"></path>
-              </svg>
-              <span>إصدار تبليغ لمحطات الشعبة</span>
-              <span style="font-size: 1.05rem;">📢</span>
-            </button>
-          ` : ''}
-        </div>
 
-        ${sectionNotifs.length === 0 ? `
-          <div style="text-align: center; padding: 3rem 1.5rem; background: var(--md-sys-color-background); border-radius: var(--radius-md); border: 2px dashed var(--md-sys-color-surface-variant);">
-            <div style="font-size: 3rem; margin-bottom: 0.75rem;">📢</div>
-            <h4 style="font-weight: 800; color: var(--md-sys-color-on-surface); margin-bottom: 0.5rem;">لا توجد تبليغات نشطة حالياً لمحطات الشعبة</h4>
-            <p style="color: var(--md-sys-color-outline); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.25rem auto;">
-              يمكن لمسؤول الشعبة إصدار توجيهات فورية أو تعليمات أمن وسلامة وجداول تشغيل موجهة لكافة المحطات أو لمحطة محددة.
-            </p>
+          ${deptNotifs.length === 0 ? `
+            <div style="text-align: center; padding: 3rem 1.5rem; color: var(--md-sys-color-outline); background: var(--md-sys-color-background); border-radius: var(--radius-md);">
+              <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📭</div>
+              <div style="font-weight: 800; font-size: 1.05rem; color: var(--md-sys-color-on-surface);">لا توجد تعاميم نشطة حالياً من إدارة القسم موجهة لهذه الشعبة</div>
+              <div style="font-size: 0.85rem; margin-top: 4px;">سيتم إشعاركم فور صدور أي توجيه أو تعميم جديد من إدارة القسم.</div>
+            </div>
+          ` : `
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+              ${deptNotifs.map(n => {
+                const notifNum = n.number || n.id || 'ت-2026/001';
+                const formattedDate = new Date(n.publishDate || n.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const isUrgent = n.importance === 'URGENT' || n.priority === 'URGENT';
+                const isHigh = n.importance === 'HIGH' || n.priority === 'HIGH';
+                const priorityBadge = isUrgent 
+                  ? '<span class="badge badge-danger" style="font-weight: 800;">🚨 عاجل جداً</span>' 
+                  : (isHigh ? '<span class="badge badge-warning" style="font-weight: 800;">⚠️ هام</span>' : '<span class="badge badge-info">ℹ️ اعتيادي</span>');
+                
+                const scopeBadge = n.targetScope === 'ALL_SECTIONS' || !n.targetSectionId
+                  ? '<span class="badge badge-primary" style="font-size: 0.78rem;">🌐 تعميم لكافة شعب ووحدات القسم</span>'
+                  : `<span class="badge badge-secondary" style="font-size: 0.78rem;">🏢 موجه حصرياً لـ: ${section.name}</span>`;
+
+                const forwardedList = (sectionNotifs || []).filter(sn => sn.originalDeptNotifId === n.id);
+                const isForwarded = forwardedList.length > 0;
+
+                return `
+                  <div style="border: 1.5px solid rgba(11, 87, 208, 0.2); border-right: 5px solid var(--md-sys-color-primary); border-radius: var(--radius-md); padding: 1.15rem; background: linear-gradient(135deg, rgba(11, 87, 208, 0.02) 0%, rgba(2, 132, 199, 0.04) 100%); box-shadow: var(--shadow-1);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.65rem;">
+                      <div>
+                        <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                          ${priorityBadge}
+                          ${scopeBadge}
+                          ${isForwarded ? `
+                            <span class="badge badge-success" style="font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.3rem;">
+                              ✅ تم التعميم على المحطات (${forwardedList.length})
+                            </span>
+                          ` : ''}
+                          <span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-family: monospace;">
+                            📅 ${formattedDate}
+                          </span>
+                        </div>
+                        <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--md-sys-color-primary);">
+                          ${n.title}
+                        </h4>
+                      </div>
+                      <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                        ${canPublish ? `
+                          <button class="btn-action-broadcast" onclick="window.app.openForwardDeptNotificationToStationsModal('${n.id}', '${section.id}')" title="تعميم ونشر هذا التوجيه على محطات الشعبة">
+                            <span>📢 نشر وتعميم على المحطات</span>
+                          </button>
+                        ` : ''}
+                        <button class="btn-action-view" onclick="window.app.openViewOfficialNotificationModal('${n.id}')" title="معاينة تفاصيل التوجيه">
+                          معاينة التوجيه
+                        </button>
+                        <button class="btn-action-print" onclick="window.app.printOfficialNotification('${n.id}')" title="طباعة التبليغ الرسمي">
+                          طباعة
+                        </button>
+                      </div>
+                    </div>
+                    <div style="font-size: 0.92rem; line-height: 1.7; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-surface); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.65rem; white-space: pre-wrap; border: 1px solid var(--md-sys-color-surface-variant);">
+                      ${n.content || n.body || ''}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--md-sys-color-outline);">
+                      <div>✍️ <strong>المسؤول المُصدِر:</strong> ${n.createdByName || n.sender || 'إدارة القسم'}</div>
+                      <div>🆔 كود التبليغ: <code style="font-weight: 700;">${notifNum}</code></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      ` : `
+        <!-- التبويب الفرعي الثاني: التبليغات الصادرة من الشعبة -->
+        <div class="card" style="border-top: 4px solid #f59e0b;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <h3 class="card-title" style="font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary);">
+                📢 تبليغات وتوجيهات مسؤول الشعبة إلى المحطات (${section.name})
+              </h3>
+              <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0.25rem 0 0 0;">
+                توجيهات وتعليمات تشغيلية وإدارية صادرة من مسؤول الشعبة موجهة حصرياً إلى المحطات التابعة للشعبة.
+              </p>
+            </div>
             ${canPublish ? `
-              <button class="btn btn-glass-amber" onclick="window.app.openCreateSectionNotificationModal('${section.id}')">
-                <span>إصدار أول تبليغ رسمي لمحطات الشعبة</span>
+              <button class="btn btn-glass-amber" onclick="window.app.openCreateSectionNotificationModal('${section.id}')" title="إصدار تبليغ وتوجيه لمحطات الشعبة">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <span>إصدار تبليغ لمحطات الشعبة</span>
                 <span style="font-size: 1.05rem;">📢</span>
               </button>
             ` : ''}
           </div>
-        ` : `
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            ${sectionNotifs.map(n => {
-              const isUrgent = n.priority === 'URGENT';
-              const isHigh = n.priority === 'HIGH';
-              const priorityBadge = isUrgent 
-                ? '<span class="badge badge-danger" style="font-weight: 800;">🚨 عاجل جداً</span>' 
-                : (isHigh ? '<span class="badge badge-warning" style="font-weight: 800;">⚠️ هام</span>' : '<span class="badge badge-info">ℹ️ اعتيادي</span>');
-              
-              const targetStationBadge = n.targetStationId === 'ALL' || !n.targetStationId
-                ? '<span class="badge badge-primary" style="font-size: 0.78rem;">📍 موجه إلى: كافة محطات الشعبة</span>'
-                : `<span class="badge badge-secondary" style="font-size: 0.78rem;">📍 موجه إلى: ${n.targetStationName || 'محطة محددة'}</span>`;
 
-              const formattedDate = new Date(n.publishDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+          ${sectionNotifs.length === 0 ? `
+            <div style="text-align: center; padding: 3.5rem 1.5rem; background: var(--md-sys-color-background); border-radius: var(--radius-md); border: 2px dashed var(--md-sys-color-surface-variant);">
+              <div style="font-size: 3rem; margin-bottom: 0.75rem;">📢</div>
+              <h4 style="font-weight: 800; color: var(--md-sys-color-on-surface); margin-bottom: 0.5rem;">لا توجد تبليغات نشطة حالياً صادرة لمحطات الشعبة</h4>
+              <p style="color: var(--md-sys-color-outline); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.25rem auto;">
+                يمكن لمسؤول الشعبة إصدار توجيهات فورية أو تعليمات أمن وسلامة وجداول تشغيل موجهة لكافة المحطات أو لمحطة محددة.
+              </p>
+              ${canPublish ? `
+                <button class="btn btn-glass-amber" onclick="window.app.openCreateSectionNotificationModal('${section.id}')">
+                  <span>إصدار أول تبليغ رسمي لمحطات الشعبة</span>
+                  <span style="font-size: 1.05rem;">📢</span>
+                </button>
+              ` : ''}
+            </div>
+          ` : `
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              ${sectionNotifs.map(n => {
+                const isUrgent = n.priority === 'URGENT';
+                const isHigh = n.priority === 'HIGH';
+                const priorityBadge = isUrgent 
+                  ? '<span class="badge badge-danger" style="font-weight: 800;">🚨 عاجل جداً</span>' 
+                  : (isHigh ? '<span class="badge badge-warning" style="font-weight: 800;">⚠️ هام</span>' : '<span class="badge badge-info">ℹ️ اعتيادي</span>');
+                
+                const targetStationBadge = n.targetStationId === 'ALL' || !n.targetStationId
+                  ? '<span class="badge badge-primary" style="font-size: 0.78rem;">📍 موجه إلى: كافة محطات الشعبة</span>'
+                  : `<span class="badge badge-secondary" style="font-size: 0.78rem;">📍 موجه إلى: ${n.targetStationName || 'محطة محددة'}</span>`;
 
-              return `
-                <div style="border: 1px solid var(--md-sys-color-surface-variant); border-right: 5px solid ${isUrgent ? 'var(--md-sys-color-error)' : (isHigh ? 'var(--md-sys-color-warning)' : 'var(--md-sys-color-primary)')}; border-radius: var(--radius-md); padding: 1.25rem; background: var(--md-sys-color-surface); box-shadow: var(--shadow-1);">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
-                    <div>
-                      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.35rem;">
-                        ${priorityBadge}
-                        ${targetStationBadge}
-                        <span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-family: monospace;">
-                          📅 ${formattedDate}
-                        </span>
+                const formattedDate = new Date(n.publishDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+                return `
+                  <div style="border: 1px solid var(--md-sys-color-surface-variant); border-right: 5px solid ${isUrgent ? 'var(--md-sys-color-error)' : (isHigh ? 'var(--md-sys-color-warning)' : 'var(--md-sys-color-primary)')}; border-radius: var(--radius-md); padding: 1.25rem; background: var(--md-sys-color-surface); box-shadow: var(--shadow-1);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+                      <div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                          ${priorityBadge}
+                          ${targetStationBadge}
+                          <span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-family: monospace;">
+                            📅 ${formattedDate}
+                          </span>
+                        </div>
+                        <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--md-sys-color-on-surface);">
+                          ${n.title}
+                        </h4>
                       </div>
-                      <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--md-sys-color-on-surface);">
-                        ${n.title}
-                      </h4>
-                    </div>
-                    
-                    <div style="display: flex; gap: 0.35rem; align-items: center;">
-                      <button class="btn-action-view" onclick="window.app.viewSectionNotificationDetails('${n.id}')" title="معاينة التبليغ">
-                        معاينة
-                      </button>
-                      <button class="btn-action-print" onclick="window.app.printSectionNotification('${n.id}')" title="طباعة التبليغ">
-                        طباعة
-                      </button>
-                      ${canPublish ? `
-                        <button class="btn-action-trash" onclick="window.app.handleDeleteSectionNotification('${n.id}', '${section.id}')" title="حذف التبليغ">
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
+                      
+                      <div style="display: flex; gap: 0.35rem; align-items: center;">
+                        <button class="btn-action-view" onclick="window.app.viewSectionNotificationDetails('${n.id}')" title="معاينة التبليغ">
+                          معاينة
                         </button>
-                      ` : ''}
+                        <button class="btn-action-print" onclick="window.app.printSectionNotification('${n.id}')" title="طباعة التبليغ">
+                          طباعة
+                        </button>
+                        ${canPublish ? `
+                          <button class="btn-action-trash" onclick="window.app.handleDeleteSectionNotification('${n.id}', '${section.id}')" title="حذف التبليغ">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                          </button>
+                        ` : ''}
+                      </div>
                     </div>
-                  </div>
 
-                  <div style="font-size: 0.92rem; line-height: 1.7; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-background); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem; white-space: pre-wrap;">
-                    ${n.content}
-                  </div>
+                    <div style="font-size: 0.92rem; line-height: 1.7; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-background); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem; white-space: pre-wrap;">
+                      ${n.content}
+                    </div>
 
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--md-sys-color-outline);">
-                    <div>
-                      ✍️ <strong>المسؤول المُصدِر:</strong> ${n.createdByName || 'مسؤول الشعبة'}
-                    </div>
-                    <div>
-                      🆔 كود التبليغ: <code>${n.id}</code>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--md-sys-color-outline);">
+                      <div>
+                        ✍️ <strong>المسؤول المُصدِر:</strong> ${n.createdByName || 'مسؤول الشعبة'}
+                      </div>
+                      <div>
+                        🆔 كود التبليغ: <code>${n.id}</code>
+                      </div>
                     </div>
                   </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `}
-      </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      `}
 
     </div>
   `;

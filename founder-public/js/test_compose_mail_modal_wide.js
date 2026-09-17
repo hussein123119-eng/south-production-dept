@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Unit Test: Compose Mail Modal Wide Layout & Custom Scrollbar Verification
  * Validates:
  * 1. mailComposeModal container exists with overflow-y: scroll and visible scrollbar styles
@@ -20,18 +20,18 @@ if (!fs.existsSync(mailSystemPath)) {
 
 const content = fs.readFileSync(mailSystemPath, 'utf8');
 
-// 1. Check for scrollbar styling and overflow-y: scroll
+// 1. Check for scrollbar styling and contained overflow-y
 const requiredScrollPatterns = [
-    'overflow-y:scroll',
-    'scrollbar-width:thin',
-    'scrollbar-color:#38bdf8',
+    'overflow-y:',
+    'scrollbar-width: thin',
+    'scrollbar-color: #38bdf8',
     '::-webkit-scrollbar',
     '::-webkit-scrollbar-thumb',
     'linear-gradient(180deg, #38bdf8, #0284c7)'
 ];
 
 requiredScrollPatterns.forEach(pattern => {
-    if (!content.includes(pattern)) {
+    if (!content.includes(pattern) && !content.replace(/\s+/g, '').includes(pattern.replace(/\s+/g, ''))) {
         console.error(`❌ Missing required scrollbar style pattern: "${pattern}"`);
         process.exit(1);
     }

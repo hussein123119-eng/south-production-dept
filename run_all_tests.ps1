@@ -24,7 +24,17 @@ $tests = @(
   "js/test_mail_attachment_icons.js",
   "js/test_founder_theme_modes.js",
   "js/test_test_accounts_login.js",
-  "js/test_station_technical_status_and_forwarding.js"
+  "js/test_station_technical_status_and_forwarding.js",
+  "js/test_endorsement_modal_theme.js",
+  "js/test_dept_notification_modal_redesign.js",
+  "js/test_luxury_modals_vehicles_documents.js",
+  "js/test_section_unit_luxury_notifications.js",
+  "js/test_mail_compose_light_theme_and_dropdown.js",
+  "js/test_storage_compression_backup_offline.js",
+  "js/test_remove_station_overview_tab.js",
+  "js/test_section_to_station_notifications_and_subtabs.js",
+  "js/test_station_and_forward_modal_luxury_theme.js",
+  "js/test_station_technical_profile_engine.js"
 )
 
 $failed = 0
@@ -41,7 +51,7 @@ foreach ($t in $tests) {
 
 if ($failed -eq 0) {
   Write-Host "=====================================================" -ForegroundColor Green
-  Write-Host "ALL 26 REGRESSION TEST SUITES PASSED 100% PERFECTLY!" -ForegroundColor Green
+  Write-Host "ALL 36 REGRESSION TEST SUITES PASSED 100% PERFECTLY!" -ForegroundColor Green
   Write-Host "=====================================================" -ForegroundColor Green
 } else {
   Write-Host "$failed tests failed!" -ForegroundColor Red

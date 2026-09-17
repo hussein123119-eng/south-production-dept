@@ -919,6 +919,26 @@ const INITIAL_DB = {
     }
   ],
 
+  // تبليغات وتوجيهات مسؤولي المحطات لكوادر ونوبات المحطة
+  stationNotifications: [
+    {
+      id: 'st-notif-01',
+      stationId: 'st-01',
+      stationName: 'محطة الرميلة الشمالية',
+      sectionId: 'sec-1',
+      departmentId: 'dept-south-prod',
+      targetScope: 'ALL_STAFF',
+      title: 'تنظيم جدول تسليم واستلام نوبة الخفر المسائية',
+      content: 'يرجى من جميع مسؤولي الوجبات ومشغلي السيطرة الالتزام بالتواجد قبل 15 دقيقة من موعد التسليم وتدوين قراءات الضغط والحرارة بدقة.',
+      priority: 'HIGH',
+      status: 'PUBLISHED',
+      publishDate: '2026-02-18T14:00:00Z',
+      createdBy: 'user-02',
+      createdByName: 'م. حيدر جاسم',
+      createdByRole: 'STATION_MANAGER'
+    }
+  ],
+
   // نظام البريد الداخلي (Mail System)
   mailSystem: {
     counter: 0,
@@ -1113,11 +1133,14 @@ const INITIAL_DB = {
 class StoreManager {
   constructor() {
     this.key = 'SPD_ENTERPRISE_DB_V3';
+    this.idbKey = 'db_root';
     this.serverOnline = null;
     this.syncInProgress = false;
     this._cachedDb = null;
     this.initStore();
+    this.initIndexedDB();
     this.initServerSync();
+    this.initOfflineListeners();
   }
 
   initStore() {
@@ -1583,15 +1606,64 @@ class StoreManager {
     }
   }
 
+  async initIndexedDB() {
+    if (typeof window === 'undefined') return;
+    try {
+      const idb = window.SPDIndexedDB || (typeof SPDIndexedDB !== 'undefined' ? SPDIndexedDB : null);
+      if (!idb || typeof idb.get !== 'function') return;
+
+      const storedInIdb = await idb.get(this.idbKey || 'db_root');
+      if (storedInIdb && typeof storedInIdb === 'object' && Object.keys(storedInIdb).length > 0) {
+        // If localStorage is empty, hydrate from IndexedDB
+        const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.key) : null;
+        if (!localRaw) {
+          this._cachedDb = storedInIdb;
+          try {
+            if (typeof localStorage !== 'undefined') {
+              localStorage.setItem(this.key, JSON.stringify(storedInIdb));
+            }
+          } catch (e) {}
+        }
+      } else {
+        // Seed IndexedDB with current cached DB
+        const current = this.getDb();
+        if (current) {
+          await idb.set(this.idbKey || 'db_root', current);
+        }
+      }
+    } catch (err) {
+      // Non-blocking fallback
+    }
+  }
+
+  initOfflineListeners() {
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+    window.addEventListener('online', () => {
+      this.serverOnline = true;
+      this.flushOfflineQueue();
+    });
+    window.addEventListener('offline', () => {
+      this.serverOnline = false;
+    });
+  }
+
   saveDb(data) {
     this._cachedDb = data;
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(this.key, JSON.stringify(data));
       } catch (e) {
-        console.error('Error saving to localStorage:', e);
+        console.warn('localStorage quota exceeded or write error, relying on IndexedDB:', e);
       }
     }
+    // High-Capacity IndexedDB Dual Write
+    try {
+      const idb = (typeof window !== 'undefined' && window.SPDIndexedDB) || (typeof SPDIndexedDB !== 'undefined' ? SPDIndexedDB : null);
+      if (idb && typeof idb.set === 'function') {
+        idb.set(this.idbKey || 'db_root', data).catch(() => {});
+      }
+    } catch (e) {}
+
     // Asynchronously synchronize with real backend database
     if (typeof window !== 'undefined' && typeof fetch !== 'undefined' && this.serverOnline !== false) {
       fetch('/api/db/sync', {
@@ -1617,22 +1689,236 @@ class StoreManager {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(this.key, JSON.stringify(INITIAL_DB));
     }
-  }
-
-  exportBackupJSON() {
-    return JSON.stringify(this.getDb(), null, 2);
-  }
-
-  importBackupJSON(jsonString) {
     try {
-      const parsed = JSON.parse(jsonString);
-      if (parsed.departments && parsed.users) {
-        this.saveDb(parsed);
-        return { success: true };
+      const idb = (typeof window !== 'undefined' && window.SPDIndexedDB) || (typeof SPDIndexedDB !== 'undefined' ? SPDIndexedDB : null);
+      if (idb && typeof idb.set === 'function') {
+        idb.set(this.idbKey || 'db_root', INITIAL_DB).catch(() => {});
       }
-      return { success: false, error: 'بنية ملف النسخة الاحتياطية غير مطابقة للمواصفات.' };
+    } catch (e) {}
+  }
+
+  _calculateChecksum(str) {
+    let hash = 0;
+    if (!str || str.length === 0) return 'CHK-00000000';
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return 'CHK-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+  }
+
+  exportBackupJSON(metadata = {}) {
+    const db = this.getDb();
+    const stats = {
+      departmentsCount: (db.departments || []).length,
+      usersCount: (db.users || []).length,
+      employeesCount: (db.employeeMasterRecords || []).length,
+      sectionsCount: (db.sections || []).length,
+      unitsCount: (db.units || []).length,
+      stationsCount: (db.stations || []).length,
+      documentsCount: (db.documents || []).length,
+      mailCount: (db.mail || []).length,
+      officialLettersCount: (db.officialLetters || []).length,
+      technicalStatusCount: (db.technicalStatusReports || []).length,
+      vehiclesCount: (db.vehicles || []).length,
+      notificationsCount: (db.notifications || []).length,
+      auditLogsCount: (db.auditLogs || []).length,
+      requestsCount: (db.requests || []).length,
+      dossiersCount: (db.dossiers || []).length
+    };
+
+    const payload = {
+      schema: 'SPD_ENTERPRISE_BACKUP_V3',
+      version: '3.0.0',
+      appName: 'إدارة قسم الإنتاج الجنوبي - المنظومة المؤسسية الموحدة',
+      exportedAt: new Date().toISOString(),
+      exportedBy: metadata.exportedBy || 'المؤسس العام / إدارة المنظومة',
+      departmentId: metadata.departmentId || 'dept-south-prod',
+      stats,
+      data: db
+    };
+
+    payload.checksum = this._calculateChecksum(JSON.stringify(db));
+    return JSON.stringify(payload, null, 2);
+  }
+
+  validateBackup(jsonInput) {
+    try {
+      const parsed = typeof jsonInput === 'string' ? JSON.parse(jsonInput) : jsonInput;
+      if (!parsed) return { valid: false, error: 'الملف فارغ أو غير صالح (Empty or invalid payload).' };
+
+      // Handle both wrapped schema and raw DB object
+      const dbData = parsed.schema === 'SPD_ENTERPRISE_BACKUP_V3' && parsed.data ? parsed.data : parsed;
+
+      if (!dbData.departments || !Array.isArray(dbData.departments)) {
+        return { valid: false, error: 'ملف النسخة الاحتياطية يفتقد جدول الأقسام (departments).' };
+      }
+      if (!dbData.users || !Array.isArray(dbData.users)) {
+        return { valid: false, error: 'ملف النسخة الاحتياطية يفتقد جدول المستخدمين (users).' };
+      }
+
+      const stats = {
+        departmentsCount: (dbData.departments || []).length,
+        usersCount: (dbData.users || []).length,
+        employeesCount: (dbData.employeeMasterRecords || []).length,
+        documentsCount: (dbData.documents || []).length,
+        mailCount: (dbData.mail || []).length,
+        officialLettersCount: (dbData.officialLetters || []).length,
+        technicalStatusCount: (dbData.technicalStatusReports || []).length,
+        vehiclesCount: (dbData.vehicles || []).length
+      };
+
+      return {
+        valid: true,
+        version: parsed.version || '3.0.0',
+        exportedAt: parsed.exportedAt || new Date().toISOString(),
+        exportedBy: parsed.exportedBy || 'غير محدد',
+        stats,
+        data: dbData
+      };
     } catch (e) {
-      return { success: false, error: 'ملف غير صالح (Invalid JSON).' };
+      return { valid: false, error: 'صيغة الملف غير متوافقة مع JSON (Invalid JSON format).' };
+    }
+  }
+
+  importBackupJSON(jsonString, actorUser) {
+    const validation = this.validateBackup(jsonString);
+    if (!validation.valid) {
+      return { success: false, error: validation.error };
+    }
+
+    try {
+      this.saveDb(validation.data);
+
+      if (actorUser && typeof this.logActivity === 'function') {
+        this.logActivity(
+          actorUser.departmentId || 'dept-south-prod',
+          actorUser.id,
+          actorUser.employeeId,
+          'RESTORE_SYSTEM_BACKUP',
+          'SUPER_ADMIN',
+          `تمت استعادة نسخة احتياطية شاملة لقاعدة البيانات بنجاح (${validation.stats.usersCount} مستخدم، ${validation.stats.documentsCount} مستند، ${validation.stats.mailCount} بريد).`
+        );
+      }
+
+      return {
+        success: true,
+        stats: validation.stats,
+        message: 'تمت استعادة قاعدة البيانات الشاملة بنجاح وتحديث كافة الجداول والمستندات.'
+      };
+    } catch (err) {
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء حفظ النسخة المستعادة: ' + (err.message || err) };
+    }
+  }
+
+  getStorageStats() {
+    const db = this.getDb();
+    let localSizeBytes = 0;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const item = localStorage.getItem(this.key);
+        if (item) localSizeBytes = item.length * 2; // Approx UTF-16 bytes
+      }
+    } catch (e) {}
+
+    const totalRecords = Object.values(db).reduce((acc, val) => acc + (Array.isArray(val) ? val.length : 1), 0);
+
+    return {
+      localStorageBytes: localSizeBytes,
+      localStorageKB: (localSizeBytes / 1024).toFixed(1),
+      localStorageMB: (localSizeBytes / (1024 * 1024)).toFixed(2),
+      totalRecords,
+      isIndexedDBSupported: typeof indexedDB !== 'undefined',
+      counts: {
+        departments: (db.departments || []).length,
+        users: (db.users || []).length,
+        employees: (db.employeeMasterRecords || []).length,
+        sections: (db.sections || []).length,
+        units: (db.units || []).length,
+        stations: (db.stations || []).length,
+        documents: (db.documents || []).length,
+        mail: (db.mail || []).length,
+        officialLetters: (db.officialLetters || []).length,
+        technicalStatus: (db.technicalStatusReports || []).length,
+        vehicles: (db.vehicles || []).length,
+        notifications: (db.notifications || []).length,
+        auditLogs: (db.auditLogs || []).length,
+        requests: (db.requests || []).length,
+        dossiers: (db.dossiers || []).length
+      }
+    };
+  }
+
+  isOnline() {
+    if (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') {
+      return navigator.onLine;
+    }
+    return this.serverOnline !== false;
+  }
+
+  getOfflineQueue() {
+    const sync = (typeof window !== 'undefined' && window.SPDOfflineSync) || null;
+    if (sync && typeof sync.getQueue === 'function') {
+      return sync.getQueue();
+    }
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem('SPD_OFFLINE_QUEUE_V1');
+        return raw ? JSON.parse(raw) : [];
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  queueOfflineAction(action) {
+    const sync = (typeof window !== 'undefined' && window.SPDOfflineSync) || null;
+    if (sync && typeof sync.enqueue === 'function') {
+      return sync.enqueue(action);
+    }
+    const queue = this.getOfflineQueue();
+    const item = {
+      id: 'off-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      type: action.type || 'GENERIC_ACTION',
+      payload: action.payload || {},
+      timestamp: new Date().toISOString(),
+      userId: action.userId || null,
+      description: action.description || 'إجراء أوفلاين'
+    };
+    queue.push(item);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('SPD_OFFLINE_QUEUE_V1', JSON.stringify(queue));
+      }
+    } catch (e) {}
+    return item;
+  }
+
+  flushOfflineQueue() {
+    const sync = (typeof window !== 'undefined' && window.SPDOfflineSync) || null;
+    if (sync && typeof sync.autoSyncOnReconnect === 'function') {
+      return sync.autoSyncOnReconnect();
+    }
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('SPD_OFFLINE_QUEUE_V1', JSON.stringify([]));
+      }
+    } catch (e) {}
+  }
+
+  async processOfflineAction(action) {
+    if (!action) return;
+    // Process known action types
+    if (action.type === 'SYNC_TECHNICAL_STATUS' && action.payload) {
+      const db = this.getDb();
+      if (!db.technicalStatusReports) db.technicalStatusReports = [];
+      const idx = db.technicalStatusReports.findIndex(t => t.id === action.payload.id);
+      if (idx !== -1) {
+        db.technicalStatusReports[idx] = { ...db.technicalStatusReports[idx], ...action.payload };
+      } else {
+        db.technicalStatusReports.push(action.payload);
+      }
+      this.saveDb(db);
     }
   }
 
@@ -3709,6 +3995,132 @@ class StoreManager {
     this.saveDb(db);
   }
 
+  // --- Station Technical Profile & Operations Engine (المنظومة الفنية والتشغيلية الشاملة للمحطات) ---
+  getDefaultStationTechnicalProfile(station) {
+    const isCentral = station.code === 'ST-CTR';
+    const isLab = station.sectionId === 'sec-3';
+    const isMeter = station.sectionId === 'sec-4';
+
+    return {
+      lastUpdated: new Date().toISOString(),
+      updatedBy: 'system',
+      updatedByName: 'الإعداد التأسيسي للموقع',
+      // 1. الآبار ومجمعات الإنتاج
+      wells: {
+        operating: isCentral ? 42 : (isLab || isMeter ? 0 : 28),
+        stopped: isCentral ? 4 : (isLab || isMeter ? 0 : 3),
+        total: isCentral ? 46 : (isLab || isMeter ? 0 : 31),
+        notes: isLab || isMeter ? 'موقع تخصصي (فحوصات ومعايرة)' : 'آبار إنتاجية مربوطة على عوازل المحطة'
+      },
+      // 2. الدمامات ومجمعات الآبار
+      manifolds: {
+        count: isCentral ? 6 : (isLab || isMeter ? 0 : 4),
+        gatheringHeaders: isCentral ? 4 : (isLab || isMeter ? 0 : 2),
+        notes: 'مجمعات صمامات العزل والاختبار الفردي للآبار'
+      },
+      // 3. الضفاف والطاقات الكلية
+      banks: {
+        count: isCentral ? 3 : (isLab || isMeter ? 1 : 2),
+        banksList: isCentral ? [
+          { name: 'الضفة الأولى (A)', capacity: '50,000 برميل/يوم', salts: '24 ppm' },
+          { name: 'الضفة الثانية (B)', capacity: '50,000 برميل/يوم', salts: '26 ppm' },
+          { name: 'الضفة الثالثة (C)', capacity: '50,000 برميل/يوم', salts: '28 ppm' }
+        ] : [
+          { name: 'الضفة الأولى (A)', capacity: '45,000 برميل/يوم', salts: '25 ppm' },
+          { name: 'الضفة الثانية (B)', capacity: '40,000 برميل/يوم', salts: '27 ppm' }
+        ],
+        totalOilCapacity: station.capacity || '120,000 برميل/يوم',
+        totalWaterCapacity: '35,000 برميل/يوم',
+        totalGasCapacity: '22 مقمق/يوم (MMSCFD)'
+      },
+      // 4. منظومة السيطرة والتحكم الآلي
+      controlSystem: {
+        type: isCentral ? 'FULL_DCS' : 'PARTIAL_DCS', // 'FULL_DCS', 'PARTIAL_DCS', 'CONVENTIONAL'
+        coverageDescription: isCentral 
+          ? 'نظام DCS كلي يغطي كافة عوازل الإنتاج، محطات الضخ، وشبكات الحماية ESD'
+          : 'نظام DCS جزئي مع مراقبة SCADA للوحدات الرئيسية'
+      },
+      // 5. المعدات الدوارة والمضخات
+      rotatingEquipment: {
+        mainPumps: isCentral ? '4 مضخات تصدير رئيسية (3 عاملة + 1 احتياطية جاهزة)' : '3 مضخات رئيسية (2 عاملة + 1 احتياطية)',
+        boosterPumps: isCentral ? '3 مضخات بوستر كهربائية ذات كفاءة عالية' : '2 مضخة بوستر في الخدمة',
+        turbines: isCentral ? '2 توربين غازي توليد وضغط' : '1 توربين توليد احتياطي'
+      },
+      // 6. الأملاح وجودة النفط
+      salts: {
+        banksAverage: '26.0 ppm',
+        mainLineSalts: '23.5 ppm',
+        bsw: '0.12%',
+        notes: 'ضمن المواصفة القياسية المعتمدة للتصدير'
+      },
+      // 7. الطاقة والمولدات والوقود
+      powerAndFuel: {
+        dieselGenerators: isCentral ? '3 مولدات ديزل ثقيلة بقدرة 1.8 MW مع مزامنة آلية' : '2 مولدة ديزل بقدرة 1.2 MW',
+        fuelPercentage: 82, // percentage 0 - 100
+        fuelStatusText: '82% - خزان الوقود في وضع تشغيلي آمن وممتلئ'
+      },
+      // 8. الضاغطات والغاز
+      compressors: {
+        totalCount: isCentral ? 4 : 2,
+        operatingCount: isCentral ? 3 : 2,
+        dieselBackupStatus: 'جاهزة وتعمل تلقائياً عند انقطاع التيار (STANDBY READY)'
+      },
+      // 9. الحقول المخصصة الإضافية
+      customFields: [
+        { id: 'cf-1', label: 'منظومة حقن الكيمياويات وموانع التآكل', value: 'تعمل بمعدل ضخ 18 لتر/ساعة', unit: 'حقن مستمر' }
+      ]
+    };
+  }
+
+  getStationTechnicalProfile(stId) {
+    const db = this.getDb();
+    const station = (db.stations || []).find(s => s.id === stId);
+    if (!station) return null;
+    if (station.technicalProfile && typeof station.technicalProfile === 'object') {
+      return station.technicalProfile;
+    }
+    const def = this.getDefaultStationTechnicalProfile(station);
+    station.technicalProfile = def;
+    this.saveDb(db);
+    return def;
+  }
+
+  updateStationTechnicalProfile(stId, profileData, actorUser) {
+    const db = this.getDb();
+    const idx = (db.stations || []).findIndex(s => s.id === stId);
+    if (idx === -1) return { success: false, error: 'المحطة غير موجودة' };
+
+    const station = db.stations[idx];
+    const current = station.technicalProfile || this.getDefaultStationTechnicalProfile(station);
+
+    const updatedProfile = {
+      ...current,
+      ...profileData,
+      lastUpdated: new Date().toISOString(),
+      updatedBy: actorUser ? actorUser.id : 'unknown',
+      updatedByName: actorUser ? (actorUser.fullName || actorUser.name || 'مسؤول الموقع') : 'مسؤول الموقع'
+    };
+
+    if (profileData.banks && profileData.banks.totalOilCapacity) {
+      station.capacity = profileData.banks.totalOilCapacity;
+    }
+
+    station.technicalProfile = updatedProfile;
+    this.saveDb(db);
+
+    if (typeof this.addAuditLog === 'function') {
+      this.addAuditLog({
+        userId: actorUser ? actorUser.id : 'unknown',
+        userName: actorUser ? (actorUser.fullName || actorUser.name) : 'مسؤول الموقع',
+        action: 'UPDATE_STATION_TECHNICAL_PROFILE',
+        details: `تحديث المواصفات والبيانات الفنية والتشغيلية لمحطة: ${station.name} (${station.code})`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    return { success: true, technicalProfile: updatedProfile, station };
+  }
+
   // --- Announcements & Notifications ---
   getAnnouncements(deptId) {
     return (this.getDb().announcements || []).filter(a => a.departmentId === deptId);
@@ -3934,6 +4346,230 @@ class StoreManager {
         'DELETE_SECTION_NOTIFICATION',
         'SECTION_WORKSPACE',
         `تم حذف تبليغ الشعبة (${notifId}).`
+      );
+    }
+  }
+
+  // --- Forward Dept Notification to Section Stations (تعميم ونشر تبليغ القسم لمحطات الشعبة) ---
+  forwardDeptNotificationToStations(notifId, sectionId, payload = {}, actorUser) {
+    const db = this.getDb();
+    const deptNotif = (db.officialNotifications || []).find(n => n.id === notifId) ||
+                      (db.notifications || []).find(n => n.id === notifId);
+    if (!deptNotif) return null;
+
+    if (!db.sectionNotifications) db.sectionNotifications = [];
+
+    const section = (db.sections || []).find(s => s.id === sectionId);
+    const targetStationId = payload.targetStationId || 'ALL';
+    let targetStationName = payload.targetStationName || 'كافة محطات الشعبة';
+    if (targetStationId !== 'ALL' && !payload.targetStationName) {
+      const st = (db.stations || []).find(s => s.id === targetStationId);
+      if (st) targetStationName = st.name;
+    }
+
+    const forwardedNotif = {
+      id: 'sec-notif-fwd-' + Date.now(),
+      sectionId: sectionId || (section ? section.id : 'sec-1'),
+      departmentId: (actorUser && actorUser.departmentId) ? actorUser.departmentId : (deptNotif.departmentId || 'dept-south-prod'),
+      sourceType: 'FORWARDED_FROM_DEPT',
+      originalDeptNotifId: notifId,
+      originalDeptNotifNumber: deptNotif.number || deptNotif.id || '',
+      originalDeptNotifSender: deptNotif.createdByName || deptNotif.sender || 'إدارة القسم',
+      targetStationId: targetStationId,
+      targetStationName: targetStationName,
+      title: payload.title || `[تعميم من القسم] ${deptNotif.title}`,
+      content: deptNotif.content || deptNotif.body || payload.content || '',
+      sectionDirective: payload.sectionDirective || '',
+      priority: payload.priority || deptNotif.importance || deptNotif.priority || 'HIGH',
+      status: 'PUBLISHED',
+      publishDate: new Date().toISOString(),
+      createdBy: actorUser ? actorUser.id : 'user-sec-mgr',
+      createdByName: actorUser ? actorUser.fullName : (section ? section.name : 'مسؤول الشعبة'),
+      createdByRole: actorUser ? actorUser.role : 'SECTION_MANAGER',
+      isForwardedFromDept: true
+    };
+
+    db.sectionNotifications.unshift(forwardedNotif);
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'FORWARD_DEPT_NOTIFICATION',
+        'SECTION_WORKSPACE',
+        `قام مسؤول الشعبة بتعميم ونشر تبليغ القسم [${deptNotif.title}] على محطات الشعبة.`
+      );
+    }
+
+    return forwardedNotif;
+  }
+
+  // --- Station-Specific Notifications to its Staff (تبليغات وتوجيهات مسؤول المحطة لكادره) ---
+  getStationNotifications(stationId, actorUser) {
+    const db = this.getDb();
+    let list = db.stationNotifications || [];
+    if (stationId) {
+      list = list.filter(n => n.stationId === stationId);
+    }
+    if (!actorUser) return list;
+
+    const customPerms = Array.isArray(actorUser.customPermissions) ? actorUser.customPermissions : [];
+    const hasGlobal = ['SUPER_ADMIN', 'DEPT_MANAGER'].includes(actorUser.role) ||
+                      customPerms.includes('SCOPE_ALL_SECTIONS') ||
+                      customPerms.includes('ALL_SECTIONS_UNITS_ACCESS') ||
+                      actorUser.hasGlobalAccess === true;
+
+    // Strict Scope Isolation: If user belongs to a different station and has no global access
+    if (!hasGlobal && actorUser.stationId && stationId && actorUser.stationId !== stationId) {
+      const station = this.getStationById ? this.getStationById(stationId) : (db.stations || []).find(s => s.id === stationId);
+      if (!(actorUser.role === 'SECTION_MANAGER' && station && station.sectionId === actorUser.sectionId)) {
+        return [];
+      }
+    }
+
+    return list;
+  }
+
+  addStationNotification(notif, actorUser) {
+    const db = this.getDb();
+    if (!db.stationNotifications) db.stationNotifications = [];
+
+    const station = this.getStationById ? this.getStationById(notif.stationId) : (db.stations || []).find(s => s.id === notif.stationId);
+
+    const newNotif = {
+      id: 'st-notif-' + Date.now(),
+      stationId: notif.stationId || (actorUser ? actorUser.stationId : 'st-01'),
+      stationName: notif.stationName || (station ? station.name : 'المحطة'),
+      sectionId: notif.sectionId || (station ? station.sectionId : (actorUser ? actorUser.sectionId : null)),
+      departmentId: (actorUser && actorUser.departmentId) ? actorUser.departmentId : 'dept-south-prod',
+      targetScope: notif.targetScope || 'ALL_STAFF',
+      title: notif.title,
+      content: notif.content,
+      priority: notif.priority || 'NORMAL',
+      status: notif.status || 'PUBLISHED',
+      publishDate: notif.publishDate || new Date().toISOString(),
+      createdBy: actorUser ? actorUser.id : 'user-st-mgr',
+      createdByName: actorUser ? actorUser.fullName : 'مسؤول المحطة',
+      createdByRole: actorUser ? actorUser.role : 'STATION_MANAGER'
+    };
+
+    db.stationNotifications.unshift(newNotif);
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'CREATE_STATION_NOTIFICATION',
+        'STATION_WORKSPACE',
+        `أصدر مسؤول المحطة تبليغاً لكادره بعنوان [${newNotif.title}].`
+      );
+    }
+
+    return newNotif;
+  }
+
+  deleteStationNotification(notifId, actorUser) {
+    const db = this.getDb();
+    if (!db.stationNotifications) return;
+
+    db.stationNotifications = db.stationNotifications.filter(n => n.id !== notifId);
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'DELETE_STATION_NOTIFICATION',
+        'STATION_WORKSPACE',
+        `تم حذف تبليغ المحطة (${notifId}).`
+      );
+    }
+  }
+
+  // --- Unit-Specific Notifications to its Staff (تبليغات وتوجيهات مسؤول الوحدة لكادره) ---
+  getUnitNotifications(unitId, actorUser) {
+    const db = this.getDb();
+    let list = db.unitNotifications || [];
+    if (unitId) {
+      list = list.filter(n => n.unitId === unitId);
+    }
+    if (!actorUser) return list;
+
+    const customPerms = Array.isArray(actorUser.customPermissions) ? actorUser.customPermissions : [];
+    const hasGlobal = ['SUPER_ADMIN', 'DEPT_MANAGER'].includes(actorUser.role) ||
+                      customPerms.includes('SCOPE_ALL_SECTIONS') ||
+                      customPerms.includes('ALL_SECTIONS_UNITS_ACCESS') ||
+                      actorUser.hasGlobalAccess === true;
+
+    // Strict Scope Isolation: If user belongs to a different unit/section and has no global access, block visibility
+    if (!hasGlobal && actorUser.unitId && unitId && actorUser.unitId !== unitId) {
+      // Check if user is the section manager of the parent section
+      const unit = this.getUnitById(unitId);
+      if (!(actorUser.role === 'SECTION_MANAGER' && unit && unit.sectionId === actorUser.sectionId)) {
+        return [];
+      }
+    }
+
+    return list;
+  }
+
+  addUnitNotification(notif, actorUser) {
+    const db = this.getDb();
+    if (!db.unitNotifications) db.unitNotifications = [];
+
+    const newNotif = {
+      id: 'unit-notif-' + Date.now(),
+      unitId: notif.unitId || (actorUser ? actorUser.unitId : 'unit-1'),
+      sectionId: notif.sectionId || (actorUser ? actorUser.sectionId : null),
+      departmentId: (actorUser && actorUser.departmentId) ? actorUser.departmentId : 'dept-south-prod',
+      targetScope: notif.targetScope || 'ALL_UNIT_STAFF',
+      title: notif.title,
+      content: notif.content,
+      priority: notif.priority || 'NORMAL',
+      status: notif.status || 'PUBLISHED',
+      publishDate: notif.publishDate || new Date().toISOString(),
+      createdBy: actorUser ? actorUser.id : 'user-unit-mgr',
+      createdByName: actorUser ? actorUser.fullName : 'مسؤول الوحدة',
+      createdByRole: actorUser ? actorUser.role : 'UNIT_MANAGER'
+    };
+
+    db.unitNotifications.unshift(newNotif);
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'CREATE_UNIT_NOTIFICATION',
+        'UNIT_WORKSPACE',
+        `أصدر مسؤول الوحدة تبليغاً لكادره بعنوان [${newNotif.title}].`
+      );
+    }
+
+    return newNotif;
+  }
+
+  deleteUnitNotification(notifId, actorUser) {
+    const db = this.getDb();
+    if (!db.unitNotifications) return;
+
+    db.unitNotifications = db.unitNotifications.filter(n => n.id !== notifId);
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId,
+        actorUser.id,
+        actorUser.employeeId,
+        'DELETE_UNIT_NOTIFICATION',
+        'UNIT_WORKSPACE',
+        `تم حذف تبليغ الوحدة (${notifId}).`
       );
     }
   }
@@ -4779,6 +5415,176 @@ class StoreManager {
   // Backward-compatibility proxy for getTechnicalStatusReports
   getTechnicalStatusReports(deptId, sectionId) {
     return this.getTechnicalStatuses(deptId, { sectionId });
+  }
+
+  // =========================================================================
+  // --- Station Technical & Operational Profile Engine (البيانات الفنية والتشغيل) ---
+  // =========================================================================
+  getDefaultStationTechnicalProfile(station) {
+    const isWater = station && (station.type === 'WATER' || (station.name && station.name.includes('حقن الماء')));
+    const isGas = station && (station.type === 'GAS' || (station.name && station.name.includes('الغاز')));
+    const isSpecial = station && ['LAB_CHEMICAL', 'LAB_GAS', 'METERING_STATION'].includes(station.type);
+
+    return {
+      wells: {
+        operating: isSpecial ? 0 : 28,
+        stopped: isSpecial ? 0 : 6,
+        total: isSpecial ? 0 : 34,
+        notes: 'الآبار موزعة على المكامن الرئيسية مع فحص دوري للإنتاجية والضغوط والموائع.'
+      },
+      manifolds: {
+        count: isSpecial ? 0 : 4,
+        gatheringHeaders: isSpecial ? 0 : 3
+      },
+      banks: {
+        count: isSpecial ? 1 : 3,
+        totalOilCapacity: isSpecial ? '0 برميل/يوم' : (station && station.capacity ? station.capacity : '150,000 برميل/يوم'),
+        totalWaterCapacity: isWater ? '120,000 برميل/يوم' : '45,000 برميل/يوم',
+        totalGasCapacity: isGas ? '120 مقمق/يوم' : '65 مقمق/يوم (MMSCFD)',
+        banksList: isSpecial ? [
+          { name: 'الضفة الرئيسية', capacity: '10,000 وحدة/يوم', salts: '20 ppm' }
+        ] : [
+          { name: 'الضفة الأولى (Bank A)', capacity: '50,000 برميل/يوم', salts: '24 PTB' },
+          { name: 'الضفة الثانية (Bank B)', capacity: '50,000 برميل/يوم', salts: '26 PTB' },
+          { name: 'الضفة الثالثة (Bank C)', capacity: '50,000 برميل/يوم', salts: '28 PTB' }
+        ]
+      },
+      rotatingEquipment: {
+        mainPumps: '4 مضخات طرد مركزي رئيسية (3 بالخدمة + 1 احتياط ساخن)',
+        boosterPumps: '3 مضخات تعزيز الضغط (2 بالخدمة + 1 احتياط جاهز)',
+        turbines: '2 توربين غازي بقدرة تشغيلية كاملة لتوليد الطاقة والضخ'
+      },
+      controlSystem: {
+        type: 'FULL_DCS',
+        coverageDescription: 'نظام سيطرة وتحكم إلكتروني متكامل (Yokogawa Centum VP) يغطي كافة عازلات المحطة وشبكة الصمامات والإنذار المبكر ESD.'
+      },
+      salts: {
+        mainLineSalts: '26.5 PTB',
+        banksAverage: '26.0 PTB',
+        bsw: '0.12 %',
+        notes: 'مطابق للمواصفات التصديرية القياسية الوطنية (أقل من 30 PTB ونسبة ترسبات أقل من 0.2%).'
+      },
+      powerAndFuel: {
+        dieselGenerators: '3 مولدات ديزل بقدرة 1500 KVA لكل منها (المحطة مربوطة بالشبكة الوطنية 33KV)',
+        fuelPercentage: 88,
+        fuelStatusText: 'خزين الكاز كافٍ للتشغيل المستمر لأكثر من 14 يوماً (44,000 لتر من أصل 50,000 لتر).'
+      },
+      compressors: {
+        totalCount: 4,
+        operatingCount: 3,
+        dieselBackupStatus: 'ضاغطة الديزل الاحتياطية جاهزة بنسبة 100% مع نظام التشغيل التلقائي (Auto-Start Standby) عند انقطاع التيار.'
+      },
+      customFields: [
+        { id: 'cust-1', label: 'محطة حقن مانع التآكل والترسبات', value: '25 لتر/يوم', unit: 'تعمل باستمرار على خط التجميع الرئيسي' },
+        { id: 'cust-2', label: 'خزانات العزل والترقيد (Wash Tanks)', value: 'خزانان (2)', unit: 'سعة كل خزان 10,000 متر مكعب' }
+      ],
+      lastUpdated: new Date().toISOString(),
+      updatedBy: 'user-st-mgr',
+      updatedByName: 'مسؤول الموقع والمحطة'
+    };
+  }
+
+  getStationTechnicalProfile(stationId) {
+    const db = this.getDb();
+    if (!db.stationTechnicalProfiles) {
+      db.stationTechnicalProfiles = {};
+    }
+    if (db.stationTechnicalProfiles[stationId]) {
+      return db.stationTechnicalProfiles[stationId];
+    }
+    const station = (db.stations || []).find(s => s.id === stationId);
+    if (station && station.technicalProfile) {
+      db.stationTechnicalProfiles[stationId] = station.technicalProfile;
+      this.saveDb(db);
+      return station.technicalProfile;
+    }
+    const defaultProfile = this.getDefaultStationTechnicalProfile(station);
+    db.stationTechnicalProfiles[stationId] = defaultProfile;
+    if (station) {
+      station.technicalProfile = defaultProfile;
+    }
+    this.saveDb(db);
+    return defaultProfile;
+  }
+
+  updateStationTechnicalProfile(stationId, profileData, actorUser) {
+    const db = this.getDb();
+    if (!db.stationTechnicalProfiles) {
+      db.stationTechnicalProfiles = {};
+    }
+    const current = this.getStationTechnicalProfile(stationId);
+    const station = (db.stations || []).find(s => s.id === stationId);
+
+    const updated = {
+      ...current,
+      ...profileData,
+      wells: {
+        ...(current.wells || {}),
+        ...(profileData.wells || {})
+      },
+      manifolds: {
+        ...(current.manifolds || {}),
+        ...(profileData.manifolds || {})
+      },
+      banks: {
+        ...(current.banks || {}),
+        ...(profileData.banks || {}),
+        banksList: (profileData.banks && profileData.banks.banksList !== undefined)
+          ? profileData.banks.banksList
+          : (current.banks ? current.banks.banksList : [])
+      },
+      rotatingEquipment: {
+        ...(current.rotatingEquipment || {}),
+        ...(profileData.rotatingEquipment || {})
+      },
+      controlSystem: {
+        ...(current.controlSystem || {}),
+        ...(profileData.controlSystem || {})
+      },
+      salts: {
+        ...(current.salts || {}),
+        ...(profileData.salts || {})
+      },
+      powerAndFuel: {
+        ...(current.powerAndFuel || {}),
+        ...(profileData.powerAndFuel || {})
+      },
+      compressors: {
+        ...(current.compressors || {}),
+        ...(profileData.compressors || {})
+      },
+      customFields: (profileData.customFields !== undefined)
+        ? profileData.customFields
+        : (current.customFields || []),
+      lastUpdated: new Date().toISOString(),
+      updatedBy: actorUser ? actorUser.id : (current.updatedBy || 'user-st-mgr'),
+      updatedByName: actorUser ? actorUser.fullName : (current.updatedByName || 'مسؤول الموقع')
+    };
+
+    if (updated.wells) {
+      const op = Number(updated.wells.operating || 0);
+      const st = Number(updated.wells.stopped || 0);
+      updated.wells.total = op + st;
+    }
+
+    db.stationTechnicalProfiles[stationId] = updated;
+    if (station) {
+      station.technicalProfile = updated;
+    }
+    this.saveDb(db);
+
+    if (actorUser) {
+      this.logActivity(
+        actorUser.departmentId || 'dept-south-prod',
+        actorUser.id,
+        actorUser.employeeId,
+        'UPDATE_STATION_TECHNICAL_PROFILE',
+        'STATION_WORKSPACE',
+        `تم تحديث البيانات الفنية والتشغيلية لمحطة [${station ? station.name : stationId}].`
+      );
+    }
+
+    return updated;
   }
 }
 

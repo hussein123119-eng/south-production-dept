@@ -15,23 +15,18 @@ if (!appJsCode.includes("openCreateDocumentModal()")) {
     process.exit(1);
 }
 
-const createDocMatch = appJsCode.match(/openCreateDocumentModal\(\)\s*\{[\s\S]*?this\.showModal\([^,]+,\s*([\s\S]*?),\s*(\{[^}]+\})\);/);
-if (!createDocMatch) {
-    console.error("❌ Test 1.1 Failed: showModal call with options not found in openCreateDocumentModal");
+const fnCreateDocStart = appJsCode.indexOf('openCreateDocumentModal()');
+const fnCreateDocEnd = appJsCode.indexOf('\n  onDocCategoryChange(', fnCreateDocStart);
+const createDocCode = appJsCode.slice(fnCreateDocStart, fnCreateDocEnd !== -1 ? fnCreateDocEnd : fnCreateDocStart + 15000);
+
+if (!createDocCode.includes('960px')) {
+    console.error("❌ Test 1.2 Failed: maxWidth 960px not configured in openCreateDocumentModal");
     process.exit(1);
 }
-
-const createDocHtml = createDocMatch[1];
-const createDocOptions = createDocMatch[2];
-
-if (!createDocOptions.includes('960px')) {
-    console.error("❌ Test 1.2 Failed: maxWidth 960px not passed to showModal:", createDocOptions);
-    process.exit(1);
-}
-console.log("✓ Test 1.1 Passed: openCreateDocumentModal sets maxWidth: 960px & size: lg.");
+console.log("✓ Test 1.1 Passed: openCreateDocumentModal sets maxWidth: 960px.");
 
 ['docTitle', 'docCategory', 'docSectionId', 'docContent', 'docVersion', 'docStatus'].forEach(id => {
-    if (!createDocHtml.includes('id="' + id + '"')) {
+    if (!createDocCode.includes('id="' + id + '"')) {
         console.error("❌ Test 1.3 Failed: Missing ID " + id + " in openCreateDocumentModal HTML");
         process.exit(1);
     }
@@ -40,22 +35,18 @@ console.log("✓ Test 1.2 Passed: All required document form elements & IDs are 
 
 // Test 2: openEditDocumentModal
 console.log("\n--- 2. Testing openEditDocumentModal ---");
-const editDocMatch = appJsCode.match(/openEditDocumentModal\(docId\)\s*\{[\s\S]*?this\.showModal\([^,]+,\s*([\s\S]*?),\s*(\{[^}]+\})\);/);
-if (!editDocMatch) {
-    console.error("❌ Test 2.1 Failed: showModal call with options not found in openEditDocumentModal");
-    process.exit(1);
-}
-const editDocHtml = editDocMatch[1];
-const editDocOptions = editDocMatch[2];
+const fnEditDocStart = appJsCode.indexOf('openEditDocumentModal(docId)');
+const fnEditDocEnd = appJsCode.indexOf('\n  handleEditDocumentSubmit(', fnEditDocStart);
+const editDocCode = appJsCode.slice(fnEditDocStart, fnEditDocEnd !== -1 ? fnEditDocEnd : fnEditDocStart + 15000);
 
-if (!editDocOptions.includes('960px')) {
-    console.error("❌ Test 2.2 Failed: maxWidth 960px not passed to openEditDocumentModal");
+if (!editDocCode.includes('960px')) {
+    console.error("❌ Test 2.2 Failed: maxWidth 960px not configured in openEditDocumentModal");
     process.exit(1);
 }
-console.log("✓ Test 2.1 Passed: openEditDocumentModal sets maxWidth: 960px & size: lg.");
+console.log("✓ Test 2.1 Passed: openEditDocumentModal sets maxWidth: 960px.");
 
 ['editDocTitle', 'editDocCategory', 'editDocSectionId', 'editDocContent', 'editDocVersion', 'editDocStatus'].forEach(id => {
-    if (!editDocHtml.includes('id="' + id + '"')) {
+    if (!editDocCode.includes('id="' + id + '"')) {
         console.error("❌ Test 2.3 Failed: Missing ID " + id + " in openEditDocumentModal HTML");
         process.exit(1);
     }

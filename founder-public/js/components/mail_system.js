@@ -556,13 +556,18 @@ function renderComposeMailModal(context, user) {
   const canSendPublic = ['SUPER_ADMIN', 'DEPT_MANAGER', 'SECTION_MANAGER', 'ADMINISTRATOR'].includes(user.role);
 
   return `
-    <div id="mailComposeModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(3,7,18,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); padding:1rem; overflow-y:scroll; scrollbar-width:thin; scrollbar-color:#38bdf8 rgba(15,23,42,0.6);"
+    <div id="mailComposeModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(3,7,18,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none;"
          onclick="if(event.target===this) window.app.closeComposeMailModal()">
       <style>
-        #mailComposeModal::-webkit-scrollbar { width: 12px; }
-        #mailComposeModal::-webkit-scrollbar-track { background: rgba(10, 18, 36, 0.75); border-radius: 8px; }
-        #mailComposeModal::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #38bdf8, #0284c7); border-radius: 8px; border: 2px solid rgba(15, 23, 42, 0.4); }
-        #mailComposeModal::-webkit-scrollbar-thumb:hover { background: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        #mailComposeModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #mailComposeModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
         .mail-compose-card {
           background: rgba(11, 20, 42, 0.96) !important;
           backdrop-filter: blur(40px) saturate(200%) !important;
@@ -571,10 +576,52 @@ function renderComposeMailModal(context, user) {
           border-radius: 24px !important;
           max-width: 980px !important;
           width: 95vw !important;
-          margin: 1.5rem auto 4.5rem auto !important;
+          max-height: 90vh !important;
+          margin: 1.5rem auto !important;
           box-shadow: 0 25px 75px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.22) !important;
           overflow: hidden !important;
           color: #ffffff !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        .mail-compose-banner {
+          flex-shrink: 0 !important;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.45) 50%, rgba(15, 23, 42, 0.95) 100%) !important;
+          padding: 1.25rem 1.65rem !important;
+          border-bottom: 1.2px solid rgba(56, 189, 248, 0.25) !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          gap: 1rem !important;
+          flex-wrap: wrap !important;
+        }
+        .mail-compose-scroll-body {
+          flex: 1 1 auto !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 1.35rem !important;
+          scrollbar-width: thin !important;
+          scrollbar-color: #38bdf8 rgba(15,23,42,0.6) !important;
+        }
+        .mail-compose-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .mail-compose-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .mail-compose-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #38bdf8, #0284c7) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+        }
+        .mail-compose-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: #38bdf8 !important;
+          box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
         }
         .mail-card-section {
           background: rgba(15, 23, 42, 0.7) !important;
@@ -587,6 +634,24 @@ function renderComposeMailModal(context, user) {
         }
         .mail-card-section:hover {
           border-color: rgba(56, 189, 248, 0.35) !important;
+        }
+        .mail-section-title-blue {
+          font-size: 0.94rem;
+          font-weight: 800;
+          color: #38bdf8;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1.1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          padding-bottom: 0.65rem;
+        }
+        .mail-compose-label {
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: #f1f5f9;
+          display: block;
+          margin-bottom: 0.45rem;
         }
         .mail-glass-ctrl {
           background: rgba(8, 15, 30, 0.75) !important;
@@ -605,11 +670,283 @@ function renderComposeMailModal(context, user) {
         .mail-glass-ctrl::placeholder {
           color: #64748b !important;
         }
+        .mail-radio-container {
+          display: flex;
+          gap: 0.75rem;
+          align-items: center;
+          min-height: 46px;
+          background: rgba(8, 15, 30, 0.6);
+          padding: 0.35rem 0.85rem;
+          border-radius: 12px;
+          border: 1.2px solid rgba(56, 189, 248, 0.3);
+        }
+        .mail-hierarchy-hint {
+          background: linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.55) 100%);
+          border: 1px solid rgba(96, 165, 250, 0.25);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          font-size: 0.82rem;
+          color: #bfdbfe;
+          line-height: 1.6;
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+        }
+        #mailTargetField {
+          border-color: rgba(168, 85, 247, 0.4) !important;
+          background: rgba(26, 16, 48, 0.55) !important;
+        }
+        .mail-target-header {
+          font-size: 0.94rem;
+          font-weight: 800;
+          color: #c084fc;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+          padding-bottom: 0.6rem;
+        }
+        #mailOfficialFieldsContainer {
+          background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.12)) !important;
+          border: 1.5px solid rgba(245,158,11,0.38) !important;
+        }
+        .mail-official-header {
+          font-weight: 900;
+          font-size: 0.94rem;
+          color: #fbbf24;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1.1rem;
+          border-bottom: 1px solid rgba(245,158,11,0.2);
+          padding-bottom: 0.65rem;
+        }
+        .mail-signature-panel {
+          border: 1.2px solid rgba(245, 158, 11, 0.35);
+          border-radius: 14px;
+          padding: 0.95rem 1.15rem;
+          background: rgba(15, 23, 42, 0.65);
+        }
+        #mailDropZone {
+          border: 2px dashed rgba(56, 189, 248, 0.4);
+          background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(99, 102, 241, 0.04) 100%);
+          border-radius: 16px;
+          padding: 1.6rem 1.2rem;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mail-drop-title {
+          font-weight: 800;
+          font-size: 1rem;
+          color: #38bdf8;
+          margin-bottom: 0.25rem;
+        }
+        .mail-drop-subtitle {
+          font-size: 0.82rem;
+          color: #94a3b8;
+        }
+        #mailPersonSearchResults {
+          background: rgba(15, 23, 42, 0.98);
+          border: 1.5px solid rgba(168, 85, 247, 0.45);
+        }
+        .mail-person-row {
+          background: rgba(15, 23, 42, 0.95);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #f8fafc;
+        }
+        .mail-person-row:hover {
+          background: rgba(30, 41, 59, 0.95) !important;
+          border-color: rgba(168, 85, 247, 0.5) !important;
+        }
+        .mail-person-row-name {
+          color: #f8fafc;
+        }
+        .mail-person-row-badge {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+        }
+        .mail-person-row-sub {
+          color: #94a3b8;
+        }
+        .mail-person-row-loc {
+          color: #38bdf8;
+        }
+
+        /* 🌞 LIGHT THEME OVERRIDES FOR COMPOSE MODAL */
+        [data-theme="light"] #mailComposeModal {
+          background: rgba(15, 23, 42, 0.65) !important;
+        }
+        [data-theme="light"] .mail-compose-card {
+          background: #ffffff !important;
+          border: 1.2px solid rgba(2, 132, 199, 0.35) !important;
+          color: #0f172a !important;
+          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.18), 0 0 30px rgba(2, 132, 199, 0.1) !important;
+        }
+        [data-theme="light"] .mail-compose-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 60%, #0369a1 100%) !important;
+          border-bottom-color: rgba(2, 132, 199, 0.35) !important;
+        }
+        [data-theme="light"] .mail-compose-subtitle {
+          color: #e2e8f0 !important;
+        }
+        [data-theme="light"] .mail-compose-close-btn {
+          background: rgba(255, 255, 255, 0.2) !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .mail-compose-close-btn:hover {
+          background: rgba(239, 68, 68, 0.8) !important;
+          border-color: #ef4444 !important;
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .mail-compose-scroll-body {
+          scrollbar-color: #0284c7 #f1f5f9 !important;
+        }
+        [data-theme="light"] .mail-compose-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+        [data-theme="light"] .mail-compose-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #0284c7, #0369a1) !important;
+          border-color: #f1f5f9 !important;
+        }
+        [data-theme="light"] .mail-card-section {
+          background: #f8fafc !important;
+          border-color: #e2e8f0 !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+        }
+        [data-theme="light"] .mail-card-section:hover {
+          border-color: rgba(2, 132, 199, 0.4) !important;
+        }
+        [data-theme="light"] .mail-section-title-blue {
+          color: #0284c7 !important;
+          border-bottom-color: #e2e8f0 !important;
+        }
+        [data-theme="light"] .mail-compose-label {
+          color: #1e293b !important;
+        }
+        [data-theme="light"] .mail-glass-ctrl {
+          background: #ffffff !important;
+          border-color: #cbd5e1 !important;
+          color: #0f172a !important;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        }
+        [data-theme="light"] .mail-glass-ctrl:focus {
+          background: #ffffff !important;
+          border-color: #0284c7 !important;
+          box-shadow: 0 0 12px rgba(2, 132, 199, 0.25) !important;
+        }
+        [data-theme="light"] .mail-glass-ctrl::placeholder {
+          color: #94a3b8 !important;
+        }
+        [data-theme="light"] .mail-glass-ctrl option {
+          background: #ffffff !important;
+          color: #0f172a !important;
+        }
+        [data-theme="light"] .mail-radio-container {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+        }
+        [data-theme="light"] .mail-hierarchy-hint {
+          background: #eff6ff !important;
+          border-color: #bfdbfe !important;
+          color: #1e40af !important;
+        }
+        [data-theme="light"] #mailTargetField {
+          background: #faf5ff !important;
+          border-color: #e9d5ff !important;
+        }
+        [data-theme="light"] .mail-target-header {
+          color: #7e22ce !important;
+          border-bottom-color: #e9d5ff !important;
+        }
+        [data-theme="light"] #mailPersonSearchResults {
+          background: #ffffff !important;
+          border-color: #c084fc !important;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.15) !important;
+        }
+        [data-theme="light"] .mail-person-row {
+          background: #ffffff !important;
+          border-color: #e2e8f0 !important;
+          color: #0f172a !important;
+        }
+        [data-theme="light"] .mail-person-row:hover {
+          background: #f1f5f9 !important;
+          border-color: #a855f7 !important;
+        }
+        [data-theme="light"] .mail-person-row-name {
+          color: #0f172a !important;
+        }
+        [data-theme="light"] .mail-person-row-badge {
+          background: rgba(2, 132, 199, 0.1) !important;
+          color: #0284c7 !important;
+        }
+        [data-theme="light"] .mail-person-row-sub {
+          color: #64748b !important;
+        }
+        [data-theme="light"] .mail-person-row-loc {
+          color: #0284c7 !important;
+        }
+        [data-theme="light"] #mailSelectedPersonBadge {
+          background: #f5f3ff !important;
+          border-color: #a855f7 !important;
+        }
+        [data-theme="light"] #mailSelectedPersonTitle {
+          color: #1e1b4b !important;
+        }
+        [data-theme="light"] #mailSelectedPersonSub {
+          color: #6b21a8 !important;
+        }
+        [data-theme="light"] #mailOfficialFieldsContainer {
+          background: #fffbeb !important;
+          border-color: #fde68a !important;
+        }
+        [data-theme="light"] .mail-official-header {
+          color: #b45309 !important;
+          border-bottom-color: #fde68a !important;
+        }
+        [data-theme="light"] .mail-signature-panel {
+          background: #f8fafc !important;
+          border-color: #fde68a !important;
+        }
+        [data-theme="light"] #mailDropZone {
+          background: #f0f9ff !important;
+          border-color: #7dd3fc !important;
+        }
+        [data-theme="light"] #mailDropZone:hover {
+          background: #e0f2fe !important;
+          border-color: #0284c7 !important;
+        }
+        [data-theme="light"] .mail-drop-title {
+          color: #0284c7 !important;
+        }
+        [data-theme="light"] .mail-drop-subtitle {
+          color: #64748b !important;
+        }
+        [data-theme="light"] .mail-btn-cancel {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+        }
+        [data-theme="light"] .mail-btn-cancel:hover {
+          background: #e2e8f0 !important;
+          color: #0f172a !important;
+        }
+        [data-theme="light"] .btn-glass-pill {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #0369a1 !important;
+        }
+        [data-theme="light"] .btn-glass-pill:hover {
+          background: #e2e8f0 !important;
+          color: #0284c7 !important;
+        }
       </style>
 
       <div class="mail-compose-card">
-        <!-- رأس النافذة الملكي الزجاجي -->
-        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.45) 50%, rgba(15, 23, 42, 0.95) 100%); padding: 1.25rem 1.65rem; border-bottom: 1.2px solid rgba(56, 189, 248, 0.25); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <!-- رأس النافذة الملكي الزجاجي الثابت -->
+        <div class="mail-compose-banner">
           <div style="display: flex; align-items: center; gap: 0.85rem;">
             <div style="width: 48px; height: 48px; border-radius: 15px; background: rgba(56, 189, 248, 0.18); border: 1.2px solid rgba(56, 189, 248, 0.45); display: flex; align-items: center; justify-content: center; font-size: 1.55rem; box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);">
               ✉️
@@ -618,7 +955,7 @@ function renderComposeMailModal(context, user) {
               <h3 style="margin: 0; font-weight: 900; color: #ffffff; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.2px;">
                 إنشاء بريد جديد ومراسلة رسمية
               </h3>
-              <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.25rem;">
+              <div class="mail-compose-subtitle" style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.25rem;">
                 المنظومة الرقمية الموحدة للمراسلات والكتب الرسمية والمطالعات التشغيلية
               </div>
             </div>
@@ -627,26 +964,26 @@ function renderComposeMailModal(context, user) {
             <span style="background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 0.8rem; font-weight: 800; padding: 0.35rem 0.85rem; border-radius: 20px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);">
               نظام البريد 2.0
             </span>
-            <button type="button" onclick="window.app.closeComposeMailModal()"
+            <button type="button" onclick="window.app.closeComposeMailModal()" class="mail-compose-close-btn"
                     style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; width: 34px; height: 34px; color: #94a3b8; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
               ✕
             </button>
           </div>
         </div>
 
-        <!-- نموذج الإرسال -->
-        <form id="mailComposeForm" onsubmit="window.app.submitComposeMail(event)" style="padding: 1.6rem; display: flex; flex-direction: column; gap: 1.35rem;">
+        <!-- نموذج الإرسال مع مسطرة التمرير الداخلية -->
+        <form id="mailComposeForm" onsubmit="window.app.submitComposeMail(event)" class="mail-compose-scroll-body">
 
           <!-- البطاقة 1: تصنيف المعاملة ونطاق البث والمسار الإداري -->
-          <div class="mail-card-section">
-            <div style="font-size: 0.94rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.65rem;">
+          <div class="mail-card-section" style="position: relative; z-index: 20;">
+            <div class="mail-section-title-blue">
               📜 تصنيف ونوع المعاملة ونطاق البث
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1rem;">
               <!-- نوع وتصنيف المعاملة -->
               <div>
-                <label style="font-weight: 700; font-size: 0.9rem; color: #f1f5f9; display: block; margin-bottom: 0.45rem;">
+                <label class="mail-compose-label">
                   📜 نوع المعاملة والمراسلة:
                 </label>
                 <select id="mailLetterType" name="letterType" class="form-control mail-glass-ctrl" onchange="window.app.onLetterTypeChange(this.value)" style="font-weight: 700; padding: 0.75rem 1rem; width: 100%; cursor: pointer;">
@@ -659,10 +996,10 @@ function renderComposeMailModal(context, user) {
 
               <!-- طبيعة البث (عام / خاص) -->
               <div>
-                <label style="font-weight: 700; font-size: 0.9rem; color: #f1f5f9; display: block; margin-bottom: 0.45rem;">
+                <label class="mail-compose-label">
                   📡 نطاق البث والتوجيه:
                 </label>
-                <div style="display: flex; gap: 0.75rem; align-items: center; min-height: 46px; background: rgba(8, 15, 30, 0.6); padding: 0.35rem 0.85rem; border-radius: 12px; border: 1.2px solid rgba(56, 189, 248, 0.3);">
+                <div class="mail-radio-container">
                   <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; color: #38bdf8; flex: 1;">
                     <input type="radio" name="mailType" value="public" checked onchange="window.app.toggleMailTargetField(this.value)"
                            style="accent-color: #38bdf8; width: 18px; height: 18px;">
@@ -678,7 +1015,7 @@ function renderComposeMailModal(context, user) {
             </div>
 
             <!-- شريط توجيه الهيكل الإداري والعملياتي المعتمد -->
-            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.55) 100%); border: 1px solid rgba(96, 165, 250, 0.25); border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.82rem; color: #bfdbfe; line-height: 1.6; display: flex; align-items: center; gap: 0.65rem;">
+            <div class="mail-hierarchy-hint">
               <span style="font-size: 1.2rem; flex-shrink: 0;">🏛️</span>
               <div>
                 <strong>الهيكل الإداري والتشغيلي:</strong> المسار المباشر للعمليات: [رئاسة القسم] ⮂ [الشعب الفنية] ⮂ [المحطات الميدانية]. وحدات إدارة القسم تختص بالتنسيق وطلب المعلومات والإحصائيات من الشعب فقط.
@@ -687,14 +1024,14 @@ function renderComposeMailModal(context, user) {
           </div>
 
           <!-- حقول التوجيه الخاص (تظهر فقط عند اختيار خاص) -->
-          <div id="mailTargetField" class="mail-card-section" style="display: none; border-color: rgba(168, 85, 247, 0.4) !important; background: rgba(26, 16, 48, 0.55) !important;">
-            <div style="font-size: 0.94rem; font-weight: 800; color: #c084fc; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(168, 85, 247, 0.2); padding-bottom: 0.6rem;">
+          <div id="mailTargetField" class="mail-card-section" style="display: none; position: relative; z-index: 100; overflow: visible !important;">
+            <div class="mail-target-header">
               🎯 تحديد الوجهة الموجه إليها البريد الخاص
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.1rem;">
               <div>
-                <label style="font-weight: 700; font-size: 0.88rem; color: #f1f5f9; display: block; margin-bottom: 0.4rem;">
+                <label class="mail-compose-label">
                   مستوى جهة التوجيه:
                 </label>
                 <select id="mailToLevel" name="toLevel" class="form-control mail-glass-ctrl" onchange="window.app.updateMailTargetOptions()"
@@ -709,7 +1046,7 @@ function renderComposeMailModal(context, user) {
 
               <!-- اختيار عادي للشعب والوحدات والمحطات -->
               <div id="mailStandardTargetContainer">
-                <label style="font-weight: 700; font-size: 0.88rem; color: #f1f5f9; display: block; margin-bottom: 0.4rem;">
+                <label class="mail-compose-label">
                   الجهة المستهدفة:
                 </label>
                 <select id="mailToTargetId" name="toTargetId" class="form-control mail-glass-ctrl" style="font-weight: 700; padding: 0.75rem 1rem; width: 100%; border-color: rgba(168, 85, 247, 0.35);">
@@ -719,12 +1056,12 @@ function renderComposeMailModal(context, user) {
             </div>
 
             <!-- حاوية البحث الذكي عن الأشخاص -->
-            <div id="mailPersonSearchContainer" style="display:none; position:relative; margin-top: 1rem;">
+            <div id="mailPersonSearchContainer" style="display:none; position:relative; z-index:100; margin-top: 1rem;">
               <input type="hidden" id="mailSelectedPersonId" name="selectedPersonId" value="">
               <input type="hidden" id="mailSelectedPersonName" name="selectedPersonName" value="">
 
               <!-- شريط البحث الفوري -->
-              <div id="mailPersonSearchInputWrapper" style="position:relative;">
+              <div id="mailPersonSearchInputWrapper" style="position:relative; z-index:100;">
                 <input type="text" id="mailPersonSearchInput" class="form-control mail-glass-ctrl"
                        placeholder="🔍 ابحث بالاسم، الرقم الوظيفي، الشعبة أو العنوان..."
                        autocomplete="off"
@@ -747,22 +1084,22 @@ function renderComposeMailModal(context, user) {
                 </button>
               </div>
 
-              <!-- القائمة المنسدلة للنتائج الذكية -->
+              <!-- القائمة المنسدلة للنتائج الذكية: مرفوعة z-index لمنع الحجب -->
               <div id="mailPersonSearchResults"
-                   style="display:none; position:absolute; top:100%; left:0; right:0; z-index:1000; background:rgba(15,23,42,0.98); border:1.5px solid rgba(168,85,247,0.45); box-shadow:0 14px 36px rgba(0,0,0,0.6); border-radius:14px; max-height:240px; overflow-y:auto; margin-top:6px; padding:0.5rem; backdrop-filter:blur(20px);">
+                   style="display:none; position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:99999; box-shadow:0 16px 40px rgba(0,0,0,0.85); border-radius:14px; max-height:240px; overflow-y:auto; padding:0.5rem; backdrop-filter:blur(20px);">
               </div>
             </div>
           </div>
 
           <!-- حقول التوثيق والصادر الرسمي المعتمد -->
-          <div id="mailOfficialFieldsContainer" class="mail-card-section" style="display:none; background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.12)); border:1.5px solid rgba(245,158,11,0.38) !important;">
-            <div style="font-weight:900; font-size:0.94rem; color:#fbbf24; display:flex; align-items:center; gap:0.5rem; margin-bottom: 1.1rem; border-bottom: 1px solid rgba(245,158,11,0.2); padding-bottom: 0.65rem;">
+          <div id="mailOfficialFieldsContainer" class="mail-card-section" style="display:none; position:relative; z-index:15;">
+            <div class="mail-official-header">
               <span>🏛️</span> <span>بيانات الصادر والتوثيق الرسمي المعتمد</span>
             </div>
 
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom: 1rem;">
               <div>
-                <label style="font-weight:700; font-size:0.86rem; color:#f1f5f9; display:block; margin-bottom:0.4rem;">
+                <label class="mail-compose-label">
                   رقم الصادر المعتمد <span style="color:#ef4444;">*</span>
                 </label>
                 <input type="text" id="mailRefNumber" name="refNumber" class="form-control mail-glass-ctrl"
@@ -770,7 +1107,7 @@ function renderComposeMailModal(context, user) {
                        style="font-size:0.9rem; font-weight:700; padding: 0.7rem 0.95rem; border-color: rgba(245,158,11,0.35);">
               </div>
               <div>
-                <label style="font-weight:700; font-size:0.86rem; color:#f1f5f9; display:block; margin-bottom:0.4rem;">
+                <label class="mail-compose-label">
                   التاريخ الرسمي للكتاب:
                 </label>
                 <input type="date" id="mailLetterDate" name="letterDate" class="form-control mail-glass-ctrl"
@@ -778,7 +1115,7 @@ function renderComposeMailModal(context, user) {
                        style="font-size:0.9rem; font-weight:700; padding: 0.7rem 0.95rem; border-color: rgba(245,158,11,0.35);">
               </div>
               <div>
-                <label style="font-weight:700; font-size:0.86rem; color:#f1f5f9; display:block; margin-bottom:0.4rem;">
+                <label class="mail-compose-label">
                   درجة الأسبقية:
                 </label>
                 <select id="mailPriority" name="priority" class="form-control mail-glass-ctrl" style="font-weight:700; font-size:0.9rem; padding: 0.7rem 0.95rem; border-color: rgba(245,158,11,0.35);">
@@ -788,7 +1125,7 @@ function renderComposeMailModal(context, user) {
                 </select>
               </div>
               <div>
-                <label style="font-weight:700; font-size:0.86rem; color:#f1f5f9; display:block; margin-bottom:0.4rem;">
+                <label class="mail-compose-label">
                   درجة السرية:
                 </label>
                 <select id="mailClassification" name="classification" class="form-control mail-glass-ctrl" style="font-weight:700; font-size:0.9rem; padding: 0.7rem 0.95rem; border-color: rgba(245,158,11,0.35);">
@@ -799,7 +1136,7 @@ function renderComposeMailModal(context, user) {
             </div>
 
             <!-- لوحة التوقيع الإلكتروني والختم المعتمد لمنشئ الكتاب -->
-            <div style="border:1.2px solid rgba(245,158,11,0.35); border-radius:14px; padding:0.95rem 1.15rem; background:rgba(15,23,42,0.65);">
+            <div class="mail-signature-panel">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                 <label style="font-weight:800; font-size:0.86rem; color:#fbbf24; margin:0; display:flex; align-items:center; gap:0.4rem;">
                   ✍️ توقيع وختم منشئ الكتاب / المراسلة
@@ -828,9 +1165,9 @@ function renderComposeMailModal(context, user) {
           </div>
 
           <!-- البطاقة 2: موضوع ونص البريد والقوالب السريعة -->
-          <div class="mail-card-section">
+          <div class="mail-card-section" style="position: relative; z-index: 10;">
             <div style="margin-bottom: 1.15rem;">
-              <label style="font-weight: 700; font-size: 0.92rem; color: #f1f5f9; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.45rem;">
+              <label class="mail-compose-label">
                 📌 موضوع البريد: <span style="color: #ef4444;">*</span>
               </label>
               <input type="text" name="subject" id="mailSubject" class="form-control mail-glass-ctrl" required
@@ -840,7 +1177,7 @@ function renderComposeMailModal(context, user) {
 
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.65rem;">
-                <label style="font-weight: 700; font-size: 0.92rem; color: #f1f5f9; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                <label class="mail-compose-label" style="margin: 0;">
                   📝 نص ومحتوى البريد: <span style="color: #ef4444;">*</span>
                 </label>
                 <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
@@ -858,9 +1195,9 @@ function renderComposeMailModal(context, user) {
           </div>
 
           <!-- البطاقة 3: المرفقات مع السحب والإفلات -->
-          <div class="mail-card-section">
+          <div class="mail-card-section" style="position: relative; z-index: 5;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <label style="font-weight: 700; font-size: 0.92rem; color: #f1f5f9; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+              <label class="mail-compose-label" style="margin: 0;">
                 <span>📎 المرفقات (صور، ملفات PDF، مستندات)</span>
               </label>
               <span id="mailAttachmentCountBadge" style="font-size: 0.8rem; color: #38bdf8; font-weight: 800; background: rgba(56,189,248,0.15); padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(56,189,248,0.3);"></span>
@@ -868,16 +1205,15 @@ function renderComposeMailModal(context, user) {
 
             <!-- منطقة السحب والإفلات الزجاجية التفاعلية -->
             <div id="mailDropZone"
-                 style="border: 2px dashed rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(99, 102, 241, 0.04) 100%); border-radius: 16px; padding: 1.6rem 1.2rem; text-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);"
                  onclick="document.getElementById('mailAttachmentsInput').click()"
                  ondragover="event.preventDefault(); this.style.borderColor='#38bdf8'; this.style.background='rgba(56, 189, 248, 0.15)'; this.style.transform='scale(1.01)';"
-                 ondragleave="event.preventDefault(); this.style.borderColor='rgba(56, 189, 248, 0.4)'; this.style.background='linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(99, 102, 241, 0.04) 100%)'; this.style.transform='scale(1)';"
+                 ondragleave="event.preventDefault(); this.style.borderColor=''; this.style.background=''; this.style.transform='scale(1)';"
                  ondrop="window.app.handleMailFileDrop(event)">
               <div style="font-size: 2.5rem; margin-bottom: 0.4rem;">📂</div>
-              <div style="font-weight: 800; font-size: 1rem; color: #38bdf8; margin-bottom: 0.25rem;">
+              <div class="mail-drop-title">
                 اسحب وأفلت الملفات أو الصور هنا
               </div>
-              <div style="font-size: 0.82rem; color: #94a3b8;">
+              <div class="mail-drop-subtitle">
                 يدعم ملفات PDF، صور JPG/PNG، ومستندات Word/Excel (أو انقر للتصفح المباشر من جهازك)
               </div>
               <input type="file" id="mailAttachmentsInput" multiple accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
@@ -890,7 +1226,7 @@ function renderComposeMailModal(context, user) {
 
           <!-- شريط أزرار الإجراءات السفلي الزجاجي -->
           <div style="display: flex; gap: 0.85rem; justify-content: flex-end; align-items: center; padding-top: 0.8rem; border-top: 1.2px solid rgba(255, 255, 255, 0.1);">
-            <button type="button" onclick="window.app.closeComposeMailModal()" class="btn btn-outline"
+            <button type="button" onclick="window.app.closeComposeMailModal()" class="btn btn-outline mail-btn-cancel"
                     style="background: rgba(255, 255, 255, 0.07); border: 1.2px solid rgba(255, 255, 255, 0.2); color: #cbd5e1; border-radius: 12px; padding: 0.65rem 1.6rem; font-weight: 700; font-size: 0.94rem; cursor: pointer; transition: all 0.2s;">
               إلغاء
             </button>
@@ -918,16 +1254,59 @@ function renderComposeMailModal(context, user) {
 // ─── نافذة عرض البريد الزجاجية فائقة الدقة والاتساع ───────────────────────────
 function renderMailViewerModal() {
   return `
-    <div id="mailViewerModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.78); backdrop-filter:blur(12px); padding:1rem; overflow-y:scroll; scrollbar-width:thin; scrollbar-color:var(--md-sys-color-primary) rgba(0,0,0,0.3);"
+    <div id="mailViewerModal" class="mail-viewer-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(2,6,23,0.85); backdrop-filter:blur(16px); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none;"
          onclick="if(event.target===this) window.app.closeMailViewer()">
       <style>
-        #mailViewerModal::-webkit-scrollbar { width: 12px; }
-        #mailViewerModal::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 8px; }
-        #mailViewerModal::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--md-sys-color-primary), #0284c7); border-radius: 8px; border: 2px solid rgba(0,0,0,0.2); }
-        #mailViewerModal::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+        #mailViewerModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #mailViewerModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        .mail-viewer-card {
+          background: var(--md-sys-color-surface);
+          border: 1.5px solid var(--md-sys-color-surface-variant);
+          border-radius: 24px;
+          max-width: 1200px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: 1rem auto 2rem auto;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 32px 110px rgba(0,0,0,0.6);
+          overflow: hidden;
+        }
+        .mail-viewer-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          scrollbar-width: thin !important;
+          scrollbar-color: #0284c7 rgba(15, 23, 42, 0.25) !important;
+        }
+        .mail-viewer-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .mail-viewer-scroll-body::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.15) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .mail-viewer-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #38bdf8, #0284c7) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(255, 255, 255, 0.4) !important;
+          box-shadow: 0 0 8px rgba(2, 132, 199, 0.4) !important;
+        }
+        .mail-viewer-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #67e8f9, #38bdf8) !important;
+          box-shadow: 0 0 14px rgba(56, 189, 248, 0.7) !important;
+        }
       </style>
-      <div style="background:var(--md-sys-color-surface); border:1.5px solid var(--md-sys-color-surface-variant); border-radius:var(--radius-lg); max-width:1200px; width:95%; margin:1rem auto 5rem auto; box-shadow:0 32px 110px rgba(0,0,0,0.5); overflow:hidden;">
-        <div id="mailViewerContent" style="padding:0;">
+      <div class="mail-viewer-card">
+        <div id="mailViewerContent" class="mail-viewer-scroll-body" style="padding:0; display:flex; flex-direction:column;">
           <!-- يُملأ ديناميكياً -->
         </div>
       </div>
@@ -948,26 +1327,135 @@ function renderMailViewerModal() {
 // ─── نافذة الرد ──────────────────────────────────────────────────────────────
 function renderMailReplyModal() {
   return `
-    <div id="mailReplyModal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(3,7,18,0.85); backdrop-filter:blur(14px); padding:1rem; overflow-y:scroll; scrollbar-width:thin; scrollbar-color:#a855f7 rgba(15,23,42,0.6);"
+    <div id="mailReplyModal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(3,7,18,0.85); backdrop-filter:blur(14px); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none;"
          onclick="if(event.target===this) window.app.closeMailReplyModal()">
       <style>
-        #mailReplyModal::-webkit-scrollbar { width: 10px; }
-        #mailReplyModal::-webkit-scrollbar-track { background: rgba(10, 18, 36, 0.7); border-radius: 8px; }
-        #mailReplyModal::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #a855f7, #7c3aed); border-radius: 8px; border: 2px solid rgba(15, 23, 42, 0.4); }
+        #mailReplyModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #mailReplyModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        .mail-reply-card {
+          background: rgba(11,20,42,0.96);
+          border: 1.2px solid rgba(168,85,247,0.38);
+          border-radius: 22px;
+          max-width: 680px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: 2rem auto;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 25px rgba(168,85,247,0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+        }
+        .mail-reply-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg,rgba(124,58,237,0.25),rgba(15,23,42,0.9));
+          padding: 1.25rem 1.6rem;
+          border-bottom: 1.2px solid rgba(168,85,247,0.3);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .mail-reply-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          padding: 1.6rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #a855f7 rgba(15,23,42,0.5) !important;
+        }
+        .mail-reply-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .mail-reply-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.7);
+          border-radius: 8px;
+          margin: 6px 0;
+        }
+        .mail-reply-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #a855f7, #7c3aed);
+          border-radius: 8px;
+          border: 2px solid rgba(15, 23, 42, 0.4);
+        }
+
+        /* 🌞 LIGHT THEME OVERRIDES FOR REPLY MODAL */
+        [data-theme="light"] #mailReplyModal {
+          background: rgba(15, 23, 42, 0.65) !important;
+        }
+        [data-theme="light"] .mail-reply-card {
+          background: #ffffff !important;
+          border-color: #c084fc !important;
+          color: #0f172a !important;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 0 25px rgba(168,85,247,0.1) !important;
+        }
+        [data-theme="light"] .mail-reply-banner {
+          background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #9333ea 100%) !important;
+          border-bottom-color: #c084fc !important;
+        }
+        [data-theme="light"] .mail-reply-banner h4 {
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .mail-reply-close-btn {
+          background: rgba(255, 255, 255, 0.2) !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .mail-reply-close-btn:hover {
+          background: rgba(239, 68, 68, 0.8) !important;
+          border-color: #ef4444 !important;
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .mail-reply-scroll-body {
+          scrollbar-color: #7c3aed #f1f5f9 !important;
+        }
+        [data-theme="light"] .mail-reply-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+        [data-theme="light"] .mail-reply-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #9333ea, #7c3aed) !important;
+          border-color: #f1f5f9 !important;
+        }
+        [data-theme="light"] #mailReplyBody {
+          background: #ffffff !important;
+          border-color: #cbd5e1 !important;
+          color: #0f172a !important;
+          box-shadow: inset 0 1px 3px rgba(0,0,0,0.06) !important;
+        }
+        [data-theme="light"] #mailReplyBody:focus {
+          border-color: #7c3aed !important;
+          box-shadow: 0 0 12px rgba(124,58,237,0.25) !important;
+        }
+        [data-theme="light"] #mailReplyBody::placeholder {
+          color: #94a3b8 !important;
+        }
+        [data-theme="light"] .mail-reply-btn-cancel {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+        }
+        [data-theme="light"] .mail-reply-btn-cancel:hover {
+          background: #e2e8f0 !important;
+          color: #0f172a !important;
+        }
       </style>
-      <div style="background:rgba(11,20,42,0.96); border:1.2px solid rgba(168,85,247,0.38); border-radius:22px; max-width:680px; width:95vw; margin:3rem auto; box-shadow:0 24px 64px rgba(0,0,0,0.7), 0 0 25px rgba(168,85,247,0.15); overflow:hidden; color:#ffffff;">
-        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.25),rgba(15,23,42,0.9)); padding:1.25rem 1.6rem; border-bottom:1.2px solid rgba(168,85,247,0.3); display:flex; justify-content:space-between; align-items:center;">
+      <div class="mail-reply-card">
+        <div class="mail-reply-banner">
           <h4 style="margin:0; font-weight:900; color:#c084fc; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
             <span>↩</span> <span>الرد على البريد الداخلي</span>
           </h4>
-          <button onclick="window.app.closeMailReplyModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:1rem; color:#94a3b8; display:flex; align-items:center; justify-content:center;">✕</button>
+          <button onclick="window.app.closeMailReplyModal()" class="mail-reply-close-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:1rem; color:#94a3b8; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">✕</button>
         </div>
-        <div style="padding:1.6rem;">
+        <div class="mail-reply-scroll-body">
           <textarea id="mailReplyBody" class="form-control" rows="5" placeholder="اكتب ردك وملاحظاتك الرسمية هنا..."
                     style="font-size:0.94rem; resize:vertical; min-height:120px; margin-bottom:1.35rem; background:rgba(8,15,30,0.75); border:1.2px solid rgba(168,85,247,0.35); border-radius:12px; color:#ffffff; padding:0.85rem 1.1rem; line-height:1.6;"></textarea>
           <input type="hidden" id="mailReplyTargetId">
           <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
-            <button onclick="window.app.closeMailReplyModal()" class="btn btn-outline" style="background:rgba(255,255,255,0.06); border:1.2px solid rgba(255,255,255,0.2); color:#cbd5e1; border-radius:10px; padding:0.6rem 1.4rem; font-weight:700;">إلغاء</button>
+            <button onclick="window.app.closeMailReplyModal()" class="btn btn-outline mail-reply-btn-cancel" style="background:rgba(255,255,255,0.06); border:1.2px solid rgba(255,255,255,0.2); color:#cbd5e1; border-radius:10px; padding:0.6rem 1.4rem; font-weight:700;">إلغاء</button>
             <button onclick="window.app.submitMailReply()" class="btn btn-glass-primary" style="font-weight:800; background:linear-gradient(135deg,#7c3aed,#9333ea); border:1.2px solid rgba(168,85,247,0.5); border-radius:10px; padding:0.6rem 1.8rem; box-shadow:0 4px 16px rgba(124,58,237,0.4);">
               ↩ إرسال الرد
             </button>
@@ -978,55 +1466,244 @@ function renderMailReplyModal() {
   `;
 }
 
-// ─── نافذة إضافة إحالة وهامش رسمي وتوجيه ────────────────────────────────────
+/// ─── نافذة إضافة إحالة وهامش رسمي وتوجيه (Workflow Endorsement) ─────────────
 function renderMailEndorsementModal() {
   const db = (window.store && typeof window.store.getDb === 'function') ? window.store.getDb() : {};
   const sections = db.sections || [];
 
   return `
-    <div id="mailEndorsementModal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(3,7,18,0.85); backdrop-filter:blur(14px); padding:1rem; overflow-y:scroll; scrollbar-width:thin; scrollbar-color:#f59e0b rgba(15,23,42,0.6);"
+    <div id="mailEndorsementModal" class="endorsement-modal-overlay" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(16px); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none;"
          onclick="if(event.target===this) window.app.closeMailEndorsementModal()">
       <style>
-        #mailEndorsementModal::-webkit-scrollbar { width: 10px; }
-        #mailEndorsementModal::-webkit-scrollbar-track { background: rgba(10, 18, 36, 0.7); border-radius: 8px; }
-        #mailEndorsementModal::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f59e0b, #d97706); border-radius: 8px; border: 2px solid rgba(15, 23, 42, 0.4); }
+        #mailEndorsementModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #mailEndorsementModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .endorsement-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.4);
+          border-radius: 24px;
+          max-width: 820px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: 1.5rem auto 2.5rem auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 40px rgba(245, 158, 11, 0.2);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s ease;
+        }
+
+        .endorsement-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 32, 67, 0.98) 0%, rgba(26, 54, 93, 0.95) 45%, rgba(180, 83, 9, 0.35) 100%);
+          padding: 1.6rem 2.2rem 1.4rem 2.2rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.45);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+        }
+
+        .endorsement-form-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.75rem 2.2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.3rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.5) !important;
+        }
+        .endorsement-form-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .endorsement-form-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.6) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .endorsement-form-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.5) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .endorsement-form-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.7) !important;
+        }
+
+        .endorsement-close-btn:hover {
+          background: rgba(239, 68, 68, 0.25) !important;
+          border-color: rgba(239, 68, 68, 0.6) !important;
+          color: #ef4444 !important;
+          transform: rotate(90deg);
+        }
+
+        .endorsement-input {
+          background: rgba(15, 23, 42, 0.92) !important;
+          color: #ffffff !important;
+          border: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+          border-radius: 12px !important;
+          padding: 0.8rem 1.1rem !important;
+          font-weight: 700 !important;
+          font-size: 0.95rem !important;
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.25) !important;
+          transition: all 0.25s ease !important;
+        }
+        .endorsement-input:focus {
+          border-color: #38bdf8 !important;
+          box-shadow: 0 0 14px rgba(56, 189, 248, 0.35), inset 0 2px 4px rgba(0,0,0,0.25) !important;
+          outline: none !important;
+        }
+        .endorsement-input option {
+          background: #0f172a;
+          color: #ffffff;
+          font-weight: 700;
+        }
+
+        .endorsement-sig-box {
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 16px;
+          padding: 1.25rem 1.4rem;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .endorsement-btn-stamp:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5) !important;
+        }
+
+        .endorsement-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6) !important;
+        }
+
+        .endorsement-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.15) !important;
+          border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* ─── وضع النهار (Light Theme Adaptation) ─── */
+        [data-theme="light"] .endorsement-modal-card {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          box-shadow: 0 30px 70px rgba(0,0,0,0.25);
+          color: #0f172a;
+        }
+        [data-theme="light"] .endorsement-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #b45309 100%);
+          border-bottom-color: rgba(245, 158, 11, 0.6);
+        }
+        [data-theme="light"] .endorsement-label {
+          color: #0f172a !important;
+          text-shadow: none !important;
+        }
+        [data-theme="light"] .endorsement-input {
+          background: #f8fafc !important;
+          color: #0f172a !important;
+          border-color: #cbd5e1 !important;
+          box-shadow: inset 0 1px 3px rgba(0,0,0,0.06) !important;
+        }
+        [data-theme="light"] .endorsement-input:focus {
+          border-color: #0284c7 !important;
+          box-shadow: 0 0 12px rgba(2, 132, 199, 0.25) !important;
+        }
+        [data-theme="light"] .endorsement-input option {
+          background: #ffffff;
+          color: #0f172a;
+        }
+        [data-theme="light"] .endorsement-sig-box {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .endorsement-sig-title {
+          color: #b45309 !important;
+        }
+        [data-theme="light"] .endorsement-btn-cancel {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+        }
+        [data-theme="light"] .endorsement-footer {
+          border-top-color: #e2e8f0 !important;
+        }
+
+        @media (max-width: 640px) {
+          .endorsement-banner {
+            padding: 1.25rem 1.25rem !important;
+          }
+          .endorsement-grid-2 {
+            grid-template-columns: 1fr !important;
+          }
+          .endorsement-form-body {
+            padding: 1.25rem 1.25rem !important;
+          }
+        }
       </style>
-      <div style="background:rgba(11,20,42,0.96); border:1.2px solid rgba(245,158,11,0.38); border-radius:22px; max-width:760px; width:95vw; margin:2rem auto 4rem auto; box-shadow:0 24px 64px rgba(0,0,0,0.7), 0 0 25px rgba(245,158,11,0.15); overflow:hidden; color:#ffffff;">
-        <!-- رأس النافذة -->
-        <div style="background:linear-gradient(135deg,rgba(245,158,11,0.25),rgba(15,23,42,0.9)); padding:1.25rem 1.6rem; border-bottom:1.2px solid rgba(245,158,11,0.3); display:flex; justify-content:space-between; align-items:center;">
-          <h4 style="margin:0; font-weight:900; color:#fbbf24; font-size:1.12rem; display:flex; align-items:center; gap:0.5rem;">
-            <span>✍️</span> <span>إضافة إحالة وهامش وتوجيه رسمي (Workflow Endorsement)</span>
-          </h4>
-          <button onclick="window.app.closeMailEndorsementModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:1rem; color:#94a3b8; display:flex; align-items:center; justify-content:center;">✕</button>
+
+      <div class="endorsement-modal-card">
+        <!-- 🌟 بانر الهيدر الموسّع والفاخر -->
+        <div class="endorsement-banner">
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(245,158,11,0.25), rgba(217,119,6,0.15)); border:1.5px solid rgba(245,158,11,0.5); display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 4px 15px rgba(245,158,11,0.25);">
+              ✍️
+            </div>
+            <div>
+              <h3 style="margin:0; font-weight:900; font-size:1.3rem; letter-spacing:-0.3px; color:#ffffff; display:flex; align-items:center; gap:0.6rem;">
+                <span style="background:linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #fbbf24 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">إضافة إحالة وهامش وتوجيه رسمي</span>
+              </h3>
+              <div style="font-size:0.84rem; color:#cbd5e1; font-weight:600; margin-top:0.35rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span>Workflow Endorsement</span>
+                <span style="opacity:0.6;">•</span>
+                <span style="color:#38bdf8; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); padding:0.15rem 0.6rem; border-radius:999px; font-size:0.75rem; font-weight:800;">نظام المراسلات والتوجيه المعتمد</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="window.app.closeMailEndorsementModal()" class="endorsement-close-btn" style="background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.22); border-radius:50%; width:38px; height:38px; cursor:pointer; color:#ffffff; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:all 0.25s ease;" title="إغلاق النافذة">✕</button>
         </div>
 
-        <form id="mailEndorsementForm" onsubmit="window.app.submitMailEndorsement(event)" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.1rem;">
+        <form id="mailEndorsementForm" onsubmit="window.app.submitMailEndorsement(event)" class="endorsement-form-body">
           <input type="hidden" id="mailEndorsementTargetMailId" value="">
 
-          <!-- توجيه الإحالة إلى -->
+          <!-- 🎯 توجيه الإحالة إلى -->
           <div>
-            <label style="font-weight:800; font-size:0.88rem; color:var(--md-sys-color-on-surface); display:block; margin-bottom:0.4rem;">
-              🎯 إحالة وتوجيه إلى
+            <label class="endorsement-label" style="font-weight:800; font-size:0.95rem; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,0,0.6); display:flex; align-items:center; gap:0.55rem; margin-bottom:0.5rem;">
+              <span style="background:rgba(56,189,248,0.18); border:1px solid rgba(56,189,248,0.4); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;">🎯</span>
+              <span>تحديد جهة الإحالة والتوجيه</span>
             </label>
-            <div style="display:grid; grid-template-columns:1fr 1.5fr; gap:0.5rem;">
-              <select id="mailEndorsementToLevel" class="form-control" onchange="window.app.updateEndorsementTargetOptions()" style="font-weight:700;">
+            <div class="endorsement-grid-2" style="display:grid; grid-template-columns:1fr 1.6fr; gap:0.75rem;">
+              <select id="mailEndorsementToLevel" class="form-control endorsement-input" onchange="window.app.updateEndorsementTargetOptions()">
                 <option value="section">🏢 شعبة محددة</option>
                 <option value="station">🛢️ محطة ميدانية</option>
                 <option value="department">🏛️ رئاسة القسم</option>
                 <option value="unit">📋 وحدة إدارة القسم</option>
               </select>
-              <select id="mailEndorsementToTargetId" class="form-control" style="font-weight:700;">
+              <select id="mailEndorsementToTargetId" class="form-control endorsement-input">
                 ${sections.map(s => `<option value="${s.id}" data-name="${s.name}">${s.name}</option>`).join('')}
               </select>
             </div>
           </div>
 
-          <!-- الإجراء المطلوب -->
+          <!-- ⚡ الإجراء والتوجيه المطلوب -->
           <div>
-            <label style="font-weight:800; font-size:0.88rem; color:var(--md-sys-color-on-surface); display:block; margin-bottom:0.4rem;">
-              ⚡ الإجراء والتوجيه المطلوب
+            <label class="endorsement-label" style="font-weight:800; font-size:0.95rem; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,0,0.6); display:flex; align-items:center; gap:0.55rem; margin-bottom:0.5rem;">
+              <span style="background:rgba(245,158,11,0.18); border:1px solid rgba(245,158,11,0.4); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;">⚡</span>
+              <span>نوع الإجراء والتوجيه المطلوب</span>
             </label>
-            <select id="mailEndorsementActionType" class="form-control" style="font-weight:700;">
+            <select id="mailEndorsementActionType" class="form-control endorsement-input">
               <option value="FOR_ACTION">لإجراء اللازم والعمل بموجبه وإعلامنا</option>
               <option value="FOR_INFO">للتفضل بالاطلاع والمتابعة</option>
               <option value="FOR_FEEDBACK">لبيان الرأي والمطالعة الفنية العاجلة</option>
@@ -1034,37 +1711,39 @@ function renderMailEndorsementModal() {
             </select>
           </div>
 
-          <!-- نص الهامش الإداري -->
+          <!-- 📝 نص الهامش الإداري -->
           <div>
-            <label style="font-weight:800; font-size:0.88rem; color:var(--md-sys-color-on-surface); display:block; margin-bottom:0.4rem;">
-              📝 نص الهامش الإداري والتوجيه <span style="color:#ef4444;">*</span>
+            <label class="endorsement-label" style="font-weight:800; font-size:0.95rem; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,0,0.6); display:flex; align-items:center; gap:0.55rem; margin-bottom:0.5rem;">
+              <span style="background:rgba(52,211,153,0.18); border:1px solid rgba(52,211,153,0.4); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;">📝</span>
+              <span>نص الهامش الإداري والتوجيه</span>
+              <span style="color:#ef4444; font-size:1.1rem; margin-right:2px;">*</span>
             </label>
-            <textarea id="mailEndorsementNote" class="form-control" rows="3" required
-                      placeholder="اكتب التوجيه أو الهامش الإداري هنا..."
-                      style="font-size:0.92rem; resize:vertical; min-height:85px;"></textarea>
+            <textarea id="mailEndorsementNote" class="form-control endorsement-input" rows="3" required
+                      placeholder="اكتب التوجيه أو الهامش الإداري هنا بكل وضوح ودقة..."
+                      style="min-height:100px; resize:vertical; line-height:1.7;"></textarea>
           </div>
 
-          <!-- لوحة توقيع وختم المسؤول المُحيل -->
-          <div style="border:1.5px solid var(--md-sys-color-surface-variant); border-radius:8px; padding:0.9rem; background:rgba(0,0,0,0.02);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-              <label style="font-weight:800; font-size:0.82rem; color:#b45309; margin:0;">
-                ✍️ توقيع وختم المسؤول المُحيل
+          <!-- ✍️ لوحة توقيع وختم المسؤول المُحيل -->
+          <div class="endorsement-sig-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.5rem;">
+              <label class="endorsement-sig-title" style="font-weight:900; font-size:0.95rem; color:#fbbf24; margin:0; display:flex; align-items:center; gap:0.45rem;">
+                <span>✍️</span> <span>توقيع وختم المسؤول المُحيل</span>
               </label>
-              <button type="button" class="btn btn-sm" onclick="window.app.applyEndorsementDigitalStamp()"
-                      style="background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.4); font-size:0.75rem; font-weight:800; border-radius:6px; cursor:pointer;">
-                🛡️ ختم وتوقيع رسمي سريع
+              <button type="button" class="endorsement-btn-stamp" onclick="window.app.applyEndorsementDigitalStamp()"
+                      style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; border:1.5px solid rgba(52,211,153,0.6); font-size:0.82rem; font-weight:800; padding:0.45rem 1.1rem; border-radius:999px; box-shadow:0 4px 14px rgba(16,185,129,0.35); cursor:pointer; display:inline-flex; align-items:center; gap:0.45rem; transition:transform 0.2s, box-shadow 0.2s;">
+                <span>🛡️</span> <span>ختم وتوقيع رسمي سريع</span>
               </button>
             </div>
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; position:relative;">
-              <canvas id="mailEndorsementCanvas" width="550" height="95"
-                      style="width:100%; height:95px; display:block; touch-action:none; cursor:crosshair; background:#ffffff;"></canvas>
-              <div id="mailEndorsementPlaceholder" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; color:#94a3b8; font-size:0.82rem; font-weight:700;">
+            <div style="background:#ffffff; border:2px solid #cbd5e1; border-radius:12px; overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,0.06); margin:0.75rem 0;">
+              <canvas id="mailEndorsementCanvas" width="550" height="105"
+                      style="width:100%; height:105px; display:block; touch-action:none; cursor:crosshair; background:#ffffff;"></canvas>
+              <div id="mailEndorsementPlaceholder" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; color:#94a3b8; font-size:0.88rem; font-weight:700;">
                 ✍️ ارسم التوقيع هنا بالإصبع أو الماوس
               </div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.3rem;">
-              <span id="mailEndorsementSignStatus" style="font-size:0.72rem; color:var(--md-sys-color-outline); font-weight:700;">لم يتم التوقيع بعد</span>
-              <button type="button" onclick="window.app.clearEndorsementSignature()" style="background:none; border:none; color:#ef4444; font-size:0.72rem; font-weight:800; cursor:pointer;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+              <span id="mailEndorsementSignStatus" style="font-size:0.82rem; color:#94a3b8; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem;">⚪ لم يتم التوقيع بعد</span>
+              <button type="button" onclick="window.app.clearEndorsementSignature()" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#f87171; border-radius:8px; padding:0.35rem 0.85rem; font-size:0.78rem; font-weight:800; cursor:pointer; transition:all 0.2s;">
                 ✕ مسح التوقيع
               </button>
             </div>
@@ -1072,11 +1751,11 @@ function renderMailEndorsementModal() {
             <input type="hidden" id="mailEndorsementStampInfo" value="">
           </div>
 
-          <!-- الأزرار -->
-          <div style="display:flex; gap:0.75rem; justify-content:flex-end; padding-top:0.5rem; border-top:1px solid var(--md-sys-color-surface-variant);">
-            <button type="button" onclick="window.app.closeMailEndorsementModal()" class="btn btn-outline" style="font-weight:700;">إلغاء</button>
-            <button type="submit" class="btn btn-glass-primary" style="font-weight:800; background:linear-gradient(135deg,#d97706,#b45309);">
-              <span>✍️ اعتماد وإرسال الإحالة الرسمية</span>
+          <!-- 🔘 أزرار الإجراءات السفلية -->
+          <div class="endorsement-footer" style="display:flex; gap:1rem; justify-content:flex-end; align-items:center; padding-top:1.25rem; border-top:1.5px solid rgba(255,255,255,0.1); margin-top:0.5rem;">
+            <button type="button" onclick="window.app.closeMailEndorsementModal()" class="endorsement-btn-cancel" style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.22); color:#ffffff; border-radius:12px; padding:0.8rem 1.8rem; font-weight:800; font-size:0.95rem; cursor:pointer; transition:all 0.2s;">إلغاء</button>
+            <button type="submit" class="endorsement-btn-submit" style="background:linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #0284c7 100%); color:#ffffff; border:1.5px solid rgba(96,165,250,0.6); border-radius:12px; padding:0.8rem 2.2rem; font-weight:900; font-size:1.02rem; box-shadow:0 4px 20px rgba(37,99,235,0.45); cursor:pointer; display:inline-flex; align-items:center; gap:0.55rem; transition:all 0.2s;">
+              <span>✍️</span> <span>اعتماد وإرسال الإحالة الرسمية</span>
             </button>
           </div>
         </form>
@@ -1121,8 +1800,8 @@ function buildMailViewerContent(mailId) {
   const masterRec = (db.employeeMasterRecords || []).find(e => e.employeeId === fromUser.employeeId) || {};
 
   return `
-    <!-- رأس عارض البريد الزجاجي -->
-    <div style="background:linear-gradient(135deg, rgba(11,87,208,0.1) 0%, rgba(2,132,199,0.15) 100%); padding:1.5rem 2rem; border-bottom:1px solid var(--md-sys-color-surface-variant); display:flex; justify-content:space-between; align-items:flex-start; gap:1.25rem;">
+    <!-- رأس عارض البريد الزجاجي الثابت -->
+    <div style="flex-shrink:0; background:linear-gradient(135deg, rgba(11,87,208,0.12) 0%, rgba(2,132,199,0.18) 100%); padding:1.4rem 2rem; border-bottom:1.5px solid var(--md-sys-color-surface-variant); display:flex; justify-content:space-between; align-items:flex-start; gap:1.25rem;">
       <div>
         <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.4rem;">
           <span style="background:var(--md-sys-color-primary); color:white; font-size:0.82rem; font-weight:900; padding:0.25rem 0.8rem; border-radius:999px; box-shadow:0 2px 8px rgba(11,87,208,0.3);">
@@ -1854,22 +2533,20 @@ function registerMailAppMethods(app) {
         <div class="mail-person-row"
              onclick="window.app.selectMailPerson('${escId}')"
              data-user-id="${escId}"
-             style="padding:0.6rem 0.8rem; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; transition:all 0.15s ease; margin-bottom:4px; border:1px solid rgba(0,0,0,0.06); background:var(--md-sys-color-surface);"
-             onmouseover="this.style.background='var(--md-sys-color-surface-variant)'; this.style.borderColor='rgba(11,87,208,0.3)';"
-             onmouseout="this.style.background='var(--md-sys-color-surface)'; this.style.borderColor='rgba(0,0,0,0.06)';">
+             style="padding:0.65rem 0.85rem; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; transition:all 0.15s ease; margin-bottom:5px;">
           <div style="min-width:0; flex:1;">
-            <div style="font-weight:800; font-size:0.88rem; color:var(--md-sys-color-on-surface); display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-              <span>${escName}</span>
-              ${u.employeeId ? `<span style="font-size:0.72rem; background:rgba(11,87,208,0.1); color:var(--md-sys-color-primary); padding:0.1rem 0.4rem; border-radius:4px; font-weight:800;">${escStr(u.employeeId)}</span>` : ''}
+            <div style="font-weight:800; font-size:0.88rem; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <span class="mail-person-row-name">${escName}</span>
+              ${u.employeeId ? `<span class="mail-person-row-badge" style="font-size:0.72rem; padding:0.15rem 0.45rem; border-radius:6px; font-weight:800;">${escStr(u.employeeId)}</span>` : ''}
             </div>
-            <div style="font-size:0.76rem; color:var(--md-sys-color-outline); margin-top:2px;">
-              ${escStr(titleText)} · <span style="color:var(--md-sys-color-primary);">${escStr(locText)}</span>
+            <div class="mail-person-row-sub" style="font-size:0.76rem; margin-top:2px;">
+              ${escStr(titleText)} · <span class="mail-person-row-loc" style="font-weight:700;">${escStr(locText)}</span>
             </div>
           </div>
           <button type="button"
                   class="btn btn-sm mail-person-select-btn mail-select-person-btn"
                   onclick="event.stopPropagation(); window.app.selectMailPerson('${escId}')"
-                  style="background:var(--md-sys-color-primary); color:#ffffff; border:none; border-radius:6px; padding:0.35rem 0.75rem; font-size:0.78rem; font-weight:800; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:0.35rem; box-shadow:0 1px 3px rgba(0,0,0,0.15); transition:all 0.15s ease;"
+                  style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:none; border-radius:8px; padding:0.35rem 0.85rem; font-size:0.78rem; font-weight:800; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:0.35rem; box-shadow:0 2px 6px rgba(2,132,199,0.3); transition:all 0.15s ease;"
                   onmouseover="this.style.opacity='0.9'; this.style.transform='scale(1.03)';"
                   onmouseout="this.style.opacity='1'; this.style.transform='none';">
             <span>اختيار</span>
@@ -2021,13 +2698,33 @@ function registerMailAppMethods(app) {
     }
   };
 
-  // إضافة ومعالجة الملفات إلى المسودة
-  app.addMailAttachmentFiles = function(fileList) {
+  // إضافة ومعالجة الملفات إلى المسودة مع ضغط الصور الذكي التلقائي
+  app.addMailAttachmentFiles = async function(fileList) {
     if (!window._mailDraftAttachments) window._mailDraftAttachments = [];
     const files = Array.from(fileList);
     if (files.length === 0) return;
 
-    files.forEach(file => {
+    for (const file of files) {
+      const isImg = file.type && file.type.startsWith('image/');
+      if (isImg && window.ImageCompressor && typeof window.ImageCompressor.compress === 'function') {
+        try {
+          const comp = await window.ImageCompressor.compress(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.78 });
+          window._mailDraftAttachments.push({
+            name: file.name,
+            size: comp.compressedSize || file.size,
+            originalSize: comp.originalSize || file.size,
+            compressionRatio: comp.compressionRatio || 0,
+            type: comp.type || file.type || 'image/jpeg',
+            dataUrl: comp.dataUrl
+          });
+          app.renderMailAttachmentsPreview();
+          continue;
+        } catch (e) {
+          console.warn('Image compression fallback:', e);
+        }
+      }
+
+      // Default reader for documents / PDFs or fallback
       const reader = new FileReader();
       reader.onload = function(e) {
         window._mailDraftAttachments.push({
@@ -2039,10 +2736,10 @@ function registerMailAppMethods(app) {
         app.renderMailAttachmentsPreview();
       };
       reader.readAsDataURL(file);
-    });
+    }
   };
 
-  // رسم معاينات المرفقات المسودة
+  // رسم معاينات المرفقات المسودة مع إحصائيات التوفير بالذاكرة
   app.renderMailAttachmentsPreview = function() {
     const preview = document.getElementById('mailAttachmentsPreview');
     const badge = document.getElementById('mailAttachmentCountBadge');
@@ -2067,9 +2764,10 @@ function registerMailAppMethods(app) {
     preview.innerHTML = list.map((att, idx) => {
       const isImg = att.type && att.type.startsWith('image/');
       const isPdf = (att.type && att.type === 'application/pdf') || (att.name && att.name.toLowerCase().endsWith('.pdf'));
+      const hasCompression = isImg && att.compressionRatio && att.compressionRatio > 5;
 
       return `
-        <div style="background:var(--md-sys-color-surface-variant); border:1.5px solid var(--md-sys-color-surface-variant); border-radius:var(--radius-md); padding:0.4rem 0.6rem; display:flex; align-items:center; gap:0.5rem; max-width:220px; box-shadow:0 2px 6px rgba(0,0,0,0.05); position:relative;">
+        <div style="background:var(--md-sys-color-surface-variant); border:1.5px solid var(--md-sys-color-surface-variant); border-radius:var(--radius-md); padding:0.4rem 0.6rem; display:flex; align-items:center; gap:0.5rem; max-width:240px; box-shadow:0 2px 6px rgba(0,0,0,0.05); position:relative;">
           ${isImg ? `
             <img src="${att.dataUrl}" alt="${att.name}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; flex-shrink:0;">
           ` : `
@@ -2081,8 +2779,13 @@ function registerMailAppMethods(app) {
             <div style="font-weight:800; font-size:0.8rem; color:var(--md-sys-color-on-surface); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
               ${att.name}
             </div>
-            <div style="font-size:0.72rem; color:var(--md-sys-color-outline);">
-              ${formatBytes(att.size)}
+            <div style="font-size:0.72rem; color:var(--md-sys-color-outline); display:flex; align-items:center; gap:0.3rem;">
+              <span>${formatBytes(att.size)}</span>
+              ${hasCompression ? `
+                <span style="color:#10b981; font-weight:700; font-size:0.65rem; background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px;" title="تم تقليل الحجم وتوفير الذاكرة بنسبة ${att.compressionRatio}%">
+                  ⚡ -${att.compressionRatio}%
+                </span>
+              ` : ''}
             </div>
           </div>
           <button type="button" onclick="window.app.removeMailDraftAttachment(${idx})"

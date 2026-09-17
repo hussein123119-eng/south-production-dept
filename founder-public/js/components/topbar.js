@@ -9,6 +9,7 @@ function renderTopbar() {
   const roleInfo = window.rbac.getRoleInfo(user.role);
   const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
   const shiftInfo = window.store.getCurrentShiftInfo();
+  const isOnline = window.store && typeof window.store.isOnline === 'function' ? window.store.isOnline() : true;
   const canManageShifts = window.rbac && typeof window.rbac.hasPermission === 'function'
     ? (window.rbac.hasPermission(user, 'MANAGE_SHIFTS') || user.role === 'DEPT_MANAGER' || user.role === 'SUPER_ADMIN')
     : (user.role === 'DEPT_MANAGER' || user.role === 'SUPER_ADMIN');
@@ -130,6 +131,15 @@ function renderTopbar() {
             </svg>
             <span class="datetime-text live-time-digits" id="topbarLiveTime" dir="ltr">${liveTimeStr}</span>
           </div>
+        </div>
+
+        <!-- Live Connection & Offline Resilience Capsule -->
+        <div class="topbar-network-pill ${isOnline ? 'net-online' : 'net-offline'}" 
+             id="topbarNetworkStatusPill"
+             onclick="window.app.openNetworkStorageModal()" 
+             title="${isOnline ? 'المنظومة متصلة ومزامنة بالكامل - انقر لمعاينة حالة التخزين والذاكرة' : 'وضع العمل دون إنترنت (أوفلاين) - انقر لمعاينة طابور الإجراءات والحفظ المحلي'}">
+          <span class="net-status-dot ${isOnline ? 'dot-green' : 'dot-amber'}" id="topbarNetworkStatusDot"></span>
+          <span class="net-status-label" id="topbarNetworkStatusLabel">${isOnline ? 'متصل' : 'أوفلاين'}</span>
         </div>
 
         <div class="topbar-actions">

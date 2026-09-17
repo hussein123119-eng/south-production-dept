@@ -162,6 +162,14 @@ console.log('✓ filterStationTechStatus executed without error.');
 window.app.forwardTechStatusToSection(createdStatus.id, standardStation.id);
 console.log('✓ window.app.forwardTechStatusToSection executed smoothly.');
 
+// 8. Test Removal of 'آخر تحديث' Column from Technical Status Tables
+console.log('\n--- 7. Testing Removal of Last Update Column ---');
+assert.strictEqual(stationTechHtml.includes('<th>آخر تحديث</th>'), false, 'Station technical status table must NOT have آخر تحديث column');
+assert.strictEqual(sectionHtml.includes('<th>آخر تحديث</th>'), false, 'Section technical status table must NOT have آخر تحديث column');
+const globalTechHtml = window.renderTechnicalStatusView();
+assert.strictEqual(globalTechHtml.includes('<th>آخر تحديث</th>'), false, 'Global technical status table must NOT have آخر تحديث column');
+console.log("✓ Test 7 Passed: 'آخر تحديث' column is completely removed from all technical status tables.");
+
 console.log('\n================================================================');
 console.log('🎉 ALL STATION TECHNICAL STATUS & FORWARDING TESTS PASSED 100%!');
 console.log('================================================================');

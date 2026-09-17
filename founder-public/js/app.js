@@ -10,11 +10,44 @@ class AppController {
     this.currentDeptManagementSubTab = 'staff';
     this.currentSectionSubTab = 'staff';
     this.currentUnitSubTab = 'staff';
+    this.currentStationSubTab = 'staff';
+    this.currentSectionNotifSubTab = 'dept';
+    this.currentUnitNotifSubTab = 'dept';
+    this.currentStationNotifSubTab = 'section';
     this.isSectionsDropdownOpen = false;
     this.isUnitsDropdownOpen = false;
     this.initTheme();
     this.initGlobalSearchShortcuts();
     this.initMobileGestures();
+    this.initNetworkStatusListener();
+  }
+
+  initNetworkStatusListener() {
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+    window.addEventListener('spd:network-status-changed', (e) => {
+      const pill = document.getElementById('topbarNetworkStatusPill');
+      const label = document.getElementById('topbarNetworkStatusLabel');
+      const dot = document.getElementById('topbarNetworkStatusDot');
+      if (!pill || !label) return;
+
+      const online = e.detail && typeof e.detail.online === 'boolean' ? e.detail.online : (typeof navigator !== 'undefined' ? navigator.onLine : true);
+      const syncing = e.detail && e.detail.syncing;
+      const pendingCount = e.detail && typeof e.detail.pendingCount === 'number' ? e.detail.pendingCount : 0;
+
+      if (syncing) {
+        pill.className = 'topbar-network-pill net-online';
+        label.textContent = 'مزامنة...';
+        if (dot) dot.className = 'net-status-dot dot-syncing';
+      } else if (online) {
+        pill.className = 'topbar-network-pill net-online';
+        label.textContent = pendingCount > 0 ? `متصل (${pendingCount})` : 'متصل';
+        if (dot) dot.className = 'net-status-dot dot-green';
+      } else {
+        pill.className = 'topbar-network-pill net-offline';
+        label.textContent = pendingCount > 0 ? `أوفلاين (${pendingCount})` : 'أوفلاين';
+        if (dot) dot.className = 'net-status-dot dot-amber';
+      }
+    });
   }
 
   initTheme() {
@@ -289,6 +322,13 @@ class AppController {
 
   navigate(viewName, paramId = null) {
     this.closeSidebar();
+    // Clean up any lingering modal overlays on view navigation
+    if (typeof document !== 'undefined' && document.querySelectorAll) {
+      const overlays = document.querySelectorAll('.sec-notif-overlay, .sec-notif-modal-overlay, .dept-notif-modal-overlay, .tech-modal-overlay');
+      overlays.forEach(el => {
+        if (el && typeof el.remove === 'function') el.remove();
+      });
+    }
     this.currentView = viewName;
     if (viewName === 'section_workspace') {
       this.currentSectionId = paramId;
@@ -1604,56 +1644,7 @@ class AppController {
   }
 
   openCreateNotificationModal() {
-    const user = window.auth.getCurrentUser();
-    const sections = window.store.getSections(user.departmentId) || [];
-    const units = window.store.getUnits(user.departmentId) || [];
-
-    this.showModal('🔔 إصدار تبليغ وتوجيه إداري رسمي', `
-      <form onsubmit="window.app.handleCreateNotificationSubmit(event)">
-        <div class="form-group">
-          <label class="form-label">عنوان التبليغ والتوجيه:</label>
-          <input type="text" id="notifTitle" class="form-control" placeholder="مثال: تعليمات السلامة وخطة التشغيل الميداني..." required>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <div class="form-group">
-            <label class="form-label">الجهة المستهدفة والنطاق:</label>
-            <select id="notifTargetSelect" class="form-control" required>
-              <option value="ALL_SECTIONS">🌐 تعميم لكافة شعب ووحدات القسم</option>
-              
-              <optgroup label="🏢 شعب القسم الإنتاجية والفنية">
-                ${sections.map(s => `<option value="SECTION:${s.id}">🏢 ${s.name}</option>`).join('')}
-              </optgroup>
-
-              <optgroup label="⚡ الوحدات التابعة لإدارة القسم">
-                ${units.map(u => `<option value="UNIT:${u.id}">⚡ ${u.name}</option>`).join('')}
-              </optgroup>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">درجة الأهمية:</label>
-            <select id="notifImportanceSelect" class="form-control">
-              <option value="NORMAL">عادي</option>
-              <option value="HIGH">⚠️ هام</option>
-              <option value="URGENT">🚨 عاجل وهام جداً</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">نص التبليغ والتوجيهات الرسمية:</label>
-          <textarea id="notifBody" class="form-control" rows="5" placeholder="اكتب التعليمات والتوجيهات الرسمية الصادرة هنا..." required></textarea>
-        </div>
-
-        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-glass-primary" style="font-weight: 800;">
-            <span>📢 إصدار ونشر التبليغ فوراً</span>
-          </button>
-        </div>
-      </form>
-    `);
+    this.openCreateDeptNotificationModal();
   }
 
   handleCreateNotificationSubmit(e) {
@@ -2001,140 +1992,508 @@ class AppController {
   openCreateDocumentModal() {
     const user = window.auth.getCurrentUser();
     const sections = window.store.getSections(user.departmentId) || [];
-    
-    this.showModal('📄 إضافة وثيقة أو تقرير رسمي جديد', `
-      <div style="direction: rtl; display: flex; flex-direction: column; gap: 1rem;">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, rgba(11,87,208,0.08) 0%, rgba(2,132,199,0.05) 100%); border: 1.5px solid rgba(11,87,208,0.18); border-radius: var(--radius-lg); padding: 1rem 1.35rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
-            <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--md-sys-color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 12px rgba(11,87,208,0.25); flex-shrink: 0;">
-              📄
-            </div>
-            <div>
-              <h4 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: var(--md-sys-color-primary);">
-                إضافة وثيقة أو تقرير رسمي جديد
-              </h4>
-              <p style="margin: 3px 0 0 0; font-size: 0.82rem; color: var(--md-sys-color-outline); line-height: 1.4;">
-                أرشفة وحفظ الكتب والمراسلات والتقارير الفنية والهندسية المعتمدة لقسم الإنتاج الجنوبي
-              </p>
+
+    const existing = document.getElementById('documentModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'documentModal';
+    overlay.className = 'dept-doc-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeDocumentModal();
+    };
+
+    overlay.innerHTML = `
+      <style>
+        #documentModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #documentModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .dept-doc-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 960px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: deptDocModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes deptDocModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .dept-doc-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
+
+        .dept-doc-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .dept-doc-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .dept-doc-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .dept-doc-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .dept-doc-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .dept-doc-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .dept-doc-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .dept-doc-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dept-doc-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .dept-doc-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.92rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-doc-input,
+        .dept-doc-select,
+        .dept-doc-textarea {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .dept-doc-input:focus,
+        .dept-doc-select:focus,
+        .dept-doc-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .dept-doc-input::placeholder,
+        .dept-doc-textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dept-doc-grid-3 {
+          display: grid;
+          grid-template-columns: 2fr 1.2fr 1.2fr;
+          gap: 1rem;
+        }
+        @media (max-width: 768px) {
+          .dept-doc-grid-3 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-doc-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .dept-doc-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-doc-tmpl-btn {
+          background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          color: #fbbf24;
+          border-radius: 8px;
+          padding: 0.35rem 0.75rem;
+          font-size: 0.8rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-doc-tmpl-btn:hover {
+          background: rgba(245, 158, 11, 0.25);
+          border-color: #f59e0b;
+          color: #ffffff;
+          transform: translateY(-1px);
+        }
+
+        .dept-doc-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+          flex-wrap: wrap;
+        }
+
+        .dept-doc-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-doc-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .dept-doc-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .dept-doc-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .dept-doc-modal-overlay {
+          background: rgba(15, 23, 42, 0.65);
+        }
+        [data-theme="light"] .dept-doc-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-doc-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .dept-doc-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .dept-doc-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .dept-doc-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .dept-doc-input,
+        [data-theme="light"] .dept-doc-select,
+        [data-theme="light"] .dept-doc-textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .dept-doc-input:focus,
+        [data-theme="light"] .dept-doc-select:focus,
+        [data-theme="light"] .dept-doc-textarea:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-doc-input::placeholder,
+        [data-theme="light"] .dept-doc-textarea::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .dept-doc-tmpl-btn {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #0369a1;
+        }
+        [data-theme="light"] .dept-doc-tmpl-btn:hover {
+          background: #e2e8f0;
+          color: #0284c7;
+        }
+        [data-theme="light"] .dept-doc-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .dept-doc-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .dept-doc-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-doc-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-doc-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+      </style>
+
+      <div class="dept-doc-modal-card" dir="rtl">
+        <!-- Luxury Top Banner -->
+        <div class="dept-doc-banner">
+          <div class="dept-doc-banner-info">
+            <div class="dept-doc-badge">📄</div>
+            <div class="dept-doc-title-wrap">
+              <h3>إضافة وثيقة أو تقرير رسمي جديد</h3>
+              <p>أرشفة وحفظ الكتب والمراسلات والتقارير الفنية والهندسية المعتمدة لقسم الإنتاج الجنوبي</p>
             </div>
           </div>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <span class="badge badge-primary" style="font-size: 0.82rem; padding: 0.35rem 0.75rem; font-weight: 800; border-radius: 8px;">
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <span class="badge badge-primary" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; font-weight: 800; border-radius: 10px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
               نظام DMS المعتمد
             </span>
+            <button type="button" class="dept-doc-close-btn" onclick="window.app.closeDocumentModal()" title="إغلاق النافذة">✕</button>
           </div>
         </div>
 
-        <form onsubmit="window.app.handleCreateDocumentSubmit(event)">
-          <!-- بطاقة 1: البيانات الأساسية والتصنيف -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-              <span style="font-size: 1.05rem;">📋</span>
-              <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">البيانات الأساسية وتصنيف الوثيقة</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr; gap: 1rem;">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.45rem;">
-                  <span>📌 عنوان الوثيقة / التقرير</span> <span style="color:#ef4444;">*</span>
-                </label>
-                <input type="text" id="docTitle" class="form-control" placeholder="مثال: تقرير الموقف اليومي لإنتاج النفط والغاز - الرميلة الجنوبية" required style="font-weight: 700;">
+        <form onsubmit="window.app.handleCreateDocumentSubmit(event)" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <!-- Contained Luxury Scrollbody -->
+          <div class="dept-doc-scroll-body">
+            <!-- بطاقة 1: البيانات الأساسية والتصنيف -->
+            <div class="dept-doc-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">📋</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">البيانات الأساسية وتصنيف الوثيقة</span>
               </div>
 
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.45rem;">
-                  <span>📂 نوع وتصنيف الملف</span> <span style="color:#ef4444;">*</span>
-                </label>
-                <select id="docCategory" class="form-control" onchange="window.app.onDocCategoryChange(this.value)" required style="font-weight: 700;">
-                  <option value="WORD">📄 مستند Word / كتاب رسمي</option>
-                  <option value="EXCEL">📊 جدول بيانات Excel / فحوصات</option>
-                  <option value="PDF">📕 تقرير PDF / وثيقة معتمدة</option>
-                </select>
-              </div>
-
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.45rem;">
-                  <span>🏛️ الجهة أو الشعبة المعنية</span>
-                </label>
-                <select id="docSectionId" class="form-control" style="font-weight: 700;">
-                  <option value="">🏢 إدارة القسم (المقر الرئيسي)</option>
-                  ${sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- بطاقة 2: محتوى ونص الوثيقة أو جدول البيانات -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div id="docWordContentBox" class="form-group" style="margin-bottom: 0;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.05rem;">📝</span>
-                  <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">محتوى ونص المستند / التقرير</span>
+              <div class="dept-doc-grid-3">
+                <div>
+                  <label class="dept-doc-label">
+                    <span>📌 عنوان الوثيقة / التقرير</span> <span style="color:#ef4444;">*</span>
+                  </label>
+                  <input type="text" id="docTitle" class="dept-doc-input" placeholder="مثال: تقرير الموقف اليومي لإنتاج النفط والغاز - الرميلة الجنوبية" required style="font-weight: 700;">
                 </div>
-                <div style="display: flex; gap: 0.35rem; align-items: center;">
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.app.insertDocTemplate('OFFICIAL_LETTER')" style="font-size: 0.76rem; padding: 0.25rem 0.55rem; font-weight: 700;" title="إدراج قالب كتاب رسمي">
-                    📋 كتاب رسمي
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.app.insertDocTemplate('DAILY_REPORT')" style="font-size: 0.76rem; padding: 0.25rem 0.55rem; font-weight: 700;" title="إدراج مسودة تقرير فني">
-                    📊 تقرير تشغيلي
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.app.insertDocTemplate('CLEAR')" style="font-size: 0.76rem; padding: 0.25rem 0.55rem; color: #ef4444;" title="مسح النص">
-                    مسح
-                  </button>
+
+                <div>
+                  <label class="dept-doc-label">
+                    <span>📂 نوع وتصنيف الملف</span> <span style="color:#ef4444;">*</span>
+                  </label>
+                  <select id="docCategory" class="dept-doc-select" onchange="window.app.onDocCategoryChange(this.value)" required style="font-weight: 700;">
+                    <option value="WORD">📄 مستند Word / كتاب رسمي</option>
+                    <option value="EXCEL">📊 جدول بيانات Excel / فحوصات</option>
+                    <option value="PDF">📕 تقرير PDF / وثيقة معتمدة</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="dept-doc-label">
+                    <span>🏛️ الجهة أو الشعبة المعنية</span>
+                  </label>
+                  <select id="docSectionId" class="dept-doc-select" style="font-weight: 700;">
+                    <option value="">🏢 إدارة القسم (المقر الرئيسي)</option>
+                    ${sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                  </select>
                 </div>
               </div>
-              <textarea id="docContent" class="form-control" rows="9" placeholder="اكتب نص المستند أو بنود التقرير الرسمي هنا بالتفصيل..." style="line-height: 1.75; font-size: 0.92rem; resize: vertical;"></textarea>
             </div>
 
-            <div id="docExcelGridBox" class="form-group" style="display: none; margin-bottom: 0;">
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-                <span style="font-size: 1.05rem;">📊</span>
-                <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">بيانات جدول Excel (أدخل الصفوف مفصولة بفواصل CSV)</span>
+            <!-- بطاقة 2: محتوى ونص الوثيقة أو جدول البيانات -->
+            <div class="dept-doc-section-card">
+              <div id="docWordContentBox">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.15rem;">📝</span>
+                    <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">محتوى ونص المستند / التقرير</span>
+                  </div>
+                  <div style="display: flex; gap: 0.4rem; align-items: center;">
+                    <button type="button" class="dept-doc-tmpl-btn" onclick="window.app.insertDocTemplate('OFFICIAL_LETTER')" title="إدراج قالب كتاب رسمي">
+                      📋 كتاب رسمي
+                    </button>
+                    <button type="button" class="dept-doc-tmpl-btn" onclick="window.app.insertDocTemplate('DAILY_REPORT')" title="إدراج مسودة تقرير فني">
+                      📊 تقرير تشغيلي
+                    </button>
+                    <button type="button" class="dept-doc-tmpl-btn" onclick="window.app.insertDocTemplate('CLEAR')" style="color:#ef4444; border-color:rgba(239,68,68,0.35);" title="مسح النص">
+                      🗑️ مسح
+                    </button>
+                  </div>
+                </div>
+                <textarea id="docContent" class="dept-doc-textarea" rows="9" placeholder="اكتب نص المستند أو بنود التقرير الرسمي هنا بالتفصيل..." style="line-height: 1.75; font-size: 0.92rem; resize: vertical;"></textarea>
               </div>
-              <textarea id="docExcelData" class="form-control" rows="8" placeholder="المحطة, الإنتاج (برميل/يوم), الضغط (Bar), الحالة&#10;المحطة المركزية, 150000, 45, تشغيلي&#10;المحطة الجنوبية, 120000, 42, تشغيلي" style="font-family: monospace; font-size: 0.88rem; direction: ltr; text-align: left; line-height: 1.6;"></textarea>
-              <div style="margin-top: 0.4rem; color: var(--md-sys-color-outline); font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem;">
-                <span>💡</span>
-                <span>الصف الأول يمثل عناوين الأعمدة والصفوف اللاحقة تمثل قراءات وسجلات المحطة.</span>
+
+              <div id="docExcelGridBox" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                  <span style="font-size: 1.15rem;">📊</span>
+                  <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">بيانات جدول Excel (أدخل الصفوف مفصولة بفواصل CSV)</span>
+                </div>
+                <textarea id="docExcelData" class="dept-doc-textarea" rows="8" placeholder="المحطة, الإنتاج (برميل/يوم), الضغط (Bar), الحالة&#10;المحطة المركزية, 150000, 45, تشغيلي&#10;المحطة الجنوبية, 120000, 42, تشغيلي" style="font-family: monospace; font-size: 0.88rem; direction: ltr; text-align: left; line-height: 1.6;"></textarea>
+                <div style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.8rem; display: flex; align-items: center; gap: 0.35rem;">
+                  <span>💡</span>
+                  <span>الصف الأول يمثل عناوين الأعمدة والصفوف اللاحقة تمثل قراءات وسجلات المحطة.</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- بطاقة 3: إعدادات الإصدار والاعتماد -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-              <span style="font-size: 1.05rem;">🏷️</span>
-              <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">إعدادات الإصدار وحالة النشر</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">رقم الإصدار (Version)</label>
-                <input type="text" id="docVersion" class="form-control" value="1.0" placeholder="1.0" style="font-weight: 700;">
+            <!-- بطاقة 3: إعدادات الإصدار والاعتماد -->
+            <div class="dept-doc-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🏷️</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">إعدادات الإصدار وحالة النشر</span>
               </div>
 
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">حالة النشر والاعتماد</label>
-                <select id="docStatus" class="form-control" style="font-weight: 700;">
-                  <option value="PUBLISHED">🟢 معتمد ومنشور (Published)</option>
-                  <option value="DRAFT">🟡 مسودة قيد المراجعة (Draft)</option>
-                </select>
+              <div class="dept-doc-grid-2">
+                <div>
+                  <label class="dept-doc-label">رقم الإصدار (Version)</label>
+                  <input type="text" id="docVersion" class="dept-doc-input" value="1.0" placeholder="1.0" style="font-weight: 700;">
+                </div>
+
+                <div>
+                  <label class="dept-doc-label">حالة النشر والاعتماد</label>
+                  <select id="docStatus" class="dept-doc-select" style="font-weight: 700;">
+                    <option value="PUBLISHED">🟢 معتمد ومنشور (Published)</option>
+                    <option value="DRAFT">🟡 مسودة قيد المراجعة (Draft)</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- شريط الإجراءات السفلي -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--md-sys-color-surface-variant); padding-top: 1.15rem; flex-wrap: wrap; gap: 0.75rem;">
-            <div style="font-size: 0.82rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.4rem;">
+          <div class="dept-doc-footer">
+            <div style="font-size: 0.84rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.45rem;">
               <span>🛡️</span>
               <span>يتم توثيق وأرشفة المستند رسمياً وربطه بسجلات قسم الإنتاج الجنوبي.</span>
             </div>
-            <div style="display: flex; gap: 0.65rem; align-items: center;">
-              <button type="button" class="btn btn-outline" onclick="window.app.closeModal()" style="padding: 0.55rem 1.35rem; font-weight: 700; border-radius: 8px;">
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <button type="button" class="dept-doc-btn-cancel" onclick="window.app.closeDocumentModal()">
                 إلغاء
               </button>
-              <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.65rem; font-weight: 800; border-radius: 8px; box-shadow: 0 4px 14px rgba(11,87,208,0.3); display: flex; align-items: center; gap: 0.5rem;">
+              <button type="submit" class="dept-doc-btn-submit">
                 <span>💾</span>
                 <span>حفظ وتوثيق المستند</span>
               </button>
@@ -2142,7 +2501,9 @@ class AppController {
           </div>
         </form>
       </div>
-    `, { size: 'lg', maxWidth: '960px' });
+    `;
+
+    document.body.appendChild(overlay);
   }
 
   onDocCategoryChange(cat) {
@@ -2218,116 +2579,457 @@ class AppController {
     const sections = window.store.getSections(user.departmentId) || [];
     const plainContent = (doc.content || '').replace(/<br\s*[\/]?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, '');
 
-    this.showModal(`✏️ تعديل وثيقة: ${doc.title}`, `
-      <div style="direction: rtl; display: flex; flex-direction: column; gap: 1rem;">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, rgba(11,87,208,0.08) 0%, rgba(2,132,199,0.05) 100%); border: 1.5px solid rgba(11,87,208,0.18); border-radius: var(--radius-lg); padding: 1rem 1.35rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
-            <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--md-sys-color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 12px rgba(11,87,208,0.25); flex-shrink: 0;">
-              ✏️
-            </div>
-            <div>
-              <h4 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: var(--md-sys-color-primary);">
-                تعديل وتحديث وثيقة: ${doc.title}
-              </h4>
-              <p style="margin: 3px 0 0 0; font-size: 0.82rem; color: var(--md-sys-color-outline); line-height: 1.4;">
-                تحديث البيانات والنصوص الرسمية وإعادة النشر أو التعديل
-              </p>
+    const existing = document.getElementById('documentModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'documentModal';
+    overlay.className = 'dept-doc-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeDocumentModal();
+    };
+
+    overlay.innerHTML = `
+      <style>
+        #documentModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #documentModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .dept-doc-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 960px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: deptDocModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes deptDocModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .dept-doc-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
+
+        .dept-doc-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .dept-doc-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .dept-doc-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .dept-doc-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .dept-doc-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .dept-doc-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .dept-doc-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .dept-doc-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .dept-doc-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dept-doc-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .dept-doc-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.92rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-doc-input,
+        .dept-doc-select,
+        .dept-doc-textarea {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .dept-doc-input:focus,
+        .dept-doc-select:focus,
+        .dept-doc-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .dept-doc-input::placeholder,
+        .dept-doc-textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dept-doc-grid-3 {
+          display: grid;
+          grid-template-columns: 2fr 1.2fr 1.2fr;
+          gap: 1rem;
+        }
+        @media (max-width: 768px) {
+          .dept-doc-grid-3 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-doc-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .dept-doc-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-doc-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+          flex-wrap: wrap;
+        }
+
+        .dept-doc-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-doc-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .dept-doc-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .dept-doc-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .dept-doc-modal-overlay {
+          background: rgba(15, 23, 42, 0.65);
+        }
+        [data-theme="light"] .dept-doc-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-doc-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .dept-doc-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .dept-doc-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .dept-doc-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .dept-doc-input,
+        [data-theme="light"] .dept-doc-select,
+        [data-theme="light"] .dept-doc-textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .dept-doc-input:focus,
+        [data-theme="light"] .dept-doc-select:focus,
+        [data-theme="light"] .dept-doc-textarea:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-doc-input::placeholder,
+        [data-theme="light"] .dept-doc-textarea::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .dept-doc-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .dept-doc-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .dept-doc-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-doc-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-doc-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+      </style>
+
+      <div class="dept-doc-modal-card" dir="rtl">
+        <!-- Luxury Top Banner -->
+        <div class="dept-doc-banner">
+          <div class="dept-doc-banner-info">
+            <div class="dept-doc-badge">✏️</div>
+            <div class="dept-doc-title-wrap">
+              <h3>تعديل وتحديث الوثيقة: ${doc.title}</h3>
+              <p>تحديث البيانات والنصوص الرسمية وإعادة النشر أو التعديل في السجل المركزي</p>
             </div>
           </div>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <span class="badge badge-info" style="font-size: 0.82rem; padding: 0.35rem 0.75rem; font-weight: 800; border-radius: 8px;">
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <span class="badge badge-info" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; font-weight: 800; border-radius: 10px; background: rgba(14, 165, 233, 0.2); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8;">
               الإصدار الحالي: v${doc.version || '1.0'}
             </span>
+            <button type="button" class="dept-doc-close-btn" onclick="window.app.closeDocumentModal()" title="إغلاق النافذة">✕</button>
           </div>
         </div>
 
-        <form onsubmit="window.app.handleEditDocumentSubmit(event, '${doc.id}')">
-          <!-- بطاقة 1: البيانات الأساسية والتصنيف -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-              <span style="font-size: 1.05rem;">📋</span>
-              <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">البيانات الأساسية وتصنيف الوثيقة</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr; gap: 1rem;">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">
-                  <span>📌 عنوان الوثيقة / التقرير</span> <span style="color:#ef4444;">*</span>
-                </label>
-                <input type="text" id="editDocTitle" class="form-control" value="${doc.title || ''}" required style="font-weight: 700;">
+        <form onsubmit="window.app.handleEditDocumentSubmit(event, '${doc.id}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <!-- Contained Luxury Scrollbody -->
+          <div class="dept-doc-scroll-body">
+            <!-- بطاقة 1: البيانات الأساسية والتصنيف -->
+            <div class="dept-doc-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">📋</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">البيانات الأساسية وتصنيف الوثيقة</span>
               </div>
 
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">
-                  <span>📂 نوع وتصنيف الملف</span> <span style="color:#ef4444;">*</span>
-                </label>
-                <select id="editDocCategory" class="form-control" required style="font-weight: 700;">
-                  <option value="WORD" ${doc.category === 'WORD' ? 'selected' : ''}>📄 مستند Word / كتاب رسمي</option>
-                  <option value="EXCEL" ${doc.category === 'EXCEL' ? 'selected' : ''}>📊 جدول بيانات Excel</option>
-                  <option value="PDF" ${doc.category === 'PDF' ? 'selected' : ''}>📕 تقرير PDF معتمد</option>
-                </select>
-              </div>
+              <div class="dept-doc-grid-3">
+                <div>
+                  <label class="dept-doc-label">
+                    <span>📌 عنوان الوثيقة / التقرير</span> <span style="color:#ef4444;">*</span>
+                  </label>
+                  <input type="text" id="editDocTitle" class="dept-doc-input" value="${doc.title || ''}" required style="font-weight: 700;">
+                </div>
 
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">
-                  <span>🏛️ الجهة أو الشعبة المعنية</span>
-                </label>
-                <select id="editDocSectionId" class="form-control" style="font-weight: 700;">
-                  <option value="">🏢 إدارة القسم (المقر الرئيسي)</option>
-                  ${sections.map(s => `<option value="${s.id}" ${doc.sectionId === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
-                </select>
-              </div>
-            </div>
-          </div>
+                <div>
+                  <label class="dept-doc-label">
+                    <span>📂 نوع وتصنيف الملف</span> <span style="color:#ef4444;">*</span>
+                  </label>
+                  <select id="editDocCategory" class="dept-doc-select" required style="font-weight: 700;">
+                    <option value="WORD" ${doc.category === 'WORD' ? 'selected' : ''}>📄 مستند Word / كتاب رسمي</option>
+                    <option value="EXCEL" ${doc.category === 'EXCEL' ? 'selected' : ''}>📊 جدول بيانات Excel</option>
+                    <option value="PDF" ${doc.category === 'PDF' ? 'selected' : ''}>📕 تقرير PDF معتمد</option>
+                  </select>
+                </div>
 
-          <!-- بطاقة 2: محتوى ونص الوثيقة -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div class="form-group" style="margin-bottom: 0;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.05rem;">📝</span>
-                  <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">نص ومحتوى المستند</span>
+                <div>
+                  <label class="dept-doc-label">
+                    <span>🏛️ الجهة أو الشعبة المعنية</span>
+                  </label>
+                  <select id="editDocSectionId" class="dept-doc-select" style="font-weight: 700;">
+                    <option value="">🏢 إدارة القسم (المقر الرئيسي)</option>
+                    ${sections.map(s => `<option value="${s.id}" ${doc.sectionId === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+                  </select>
                 </div>
               </div>
-              <textarea id="editDocContent" class="form-control" rows="9" required style="line-height: 1.75; font-size: 0.92rem; resize: vertical;">${plainContent}</textarea>
-            </div>
-          </div>
-
-          <!-- بطاقة 3: الإصدار والاعتماد -->
-          <div style="background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--md-sys-color-surface-variant);">
-              <span style="font-size: 1.05rem;">🏷️</span>
-              <span style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface);">إعدادات الإصدار وحالة النشر</span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">رقم الإصدار (Version)</label>
-                <input type="text" id="editDocVersion" class="form-control" value="${doc.version || '1.0'}" required style="font-weight: 700;">
+            <!-- بطاقة 2: محتوى ونص الوثيقة -->
+            <div class="dept-doc-section-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.15rem;">📝</span>
+                    <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">نص ومحتوى المستند</span>
+                  </div>
+                </div>
+                <textarea id="editDocContent" class="dept-doc-textarea" rows="9" required style="line-height: 1.75; font-size: 0.92rem; resize: vertical;">${plainContent}</textarea>
+              </div>
+            </div>
+
+            <!-- بطاقة 3: الإصدار والاعتماد -->
+            <div class="dept-doc-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🏷️</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">إعدادات الإصدار وحالة النشر</span>
               </div>
 
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 800; font-size: 0.86rem; color: var(--md-sys-color-on-surface); margin-bottom: 0.45rem;">حالة النشر والاعتماد</label>
-                <select id="editDocStatus" class="form-control" style="font-weight: 700;">
-                  <option value="PUBLISHED" ${doc.status === 'PUBLISHED' ? 'selected' : ''}>🟢 معتمد ومنشور (Published)</option>
-                  <option value="DRAFT" ${doc.status === 'DRAFT' ? 'selected' : ''}>🟡 مسودة قيد المراجعة (Draft)</option>
-                </select>
+              <div class="dept-doc-grid-2">
+                <div>
+                  <label class="dept-doc-label">رقم الإصدار (Version)</label>
+                  <input type="text" id="editDocVersion" class="dept-doc-input" value="${doc.version || '1.0'}" required style="font-weight: 700;">
+                </div>
+
+                <div>
+                  <label class="dept-doc-label">حالة النشر والاعتماد</label>
+                  <select id="editDocStatus" class="dept-doc-select" style="font-weight: 700;">
+                    <option value="PUBLISHED" ${doc.status === 'PUBLISHED' ? 'selected' : ''}>🟢 معتمد ومنشور (Published)</option>
+                    <option value="DRAFT" ${doc.status === 'DRAFT' ? 'selected' : ''}>🟡 مسودة قيد المراجعة (Draft)</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- شريط الإجراءات السفلي -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--md-sys-color-surface-variant); padding-top: 1.15rem; flex-wrap: wrap; gap: 0.75rem;">
-            <div style="font-size: 0.82rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.4rem;">
+          <div class="dept-doc-footer">
+            <div style="font-size: 0.84rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.45rem;">
               <span>🛡️</span>
               <span>سيتم حفظ التعديلات في السجل المركزي للوثائق وإتاحتها فوراً.</span>
             </div>
-            <div style="display: flex; gap: 0.65rem; align-items: center;">
-              <button type="button" class="btn btn-outline" onclick="window.app.closeModal()" style="padding: 0.55rem 1.35rem; font-weight: 700; border-radius: 8px;">
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <button type="button" class="dept-doc-btn-cancel" onclick="window.app.closeDocumentModal()">
                 إلغاء
               </button>
-              <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.65rem; font-weight: 800; border-radius: 8px; box-shadow: 0 4px 14px rgba(11,87,208,0.3); display: flex; align-items: center; gap: 0.5rem;">
+              <button type="submit" class="dept-doc-btn-submit">
                 <span>💾</span>
                 <span>حفظ التعديلات</span>
               </button>
@@ -2335,7 +3037,9 @@ class AppController {
           </div>
         </form>
       </div>
-    `, { size: 'lg', maxWidth: '960px' });
+    `;
+
+    document.body.appendChild(overlay);
   }
 
   handleEditDocumentSubmit(e, docId) {
@@ -3027,6 +3731,15 @@ class AppController {
   }
 
   closeModal() {
+    const deptNotifModal = document.getElementById('deptNotificationModal');
+    if (deptNotifModal) deptNotifModal.remove();
+
+    const vehicleModal = document.getElementById('vehicleModal');
+    if (vehicleModal) vehicleModal.remove();
+
+    const docModal = document.getElementById('documentModal');
+    if (docModal) docModal.remove();
+
     const backdrop = document.getElementById('appModalBackdrop');
     if (backdrop) {
       backdrop.classList.remove('active');
@@ -3035,6 +3748,16 @@ class AppController {
         backdrop.remove();
       }, 200);
     }
+  }
+
+  closeVehicleModal() {
+    const m = document.getElementById('vehicleModal');
+    if (m) m.remove();
+  }
+
+  closeDocumentModal() {
+    const m = document.getElementById('documentModal');
+    if (m) m.remove();
   }
 
   // --- Dynamic Request System ---
@@ -3185,8 +3908,23 @@ class AppController {
     this.render();
   }
 
+  setSectionNotifSubTab(subTab) {
+    this.currentSectionNotifSubTab = subTab;
+    this.render();
+  }
+
   setUnitSubTab(subTab) {
     this.currentUnitSubTab = subTab;
+    this.render();
+  }
+
+  setUnitNotifSubTab(subTab) {
+    this.currentUnitNotifSubTab = subTab;
+    this.render();
+  }
+
+  setStationNotifSubTab(subTab) {
+    this.currentStationNotifSubTab = subTab;
     this.render();
   }
 
@@ -3459,28 +4197,168 @@ class AppController {
     window.exporter.exportToExcel('سجل_حركة_السيارات', headers, rows);
   }
 
-  // --- Database Backup & Restore & Multi-Tenant Tools ---
+  // --- Network, Storage Expansion & Database Backup Engine ---
+  openNetworkStorageModal() {
+    const stats = window.store.getStorageStats();
+    const isOnline = window.store.isOnline();
+    const queue = window.store.getOfflineQueue();
+    const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
+
+    this.showModal('🌐 إدارة الاتصال والذاكرة والنسخ الاحتياطي', `
+      <div style="display: flex; flex-direction: column; gap: 1.25rem; font-family: 'Cairo', sans-serif;">
+        <!-- Card 1: Network & Offline Status -->
+        <div style="background: ${isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(248, 250, 252, 0.95)'}; border: 1.5px solid ${isDark ? 'rgba(56, 189, 248, 0.25)' : 'rgba(14, 165, 233, 0.25)'}; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.3rem;">📶</span>
+              <div>
+                <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: ${isDark ? '#38bdf8' : '#0284c7'};">حالة الاتصال والعمل دون إنترنت</h4>
+                <p style="margin: 0; font-size: 0.78rem; color: var(--md-sys-color-outline);">التزامن التلقائي مع السيرفر المحلي ومزامنة التغييرات</p>
+              </div>
+            </div>
+            <span style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: 800; font-size: 0.8rem; background: ${isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)'}; color: ${isOnline ? '#10b981' : '#f59e0b'}; border: 1px solid ${isOnline ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'};">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isOnline ? '#10b981' : '#f59e0b'};"></span>
+              ${isOnline ? '🟢 متصل ومزامن' : '🟠 وضع الأوفلاين (حفظ محلي)'}
+            </span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; font-size: 0.82rem;">
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">طابور العمليات المعلقة:</span>
+              <strong style="display: block; font-size: 1.05rem; color: var(--md-sys-color-on-surface); margin-top: 2px;">${queue.length} إجراء</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">الوضع التشغيلي:</span>
+              <strong style="display: block; font-size: 0.95rem; color: #10b981; margin-top: 2px;">محرك أوفلاين ذكي (Offline-First)</strong>
+            </div>
+          </div>
+          <div style="margin-top: 0.85rem; display: flex; justify-content: flex-end;">
+            <button class="btn btn-outline" style="font-size: 0.82rem; padding: 0.4rem 0.9rem;" onclick="window.app.triggerManualSync()">
+              🔄 مزامنة البيانات الآن
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2: High-Capacity Storage & Compression Engine -->
+        <div style="background: ${isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(248, 250, 252, 0.95)'}; border: 1.5px solid ${isDark ? 'rgba(168, 85, 247, 0.25)' : 'rgba(147, 51, 234, 0.25)'}; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.3rem;">💾</span>
+            <div>
+              <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: ${isDark ? '#c084fc' : '#7e22ce'};">محرك التخزين الموسع وضغط الصور</h4>
+              <p style="margin: 0; font-size: 0.78rem; color: var(--md-sys-color-outline);">سعة تخزين ضخمة تتجاوز 1 جيجابايت عبر IndexedDB وضغط صور الكتب والمستمسكات</p>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; font-size: 0.82rem;">
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">المحرك الأساسي:</span>
+              <strong style="display: block; font-size: 0.95rem; color: #10b981; margin-top: 2px;">IndexedDB V3 ⚡</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">الحجم المستهلك:</span>
+              <strong style="display: block; font-size: 0.95rem; color: var(--md-sys-color-on-surface); margin-top: 2px;">${stats.localStorageKB} KB</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">إجمالي السجلات:</span>
+              <strong style="display: block; font-size: 0.95rem; color: var(--md-sys-color-on-surface); margin-top: 2px;">${stats.totalRecords} سجل</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.03); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--md-sys-color-outline-variant);">
+              <span style="color: var(--md-sys-color-outline);">ضغط الصور:</span>
+              <strong style="display: block; font-size: 0.95rem; color: #0284c7; margin-top: 2px;">نشط (-85% حجم)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Executive Database Backup & Restore -->
+        <div style="background: ${isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(248, 250, 252, 0.95)'}; border: 1.5px solid ${isDark ? 'rgba(16, 185, 129, 0.25)' : 'rgba(5, 150, 105, 0.25)'}; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.3rem;">🛡️</span>
+            <div>
+              <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: ${isDark ? '#34d399' : '#059669'};">النسخ الاحتياطي الشامل والاستعادة</h4>
+              <p style="margin: 0; font-size: 0.78rem; color: var(--md-sys-color-outline);">تصدير واستيراد قاعدة البيانات بالكامل مع التحقق من البصمة الرقمية والبيانات</p>
+            </div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem;">
+            <button class="btn btn-primary" style="flex: 1; min-width: 180px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="window.app.exportDatabaseBackup()">
+              <span>📥</span>
+              <span>تصدير نسخة احتياطية فورية (JSON)</span>
+            </button>
+            <button class="btn btn-outline" style="flex: 1; min-width: 180px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="window.app.openRestoreDatabaseModal()">
+              <span>📤</span>
+              <span>استعادة نسخة احتياطية</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  async triggerManualSync() {
+    if (window.store && typeof window.store.flushOfflineQueue === 'function') {
+      window.store.flushOfflineQueue();
+    }
+    if (window.store && typeof window.store.syncWithServer === 'function') {
+      await window.store.syncWithServer();
+    }
+    alert('✅ تم تنفيذ المزامنة وتحديث حالة الاتصال والذاكرة بنجاح.');
+    if (this.currentModal) {
+      this.openNetworkStorageModal();
+    }
+  }
+
   exportDatabaseBackup() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(window.store.exportBackupJSON());
+    const actorUser = window.auth.getCurrentUser();
+    const backupJson = window.store.exportBackupJSON({
+      exportedBy: actorUser ? `${actorUser.fullName} (${actorUser.jobTitle || actorUser.role})` : 'المؤسس العام',
+      departmentId: actorUser ? actorUser.departmentId : 'dept-south-prod'
+    });
+
+    const blob = new Blob([backupJson], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", `SPD_Backup_${new Date().toISOString().split('T')[0]}.json`);
+    const dateStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    link.href = url;
+    link.download = `SPD_ENTERPRISE_FULL_BACKUP_${dateStr}.json`;
     document.body.appendChild(link);
     link.click();
-    link.remove();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    if (window.store.logActivity && actorUser) {
+      window.store.logActivity(
+        actorUser.departmentId || 'dept-south-prod',
+        actorUser.id,
+        actorUser.employeeId,
+        'EXPORT_SYSTEM_BACKUP',
+        'SUPER_ADMIN',
+        `تم تصدير نسخة احتياطية شاملة لقاعدة البيانات بصيغة JSON.`
+      );
+    }
   }
 
   openRestoreDatabaseModal() {
-    this.showModal('📤 استعادة نسخة احتياطية لقاعدة البيانات', `
-      <form onsubmit="window.app.handleRestoreDatabaseSubmit(event)">
-        <p style="color: var(--md-sys-color-error); font-size: 0.85rem; margin-bottom: 1rem;">
-          ⚠️ تنبيه: استعادة النسخة الاحتياطية ستقوم باستبدال كافة البيانات الحالية بالبيانات الموجودة في الملف.
-        </p>
-        <div class="form-group">
-          <label class="form-label">اختر ملف النسخة الاحتياطية (.json)</label>
-          <input type="file" id="backupJsonFile" class="form-control" accept=".json" required>
+    this.showModal('📤 استعادة نسخة احتياطية شاملة لقاعدة البيانات', `
+      <form onsubmit="window.app.handleRestoreDatabaseSubmit(event)" style="font-family: 'Cairo', sans-serif;">
+        <div style="background: rgba(239, 68, 68, 0.08); border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem;">
+          <h4 style="margin: 0 0 0.4rem 0; color: #ef4444; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+            <span>⚠️</span>
+            <span>تحذير أمني وإداري بالغ الأهمية</span>
+          </h4>
+          <p style="margin: 0; color: var(--md-sys-color-on-surface); font-size: 0.82rem; line-height: 1.6;">
+            عملية الاستعادة ستقوم بتحديث واستبدال قاعدة البيانات الحالية بالبيانات الموثقة داخل ملف النسخة الاحتياطية. يرجى التأكد من اختيار الملف الصحيح المعتمد.
+          </p>
         </div>
-        <button type="submit" class="btn btn-danger" style="width: 100%;">تأكيد استعادة قاعدة البيانات</button>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-weight: 700; margin-bottom: 0.5rem; display: block;">اختر ملف النسخة الاحتياطية (.json)</label>
+          <input type="file" id="backupJsonFile" class="form-control" accept=".json" required style="padding: 0.6rem;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
+          <button type="submit" class="btn btn-danger" style="display: flex; align-items: center; gap: 0.5rem;">
+            <span>🔄</span>
+            <span>تأكيد استعادة وتحديث المنظومة</span>
+          </button>
+        </div>
       </form>
     `);
   }
@@ -3488,17 +4366,21 @@ class AppController {
   handleRestoreDatabaseSubmit(e) {
     e.preventDefault();
     const file = document.getElementById('backupJsonFile').files[0];
-    if (!file) return;
+    if (!file) {
+      alert('يرجى اختيار ملف النسخة الاحتياطية أولاً.');
+      return;
+    }
 
+    const actorUser = window.auth.getCurrentUser();
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const res = window.store.importBackupJSON(evt.target.result);
+      const res = window.store.importBackupJSON(evt.target.result, actorUser);
       if (res.success) {
-        alert('تمت استعادة قاعدة البيانات بنجاح!');
+        alert(`✅ تمت استعادة قاعدة البيانات بنجاح!\n\nالإحصائيات المستعادة:\n- ${res.stats.usersCount || 0} مستخدم\n- ${res.stats.documentsCount || 0} مستند ونموذج\n- ${res.stats.mailCount || 0} رسالة بريد\n- ${res.stats.technicalStatusCount || 0} تقرير موقف فني`);
         this.closeModal();
         this.render();
       } else {
-        alert('فشل في استعادة البيانات: ' + res.error);
+        alert('❌ فشل في استعادة البيانات: ' + (res.error || 'الملف غير صالح'));
       }
     };
     reader.readAsText(file);
@@ -4022,51 +4904,474 @@ class AppController {
     }
   }
 
+  // --- Notification Sub-Tab Switchers (التبويبات الفرعية للتبليغات في الشعب والوحدات) ---
+  setSectionNotifSubTab(tab) {
+    this.currentSectionNotifSubTab = tab;
+    this.render();
+  }
+
+  setUnitNotifSubTab(tab) {
+    this.currentUnitNotifSubTab = tab;
+    this.render();
+  }
+
   // --- Section to Stations Notifications (تبليغات مسؤول الشعبة لمحطاته) ---
   openCreateSectionNotificationModal(sectionId) {
     const user = window.auth.getCurrentUser();
     const section = window.store.getSectionById(sectionId);
-    const stations = window.store.getStations(user ? user.departmentId : 'dept-south-prod', sectionId);
+    const stations = window.store.getStations(user ? user.departmentId : 'dept-south-prod', sectionId) || [];
 
-    this.showModal(`📢 إصدار تبليغ رسمي لمحطات الشعبة (${section?.name || 'الشعبة'})`, `
-      <form onsubmit="window.app.handleCreateSectionNotificationSubmit(event, '${sectionId}')">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" style="font-weight: 700;">عنوان التبليغ / التوجيه <span style="color: red;">*</span></label>
-          <input type="text" id="secNotifTitle" class="form-control" placeholder="مثال: تأكيد الالتزام بإجراءات السلامة وفحص صمامات العزل" required>
+    const existing = document.getElementById('sectionNotificationModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'sectionNotificationModal';
+    overlay.className = 'dept-notif-modal-overlay section-notif-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeSectionNotificationModal();
+    };
+
+    overlay.innerHTML = `
+      <style>
+        #sectionNotificationModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #sectionNotificationModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .sec-notif-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 820px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: secNotifModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes secNotifModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .sec-notif-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
+
+        .sec-notif-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .sec-notif-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .sec-notif-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .sec-notif-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .sec-notif-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .sec-notif-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .sec-notif-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .sec-notif-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .sec-notif-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .sec-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .sec-notif-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .sec-notif-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sec-notif-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .sec-notif-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.94rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .sec-notif-input,
+        .sec-notif-select,
+        .sec-notif-textarea {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .sec-notif-input:focus,
+        .sec-notif-select:focus,
+        .sec-notif-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .sec-notif-input::placeholder,
+        .sec-notif-textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .sec-notif-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .sec-notif-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .sec-notif-info-tip {
+          background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(245, 158, 11, 0.15) 100%);
+          border: 1.2px dashed rgba(245, 158, 11, 0.45);
+          border-radius: 14px;
+          padding: 0.85rem 1.15rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 0.84rem;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 600;
+          line-height: 1.5;
+        }
+
+        .sec-notif-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .sec-notif-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .sec-notif-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .sec-notif-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .sec-notif-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+        .sec-notif-btn-submit:active {
+          transform: translateY(0);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .sec-notif-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .sec-notif-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .sec-notif-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .sec-notif-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .sec-notif-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .sec-notif-input,
+        [data-theme="light"] .sec-notif-select,
+        [data-theme="light"] .sec-notif-textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .sec-notif-input:focus,
+        [data-theme="light"] .sec-notif-select:focus,
+        [data-theme="light"] .sec-notif-textarea:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .sec-notif-input::placeholder,
+        [data-theme="light"] .sec-notif-textarea::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .sec-notif-info-tip {
+          background: linear-gradient(135deg, #eff6ff 0%, #fef3c7 100%);
+          border-color: rgba(217, 119, 6, 0.4);
+          color: #1e3a8a;
+        }
+        [data-theme="light"] .sec-notif-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .sec-notif-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .sec-notif-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .sec-notif-btn-submit {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+          color: #ffffff;
+          box-shadow: 0 4px 15px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .sec-notif-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .sec-notif-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+        [data-theme="light"] .sec-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #d97706, #b45309) !important;
+          border-color: #e2e8f0 !important;
+        }
+      </style>
+
+      <div class="sec-notif-modal-card">
+        <!-- Luxury Header Banner -->
+        <div class="sec-notif-banner">
+          <div class="sec-notif-banner-info">
+            <div class="sec-notif-badge">📢</div>
+            <div class="sec-notif-title-wrap">
+              <h3>إصدار تبليغ رسمي لمحطات الشعبة (${section?.name || 'الشعبة'})</h3>
+              <p>نظام التوجيهات الميدانية والتعليمات التشغيلية للمحطات — ${section?.name || 'الشعبة'}</p>
+            </div>
+          </div>
+          <button type="button" class="sec-notif-close-btn" onclick="window.app.closeSectionNotificationModal()" title="إغلاق النافذة">✕</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">المحطة المستهدفة بالتبليغ</label>
-            <select id="secNotifTargetStation" class="form-control">
-              <option value="ALL">📍 كافة محطات الشعبة (${stations.length} محطات)</option>
-              ${stations.map(st => `
-                <option value="${st.id}">محطة: ${st.name} (${st.code})</option>
-              `).join('')}
-            </select>
+        <!-- Scrollable Form Body with Contained Luxury Scrollbar -->
+        <form onsubmit="window.app.handleCreateSectionNotificationSubmit(event, '${sectionId}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <div class="sec-notif-scroll-body">
+            
+            <!-- Title Section -->
+            <div class="sec-notif-section-card">
+              <label class="sec-notif-label" for="secNotifTitle">
+                <span>🏷️</span>
+                <span>عنوان التبليغ / التوجيه التشغيلي:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <input type="text" id="secNotifTitle" class="sec-notif-input" required placeholder="مثال: تأكيد الالتزام بإجراءات السلامة وفحص صمامات العزل..." autocomplete="off" />
+            </div>
+
+            <!-- Target Station & Importance Grid -->
+            <div class="sec-notif-grid-2">
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="secNotifTargetStation">
+                  <span>📍</span>
+                  <span>المحطة المستهدفة بالتبليغ:</span>
+                  <span style="color:#ef4444; font-weight:900;">*</span>
+                </label>
+                <select id="secNotifTargetStation" class="sec-notif-select">
+                  <option value="ALL">📍 كافة محطات الشعبة (${stations.length} محطات)</option>
+                  ${stations.map(st => `
+                    <option value="${st.id}">محطة: ${st.name} (${st.code || st.id})</option>
+                  `).join('')}
+                </select>
+              </div>
+
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="secNotifPriority">
+                  <span>⚡</span>
+                  <span>درجة الأولوية والأهمية:</span>
+                </label>
+                <select id="secNotifPriority" class="sec-notif-select">
+                  <option value="NORMAL">🟢 عادي (إشعار تشغيلي اعتيادي)</option>
+                  <option value="HIGH">⚠️ هام (متابعة تشغيلية مهمة)</option>
+                  <option value="URGENT">🚨 عاجل وهام جداً (توجيه فوري ومثبت)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Content Body Section -->
+            <div class="sec-notif-section-card">
+              <label class="sec-notif-label" for="secNotifContent">
+                <span>📝</span>
+                <span>نص التوجيه / التبليغ الرسمي:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <textarea id="secNotifContent" class="sec-notif-textarea" rows="6" required placeholder="أدخل تفاصيل التوجيه والتعليمات الصادرة لمسؤولي المحطات ومشغلي النوبات بدقة..."></textarea>
+            </div>
+
+            <!-- Information Tip Banner -->
+            <div class="sec-notif-info-tip">
+              <span style="font-size:1.25rem;">💡</span>
+              <span>سيتم نشر هذا التبليغ وتعميمه مباشرة في لوحة إعلانات المحطات المستهدفة مع إشعار كافة مسؤولي المحطات ومشغلي النوبات التابعة للشعبة.</span>
+            </div>
+
           </div>
 
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700;">درجة الأولوية والأهمية</label>
-            <select id="secNotifPriority" class="form-control">
-              <option value="NORMAL">ℹ️ اعتيادي</option>
-              <option value="HIGH">⚠️ هام</option>
-              <option value="URGENT">🚨 عاجل جداً</option>
-            </select>
+          <!-- Pinned Footer -->
+          <div class="sec-notif-footer">
+            <button type="button" class="sec-notif-btn-cancel" onclick="window.app.closeSectionNotificationModal()">إلغاء</button>
+            <button type="submit" class="sec-notif-btn-submit">
+              <span>📢 إصدار ونشر التبليغ للمحطات</span>
+            </button>
           </div>
-        </div>
+        </form>
+      </div>
+    `;
 
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label class="form-label" style="font-weight: 700;">نص التوجيه / التبليغ الرسمي <span style="color: red;">*</span></label>
-          <textarea id="secNotifContent" class="form-control" rows="5" placeholder="أدخل تفاصيل التوجيه والتعليمات الصادرة لمسؤولي المحطات ومشغلي النوبات..." required></textarea>
-        </div>
+    document.body.appendChild(overlay);
+  }
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-primary" style="font-weight: 700;">📢 نشر التبليغ فوراً</button>
-        </div>
-      </form>
-    `);
+  closeSectionNotificationModal() {
+    const modal = document.getElementById('sectionNotificationModal');
+    if (modal) modal.remove();
   }
 
   handleCreateSectionNotificationSubmit(e, sectionId) {
@@ -4098,8 +5403,9 @@ class AppController {
     }, user);
 
     alert('✅ تم نشر وتوجيه التبليغ الرسمي لمحطات الشعبة بنجاح.');
-    this.closeModal();
+    this.closeSectionNotificationModal();
     this.currentSectionSubTab = 'notifs';
+    this.currentSectionNotifSubTab = 'section';
     this.render();
   }
 
@@ -4224,12 +5530,1039 @@ class AppController {
     }
   }
 
+  // --- Forward Department Notifications to Section Stations (تعميم ونشر تبليغ القسم لمحطات الشعبة) ---
+  openForwardDeptNotificationToStationsModal(notifId, sectionId) {
+    const user = window.auth.getCurrentUser();
+    const db = window.store.getDb();
+    const notif = (db.officialNotifications || []).find(n => n.id === notifId) ||
+                  (db.notifications || []).find(n => n.id === notifId);
+    if (!notif) {
+      alert('التبليغ الوزاري أو توجيه القسم غير موجود.');
+      return;
+    }
+
+    const sec = (db.sections || []).find(s => s.id === sectionId);
+    const stations = (window.store && typeof window.store.getStations === 'function')
+      ? window.store.getStations(notif.departmentId || 'dept-south-prod', sectionId)
+      : (db.stations || []).filter(s => s.sectionId === sectionId);
+
+    const existing = document.getElementById('forwardDeptNotifModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'forwardDeptNotifModal';
+    overlay.className = 'dept-notif-modal-overlay sec-notif-modal-overlay sec-notif-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.85); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeForwardDeptNotifModal();
+    };
+
+    overlay.innerHTML = `
+      <div class="sec-notif-modal-card sec-notif-card" style="max-width: 720px; width: 95vw; margin: auto;">
+        <div class="sec-notif-banner sec-notif-header">
+          <div class="sec-notif-banner-info sec-notif-header-info">
+            <div class="sec-notif-badge">📢</div>
+            <div class="sec-notif-title-wrap">
+              <h3>نشر وتعميم توجيه القسم على محطات الشعبة</h3>
+              <p>تعميم وإرسال التوجيه الرسمي الصادر من إدارة القسم إلى محطات (${sec ? sec.name : 'الشعبة'}) مع إمكانية إضافة هامش توجيهي من مسؤول الشعبة</p>
+            </div>
+          </div>
+          <button type="button" class="sec-notif-close-btn" onclick="window.app.closeForwardDeptNotifModal()" title="إغلاق النافذة">✕</button>
+        </div>
+
+        <form onsubmit="window.app.handleForwardDeptNotificationSubmit(event, '${notifId}', '${sectionId}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <div class="sec-notif-scroll-body">
+            
+            <!-- Original Dept Notif Summary Card -->
+            <div class="fwd-dept-summary-box">
+              <div style="font-size: 0.8rem; font-weight: 800; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem; color: #3b82f6;">
+                <span>🏛️</span>
+                <span>التوجيه الصادر من إدارة القسم:</span>
+              </div>
+              <h4 class="fwd-dept-title-text">
+                ${notif.title}
+              </h4>
+              <div class="fwd-dept-content-text">
+                ${notif.content || notif.body || ''}
+              </div>
+            </div>
+
+            <!-- Target Station & Priority -->
+            <div class="sec-notif-grid-2">
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="fwdTargetStation">
+                  <span>📍</span>
+                  <span>المحطة المستهدفة بالتعميم:</span>
+                  <span style="color:#ef4444; font-weight:900;">*</span>
+                </label>
+                <select id="fwdTargetStation" class="sec-notif-select">
+                  <option value="ALL">📍 كافة محطات الشعبة (${stations.length} محطات)</option>
+                  ${stations.map(st => `
+                    <option value="${st.id}">محطة: ${st.name} (${st.code || st.id})</option>
+                  `).join('')}
+                </select>
+              </div>
+
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="fwdPriority">
+                  <span>⚡</span>
+                  <span>درجة الأولوية والأهمية:</span>
+                </label>
+                <select id="fwdPriority" class="sec-notif-select">
+                  <option value="NORMAL" ${notif.importance === 'NORMAL' ? 'selected' : ''}>🟢 عادي (إشعار تشغيلي اعتيادي)</option>
+                  <option value="HIGH" ${(notif.importance === 'HIGH' || !notif.importance) ? 'selected' : ''}>⚠️ هام (متابعة تشغيلية مهمة)</option>
+                  <option value="URGENT" ${notif.importance === 'URGENT' ? 'selected' : ''}>🚨 عاجل وهام جداً (توجيه فوري ومثبت)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Section Manager Directive Note -->
+            <div class="sec-notif-section-card">
+              <label class="sec-notif-label" for="fwdSectionDirective">
+                <span>📌</span>
+                <span>هامش وتوجيهات مسؤول الشعبة إلى مسؤولي المحطات (اختياري / إضافي):</span>
+              </label>
+              <textarea id="fwdSectionDirective" class="sec-notif-textarea" rows="3" placeholder="مثال: يرجى من كافة مسؤولي المحطات الالتزام بمضمون التوجيه الوزاري وتزويدنا بالموقف النهائي قبل نهاية الدوام الرسمي..."></textarea>
+            </div>
+
+            <div class="sec-notif-info-tip">
+              <span style="font-size:1.25rem;">💡</span>
+              <span>عند التعميم، سيظهر هذا التبليغ مباشرة في مساحات عمل المحطات المستهدفة تحت تبويب (التبليغات الواردة من الشعبة) مع هامش التوجيه الخاص بكم.</span>
+            </div>
+
+          </div>
+
+          <div class="sec-notif-footer">
+            <button type="button" class="sec-notif-btn-cancel" onclick="window.app.closeForwardDeptNotifModal()">إلغاء</button>
+            <button type="submit" class="sec-notif-btn-submit">
+              <span>📢 تعميم ونشر التوجيه على المحطات</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  closeForwardDeptNotifModal() {
+    const modal = document.getElementById('forwardDeptNotifModal');
+    if (modal) modal.remove();
+  }
+
+  handleForwardDeptNotificationSubmit(e, notifId, sectionId) {
+    if (e && e.preventDefault) e.preventDefault();
+    const user = window.auth.getCurrentUser();
+    const targetStationId = document.getElementById('fwdTargetStation')?.value || 'ALL';
+    const priority = document.getElementById('fwdPriority')?.value || 'HIGH';
+    const sectionDirective = document.getElementById('fwdSectionDirective')?.value.trim() || '';
+
+    let targetStationName = 'كافة محطات الشعبة';
+    if (targetStationId !== 'ALL') {
+      const st = (window.store && typeof window.store.getStationById === 'function')
+        ? window.store.getStationById(targetStationId)
+        : ((window.store.getDb().stations || []).find(s => s.id === targetStationId));
+      if (st) targetStationName = st.name;
+    }
+
+    window.store.forwardDeptNotificationToStations(notifId, sectionId, {
+      targetStationId,
+      targetStationName,
+      sectionDirective,
+      priority
+    }, user);
+
+    alert('✅ تم تعميم ونشر تبليغ القسم على محطات الشعبة بنجاح.');
+    this.closeForwardDeptNotifModal();
+    this.currentSectionSubTab = 'notifs';
+    this.currentSectionNotifSubTab = 'dept';
+    this.render();
+  }
+
+  // --- Station Directives & Notifications (تبليغات وتوجيهات مسؤول المحطة لكادره) ---
+  openCreateStationNotificationModal(stationId) {
+    const user = window.auth.getCurrentUser();
+    const db = window.store.getDb();
+    const station = (db.stations || []).find(s => s.id === stationId);
+    if (!station) {
+      alert('المحطة غير موجودة.');
+      return;
+    }
+
+    const existing = document.getElementById('stationNotificationModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'stationNotificationModal';
+    overlay.className = 'dept-notif-modal-overlay sec-notif-modal-overlay sec-notif-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.85); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeStationNotificationModal();
+    };
+
+    overlay.innerHTML = `
+      <div class="sec-notif-modal-card sec-notif-card" style="max-width: 720px; width: 95vw; margin: auto;">
+        <div class="sec-notif-banner sec-notif-header">
+          <div class="sec-notif-banner-info sec-notif-header-info">
+            <div class="sec-notif-badge">📢</div>
+            <div class="sec-notif-title-wrap">
+              <h3>إصدار تبليغ وتوجيه داخلي لكادر المحطة</h3>
+              <p>توجيه رسمي من مسؤول الموقع لكافة كوادر ونوبات (${station.name})</p>
+            </div>
+          </div>
+          <button type="button" class="sec-notif-close-btn" onclick="window.app.closeStationNotificationModal()" title="إغلاق النافذة">✕</button>
+        </div>
+
+        <form onsubmit="window.app.handleCreateStationNotificationSubmit(event, '${stationId}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <div class="sec-notif-scroll-body">
+            
+            <!-- Title Section -->
+            <div class="sec-notif-section-card">
+              <label class="sec-notif-label" for="stNotifTitle">
+                <span>🏷️</span>
+                <span>عنوان التبليغ / التوجيه الموقعي:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <input type="text" id="stNotifTitle" class="sec-notif-input" required placeholder="مثال: تنظيم جدول تسليم النوبات وفحص منظومة الإطفاء..." autocomplete="off" />
+            </div>
+
+            <!-- Target Scope & Priority -->
+            <div class="sec-notif-grid-2">
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="stNotifTargetScope">
+                  <span>👥</span>
+                  <span>النطاق والكوادر المستهدفة:</span>
+                  <span style="color:#ef4444; font-weight:900;">*</span>
+                </label>
+                <select id="stNotifTargetScope" class="sec-notif-select">
+                  <option value="ALL_STAFF">👥 كافة كادر ونوبات المحطة</option>
+                  <option value="SHIFT_A">الوجبة A (الشفت الأول / الصباحي)</option>
+                  <option value="SHIFT_B">الوجبة B (الشفت الثاني / المسائي)</option>
+                  <option value="SHIFT_C">الوجبة C (الشفت الثالث / الليلي)</option>
+                  <option value="DAY_SHIFT">الكادر النهاري الدائم</option>
+                  <option value="MAINTENANCE">فريق الصيانة والتشغيل</option>
+                  <option value="SAFETY">فريق السلامة والأمن الصناعي</option>
+                </select>
+              </div>
+
+              <div class="sec-notif-section-card">
+                <label class="sec-notif-label" for="stNotifPriority">
+                  <span>⚡</span>
+                  <span>درجة الأولوية والأهمية:</span>
+                </label>
+                <select id="stNotifPriority" class="sec-notif-select">
+                  <option value="NORMAL">🟢 عادي (إشعار تشغيلي اعتيادي)</option>
+                  <option value="HIGH">⚠️ هام (متابعة تشغيلية مهمة)</option>
+                  <option value="URGENT">🚨 عاجل وهام جداً (توجيه فوري ومثبت)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Content Body Section -->
+            <div class="sec-notif-section-card">
+              <label class="sec-notif-label" for="stNotifContent">
+                <span>📝</span>
+                <span>نص التوجيه والتعليمات الصادرة:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <textarea id="stNotifContent" class="sec-notif-textarea" rows="5" required placeholder="أدخل تفاصيل التوجيه لكوادر ومشغلي المحطة بدقة..."></textarea>
+            </div>
+
+            <div class="sec-notif-info-tip">
+              <span style="font-size:1.25rem;">💡</span>
+              <span>سيتم نشر هذا التوجيه فوراً في لوحة تبليغات المحطة تحت تبويب (التبليغات الصادرة من المحطة) ليتمكن الكادر من الاطلاع عليه والطباعة.</span>
+            </div>
+
+          </div>
+
+          <div class="sec-notif-footer">
+            <button type="button" class="sec-notif-btn-cancel" onclick="window.app.closeStationNotificationModal()">إلغاء</button>
+            <button type="submit" class="sec-notif-btn-submit">
+              <span>📢 إصدار ونشر التبليغ لكادر المحطة</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  closeStationNotificationModal() {
+    const modal = document.getElementById('stationNotificationModal');
+    if (modal) modal.remove();
+  }
+
+  handleCreateStationNotificationSubmit(e, stationId) {
+    if (e && e.preventDefault) e.preventDefault();
+    const user = window.auth.getCurrentUser();
+    const title = document.getElementById('stNotifTitle')?.value.trim();
+    const targetScope = document.getElementById('stNotifTargetScope')?.value || 'ALL_STAFF';
+    const priority = document.getElementById('stNotifPriority')?.value || 'NORMAL';
+    const content = document.getElementById('stNotifContent')?.value.trim();
+
+    if (!title || !content) {
+      alert('يرجى ملء عنوان التبليغ ونصه بشكل كامل.');
+      return;
+    }
+
+    window.store.addStationNotification({
+      stationId,
+      targetScope,
+      title,
+      content,
+      priority
+    }, user);
+
+    alert('✅ تم إصدار ونشر التبليغ لكادر المحطة بنجاح.');
+    this.closeStationNotificationModal();
+    this.currentStationSubTab = 'notifs';
+    this.currentStationNotifSubTab = 'station';
+    this.render();
+  }
+
+  handleDeleteStationNotification(notifId, stationId) {
+    const user = window.auth.getCurrentUser();
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التبليغ؟')) return;
+
+    window.store.deleteStationNotification(notifId, user);
+    this.render();
+  }
+
+  viewStationNotificationDetails(notifId) {
+    const db = window.store.getDb();
+    const notif = (db.stationNotifications || []).find(n => n.id === notifId);
+    if (!notif) {
+      alert('التبليغ غير موجود.');
+      return;
+    }
+
+    const priorityLabel = notif.priority === 'URGENT' ? '🚨 عاجل جداً' : (notif.priority === 'HIGH' ? '⚠️ هام' : 'ℹ️ اعتيادي');
+    const scopeLabel = notif.targetScope === 'SHIFT_A' ? 'الوجبة A' :
+                       (notif.targetScope === 'SHIFT_B' ? 'الوجبة B' :
+                       (notif.targetScope === 'SHIFT_C' ? 'الوجبة C' :
+                       (notif.targetScope === 'DAY_SHIFT' ? 'الكادر النهاري' :
+                       (notif.targetScope === 'MAINTENANCE' ? 'فريق الصيانة' :
+                       (notif.targetScope === 'SAFETY' ? 'فريق السلامة والأمن' : 'كافة كادر المحطة')))));
+
+    this.showModal(`📢 تفاصيل التبليغ الموقعي: ${notif.title}`, `
+      <div style="direction: rtl;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="badge ${notif.priority === 'URGENT' ? 'badge-danger' : (notif.priority === 'HIGH' ? 'badge-warning' : 'badge-info')}">
+              ${priorityLabel}
+            </span>
+            <span class="badge badge-secondary">
+              🎯 النطاق: ${scopeLabel}
+            </span>
+          </div>
+          <span style="font-size: 0.82rem; color: var(--md-sys-color-outline); font-family: monospace;">
+            📅 ${new Date(notif.publishDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </span>
+        </div>
+
+        <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.25rem; white-space: pre-wrap;">
+          ${notif.content}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--md-sys-color-outline); margin-bottom: 1rem;">
+          <div>
+            ✍️ <strong>المسؤول المُصدِر:</strong> ${notif.createdByName || 'مسؤول المحطة'}
+          </div>
+          <div>
+            🆔 <code>${notif.id}</code>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button class="btn btn-outline" onclick="window.app.printStationNotification('${notif.id}')">
+            🖨️ طباعة التبليغ
+          </button>
+          <button class="btn btn-primary" onclick="window.app.closeModal()">
+            إغلاق
+          </button>
+        </div>
+      </div>
+    `);
+  }
+
+  printStationNotification(notifId) {
+    const db = window.store.getDb();
+    const notif = (db.stationNotifications || []).find(n => n.id === notifId);
+    if (!notif) {
+      alert('التبليغ غير موجود');
+      return;
+    }
+
+    const priorityLabel = notif.priority === 'URGENT' ? 'عاجل جداً' : (notif.priority === 'HIGH' ? 'هام' : 'اعتيادي');
+    const station = notif.stationId ? (db.stations || []).find(s => s.id === notif.stationId) : null;
+    const sec = notif.sectionId ? (db.sections || []).find(s => s.id === notif.sectionId) : null;
+    const formattedDate = new Date(notif.publishDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    const contentHtml = `
+      <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px;">
+        <div style="border-bottom: 2px solid #003366; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #003366;">جمهورية العراق - وزارة النفط</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #004d40;">شركة نفط البصرة</div>
+            <div style="font-size: 1rem; font-weight: 800; color: #b45309;">هيأة تشغيل الرميلة</div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">قسم الإنتاج الجنوبي ${sec ? ' | ' + sec.name : ''} ${station ? ' | ' + station.name : ''}</div>
+          </div>
+          <div style="text-align: left; font-size: 0.9rem; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; background: #f8fafc;">
+            <div><strong>كود التبليغ:</strong> <code>${notif.id}</code></div>
+            <div><strong>التاريخ:</strong> <span style="font-family: monospace;">${formattedDate}</span></div>
+            <div><strong>درجة الأهمية:</strong> <span style="color: ${notif.priority === 'URGENT' ? '#dc2626' : '#2563eb'}; font-weight: bold;">${priorityLabel}</span></div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #003366; margin: 0 0 10px 0; font-size: 1.4rem; font-weight: 900;">أمر / توجيه موقعي داخلي</h2>
+          <div style="display: inline-block; background: #f1f5f9; padding: 6px 16px; border-radius: 20px; font-weight: bold; border: 1px solid #cbd5e1;">
+            ${notif.title}
+          </div>
+        </div>
+
+        <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 25px; line-height: 2; font-size: 1.05rem; background: #ffffff; min-height: 200px; white-space: pre-wrap;">
+          ${notif.content}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
+          <div style="font-size: 0.85rem; color: #64748b;">
+            <div>تم الإنشاء والتوثيق عبر: المنظومة الإدارية لقسم الإنتاج الجنوبي</div>
+            <div>رمز الموقع: <strong>${station ? station.code || station.id : 'STATION'}</strong></div>
+          </div>
+          <div style="text-align: center; min-width: 220px;">
+            <div style="font-weight: 800; font-size: 1rem; color: #003366;">مسؤول الموقع / المحطة</div>
+            <div style="font-size: 1.1rem; font-weight: 900; margin: 8px 0 4px 0;">${notif.createdByName || 'مسؤول المحطة'}</div>
+            <div style="font-size: 0.8rem; color: #64748b;">التوقيع والختم الموقعي</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (window.exporter && typeof window.exporter.printDocument === 'function') {
+      window.exporter.printDocument(`تبليغ موقعي - ${notif.title}`, 'وزارة النفط - شركة نفط البصرة - هيأة تشغيل الرميلة - قسم الإنتاج الجنوبي', contentHtml, {
+        sectionName: sec ? sec.name : '',
+        stationName: station ? station.name : '',
+        docNumber: notif.id
+      });
+    } else {
+      window.print();
+    }
+  }
+
+  // --- Unit Notifications (تبليغات وتوجيهات مسؤول الوحدة لكادره) ---
+  openCreateUnitNotificationModal(unitId) {
+    const user = window.auth.getCurrentUser();
+    const unit = window.store.getUnitById(unitId);
+
+    const existing = document.getElementById('unitNotificationModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'unitNotificationModal';
+    overlay.className = 'dept-notif-modal-overlay unit-notif-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeUnitNotificationModal();
+    };
+
+    overlay.innerHTML = `
+      <style>
+        #unitNotificationModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #unitNotificationModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .unit-notif-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 820px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: unitNotifModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes unitNotifModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .unit-notif-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
+
+        .unit-notif-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .unit-notif-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .unit-notif-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .unit-notif-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .unit-notif-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .unit-notif-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .unit-notif-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .unit-notif-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .unit-notif-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .unit-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .unit-notif-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .unit-notif-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .unit-notif-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .unit-notif-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.94rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .unit-notif-input,
+        .unit-notif-select,
+        .unit-notif-textarea {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .unit-notif-input:focus,
+        .unit-notif-select:focus,
+        .unit-notif-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .unit-notif-input::placeholder,
+        .unit-notif-textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .unit-notif-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .unit-notif-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .unit-notif-info-tip {
+          background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(245, 158, 11, 0.15) 100%);
+          border: 1.2px dashed rgba(245, 158, 11, 0.45);
+          border-radius: 14px;
+          padding: 0.85rem 1.15rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 0.84rem;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 600;
+          line-height: 1.5;
+        }
+
+        .unit-notif-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .unit-notif-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .unit-notif-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .unit-notif-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .unit-notif-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+        .unit-notif-btn-submit:active {
+          transform: translateY(0);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .unit-notif-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .unit-notif-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .unit-notif-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .unit-notif-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .unit-notif-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .unit-notif-input,
+        [data-theme="light"] .unit-notif-select,
+        [data-theme="light"] .unit-notif-textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .unit-notif-input:focus,
+        [data-theme="light"] .unit-notif-select:focus,
+        [data-theme="light"] .unit-notif-textarea:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .unit-notif-input::placeholder,
+        [data-theme="light"] .unit-notif-textarea::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .unit-notif-info-tip {
+          background: linear-gradient(135deg, #eff6ff 0%, #fef3c7 100%);
+          border-color: rgba(217, 119, 6, 0.4);
+          color: #1e3a8a;
+        }
+        [data-theme="light"] .unit-notif-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .unit-notif-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .unit-notif-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .unit-notif-btn-submit {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+          color: #ffffff;
+          box-shadow: 0 4px 15px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .unit-notif-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .unit-notif-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+        [data-theme="light"] .unit-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #d97706, #b45309) !important;
+          border-color: #e2e8f0 !important;
+        }
+      </style>
+
+      <div class="unit-notif-modal-card">
+        <!-- Luxury Header Banner -->
+        <div class="unit-notif-banner">
+          <div class="unit-notif-banner-info">
+            <div class="unit-notif-badge">📢</div>
+            <div class="unit-notif-title-wrap">
+              <h3>إصدار تبليغ رسمي لكادر الوحدة (${unit?.name || 'الوحدة'})</h3>
+              <p>نظام التوجيهات والمهام الإدارية والفنية — ${unit?.name || 'الوحدة'}</p>
+            </div>
+          </div>
+          <button type="button" class="unit-notif-close-btn" onclick="window.app.closeUnitNotificationModal()" title="إغلاق النافذة">✕</button>
+        </div>
+
+        <!-- Scrollable Form Body with Contained Luxury Scrollbar -->
+        <form onsubmit="window.app.handleCreateUnitNotificationSubmit(event, '${unitId}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <div class="unit-notif-scroll-body">
+            
+            <!-- Title Section -->
+            <div class="unit-notif-section-card">
+              <label class="unit-notif-label" for="unitNotifTitle">
+                <span>🏷️</span>
+                <span>عنوان التبليغ / التوجيه الإداري والفني:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <input type="text" id="unitNotifTitle" class="unit-notif-input" required placeholder="مثال: تعليمات تنفيذ جدول المناوبات والصيانة الدورية..." autocomplete="off" />
+            </div>
+
+            <!-- Target Scope & Importance Grid -->
+            <div class="unit-notif-grid-2">
+              <div class="unit-notif-section-card">
+                <label class="unit-notif-label" for="unitNotifTargetScope">
+                  <span>👥</span>
+                  <span>الجهة المستهدفة بالتبليغ:</span>
+                  <span style="color:#ef4444; font-weight:900;">*</span>
+                </label>
+                <select id="unitNotifTargetScope" class="unit-notif-select">
+                  <option value="ALL">👥 كافة كادر ومنتسبي الوحدة</option>
+                </select>
+              </div>
+
+              <div class="unit-notif-section-card">
+                <label class="unit-notif-label" for="unitNotifPriority">
+                  <span>⚡</span>
+                  <span>درجة الأولوية والأهمية:</span>
+                </label>
+                <select id="unitNotifPriority" class="unit-notif-select">
+                  <option value="NORMAL">🟢 عادي (إشعار دوري اعتيادي)</option>
+                  <option value="HIGH">⚠️ هام (يتطلب متابعة سريعة)</option>
+                  <option value="URGENT">🚨 عاجل وهام جداً (توجيه فوري ومثبت)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Content Body Section -->
+            <div class="unit-notif-section-card">
+              <label class="unit-notif-label" for="unitNotifContent">
+                <span>📝</span>
+                <span>نص التوجيه / التبليغ الرسمي:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <textarea id="unitNotifContent" class="unit-notif-textarea" rows="6" required placeholder="أدخل تفاصيل التوجيه والتعليمات الصادرة لكادر الوحدة بدقة..."></textarea>
+            </div>
+
+            <!-- Information Tip Banner -->
+            <div class="unit-notif-info-tip">
+              <span style="font-size:1.25rem;">💡</span>
+              <span>سيتم نشر هذا التبليغ وتعميمه مباشرة في لوحة إعلانات وتبليغات الوحدة مع إشعار كافة منتسبي وكادر الوحدة المعنيين.</span>
+            </div>
+
+          </div>
+
+          <!-- Pinned Footer -->
+          <div class="unit-notif-footer">
+            <button type="button" class="unit-notif-btn-cancel" onclick="window.app.closeUnitNotificationModal()">إلغاء</button>
+            <button type="submit" class="unit-notif-btn-submit">
+              <span>📢 إصدار ونشر التبليغ لكادر الوحدة</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  closeUnitNotificationModal() {
+    const modal = document.getElementById('unitNotificationModal');
+    if (modal) modal.remove();
+  }
+
+  handleCreateUnitNotificationSubmit(e, unitId) {
+    if (e && e.preventDefault) e.preventDefault();
+    const user = window.auth.getCurrentUser();
+    const title = document.getElementById('unitNotifTitle')?.value.trim();
+    const targetScope = document.getElementById('unitNotifTargetScope')?.value || 'ALL';
+    const priority = document.getElementById('unitNotifPriority')?.value || 'NORMAL';
+    const content = document.getElementById('unitNotifContent')?.value.trim();
+
+    if (!title || !content) {
+      alert('يرجى ملء عنوان التبليغ ونصه بشكل كامل.');
+      return;
+    }
+
+    window.store.addUnitNotification({
+      unitId,
+      title,
+      content,
+      priority,
+      targetScope
+    }, user);
+
+    alert('✅ تم نشر وتوجيه التبليغ الرسمي لكادر الوحدة بنجاح.');
+    this.closeUnitNotificationModal();
+    this.currentUnitSubTab = 'notifs';
+    this.currentUnitNotifSubTab = 'unit';
+    this.render();
+  }
+
+  handleDeleteUnitNotification(notifId, unitId) {
+    const user = window.auth.getCurrentUser();
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا التبليغ؟')) return;
+
+    window.store.deleteUnitNotification(notifId, user);
+    this.render();
+  }
+
+  viewUnitNotificationDetails(notifId) {
+    const db = window.store.getDb();
+    const notif = (db.unitNotifications || []).find(n => n.id === notifId);
+    if (!notif) {
+      alert('التبليغ غير موجود.');
+      return;
+    }
+
+    const priorityLabel = notif.priority === 'URGENT' ? '🚨 عاجل جداً' : (notif.priority === 'HIGH' ? '⚠️ هام' : 'ℹ️ اعتيادي');
+
+    this.showModal(`📢 تفاصيل التبليغ: ${notif.title}`, `
+      <div style="direction: rtl;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="badge ${notif.priority === 'URGENT' ? 'badge-danger' : (notif.priority === 'HIGH' ? 'badge-warning' : 'badge-info')}">
+              ${priorityLabel}
+            </span>
+            <span class="badge badge-primary">
+              👥 موجه إلى: كافة كادر ومنتسبي الوحدة
+            </span>
+          </div>
+          <span style="font-size: 0.82rem; color: var(--md-sys-color-outline); font-family: monospace;">
+            📅 ${new Date(notif.publishDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </span>
+        </div>
+
+        <div style="background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.25rem; white-space: pre-wrap;">
+          ${notif.content}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--md-sys-color-outline); margin-bottom: 1rem;">
+          <div>
+            ✍️ <strong>المسؤول المُصدِر:</strong> ${notif.createdByName || 'مسؤول الوحدة'}
+          </div>
+          <div>
+            🆔 <code>${notif.id}</code>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button class="btn btn-outline" onclick="window.app.printUnitNotification('${notif.id}')">
+            🖨️ طباعة التبليغ
+          </button>
+          <button class="btn btn-primary" onclick="window.app.closeModal()">
+            إغلاق
+          </button>
+        </div>
+      </div>
+    `);
+  }
+
+  printUnitNotification(notifId) {
+    const db = window.store.getDb();
+    const notif = (db.unitNotifications || []).find(n => n.id === notifId);
+    if (!notif) {
+      alert('التبليغ غير موجود');
+      return;
+    }
+
+    const priorityLabel = notif.priority === 'URGENT' ? 'عاجل جداً' : (notif.priority === 'HIGH' ? 'هام' : 'اعتيادي');
+    const unit = notif.unitId ? window.store.getUnitById(notif.unitId) : null;
+    const formattedDate = new Date(notif.publishDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    const contentHtml = `
+      <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px;">
+        <div style="border-bottom: 2px solid #003366; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #003366;">جمهورية العراق - وزارة النفط</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #004d40;">شركة نفط البصرة</div>
+            <div style="font-size: 1rem; font-weight: 800; color: #b45309;">هيأة تشغيل الرميلة</div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">قسم الإنتاج الجنوبي ${unit ? ' | ' + unit.name : ''}</div>
+          </div>
+          <div style="text-align: left; font-size: 0.9rem; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; background: #f8fafc;">
+            <div><strong>كود التبليغ:</strong> <code>${notif.id}</code></div>
+            <div><strong>التاريخ:</strong> <span style="font-family: monospace;">${formattedDate}</span></div>
+            <div><strong>الأولوية:</strong> ${priorityLabel}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div style="background: #f4f4f4; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px;">
+            <strong>الجهة المستهدفة:</strong> كافة كادر ومنتسبي ${unit ? unit.name : 'الوحدة'}
+          </div>
+          <h3 style="color: #003366; margin-bottom: 15px;">${notif.title}</h3>
+          <div style="font-size: 1.05rem; line-height: 1.9; white-space: pre-wrap; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            ${notif.content}
+          </div>
+        </div>
+
+        <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <strong>المُصدِر:</strong> ${notif.createdByName || 'مسؤول الوحدة'}<br>
+            <span style="font-size: 0.85rem; color: #666;">مسؤول الوحدة</span>
+          </div>
+          <div style="text-align: left;">
+            <strong>التوقيع والختم الرسمي</strong><br><br>
+            _______________________
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (window.exporter && typeof window.exporter.printDocument === 'function') {
+      window.exporter.printDocument(`تبليغ رسمي - ${notif.title}`, 'وزارة النفط - شركة نفط البصرة - هيأة تشغيل الرميلة - قسم الإنتاج الجنوبي', contentHtml, {
+        unitName: unit ? unit.name : '',
+        docNumber: notif.id
+      });
+    } else {
+      window.print();
+    }
+  }
+
   // --- Official Department & Central Notifications (معاينة وطباعة التبليغات المركزية) ---
   openViewOfficialNotificationModal(notifId) {
     const db = window.store.getDb();
     let notif = (db.officialNotifications || []).find(n => n.id === notifId);
     if (!notif) {
       notif = (db.sectionNotifications || []).find(n => n.id === notifId);
+    }
+    if (!notif) {
+      notif = (db.unitNotifications || []).find(n => n.id === notifId);
     }
     if (!notif) {
       alert('التبليغ غير موجود.');
@@ -8773,50 +11106,467 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const sections = window.store.getSections(actorUser.departmentId) || [];
     const units = window.store.getUnits(actorUser.departmentId) || [];
 
-    this.showModal('📢 إصدار تبليغ رسمي جديد للقسم', `
-      <form onsubmit="window.app.handleSaveDeptNotification(event)">
-        <div class="form-group">
-          <label class="form-label">عنوان التبليغ الإداري:</label>
-          <input type="text" id="deptNotifTitleInput" class="form-control" required placeholder="مثال: جدول مواعيد السلامة والصيانة..." />
+    const existing = document.getElementById('deptNotificationModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'deptNotificationModal';
+    overlay.className = 'dept-notif-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeDeptNotificationModal();
+    };
+
+    overlay.innerHTML = `
+      <style>
+        #deptNotificationModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #deptNotificationModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .dept-notif-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 820px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: deptNotifModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes deptNotifModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .dept-notif-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
+
+        .dept-notif-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .dept-notif-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .dept-notif-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .dept-notif-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .dept-notif-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .dept-notif-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .dept-notif-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .dept-notif-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .dept-notif-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .dept-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .dept-notif-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .dept-notif-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dept-notif-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .dept-notif-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.94rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-notif-input,
+        .dept-notif-select,
+        .dept-notif-textarea {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .dept-notif-input:focus,
+        .dept-notif-select:focus,
+        .dept-notif-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .dept-notif-input::placeholder,
+        .dept-notif-textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dept-notif-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .dept-notif-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-notif-info-tip {
+          background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(245, 158, 11, 0.15) 100%);
+          border: 1.2px dashed rgba(245, 158, 11, 0.45);
+          border-radius: 14px;
+          padding: 0.85rem 1.15rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 0.84rem;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 600;
+          line-height: 1.5;
+        }
+
+        .dept-notif-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-notif-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-notif-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .dept-notif-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .dept-notif-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+        .dept-notif-btn-submit:active {
+          transform: translateY(0);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .dept-notif-modal-overlay {
+          background: rgba(15, 23, 42, 0.65);
+        }
+        [data-theme="light"] .dept-notif-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-notif-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .dept-notif-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .dept-notif-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .dept-notif-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .dept-notif-input,
+        [data-theme="light"] .dept-notif-select,
+        [data-theme="light"] .dept-notif-textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .dept-notif-input:focus,
+        [data-theme="light"] .dept-notif-select:focus,
+        [data-theme="light"] .dept-notif-textarea:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-notif-input::placeholder,
+        [data-theme="light"] .dept-notif-textarea::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .dept-notif-info-tip {
+          background: linear-gradient(135deg, #eff6ff 0%, #fef3c7 100%);
+          border-color: rgba(217, 119, 6, 0.4);
+          color: #1e3a8a;
+        }
+        [data-theme="light"] .dept-notif-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .dept-notif-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .dept-notif-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-notif-btn-submit {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+          color: #ffffff;
+          box-shadow: 0 4px 15px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-notif-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-notif-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-notif-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #d97706, #b45309) !important;
+          border-color: #e2e8f0 !important;
+        }
+      </style>
+
+      <div class="dept-notif-modal-card">
+        <!-- Luxury Header Banner -->
+        <div class="dept-notif-banner">
+          <div class="dept-notif-banner-info">
+            <div class="dept-notif-badge">📢</div>
+            <div class="dept-notif-title-wrap">
+              <h3>إصدار تبليغ رسمي جديد للقسم</h3>
+              <p>نظام التعميمات والتبليغات الإدارية الفورية والتوجيهات الميدانية — قسم الإنتاج الجنوبي</p>
+            </div>
+          </div>
+          <button type="button" class="dept-notif-close-btn" onclick="window.app.closeDeptNotificationModal()" title="إغلاق النافذة">✕</button>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">الجهة المستلمة والنطاق الموجه له:</label>
-          <select id="deptNotifTargetSelect" class="form-control" required>
-            <option value="ALL_SECTIONS">🌐 تعميم لكافة شعب ووحدات القسم</option>
+        <!-- Scrollable Form Body with Contained Luxury Scrollbar -->
+        <form onsubmit="window.app.handleSaveDeptNotification(event)" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <div class="dept-notif-scroll-body">
             
-            <optgroup label="🏢 شعب القسم الإنتاجية والفنية">
-              ${sections.map(s => `<option value="SECTION:${s.id}">🏢 ${s.name}</option>`).join('')}
-            </optgroup>
+            <!-- Title Section -->
+            <div class="dept-notif-section-card">
+              <label class="dept-notif-label" for="deptNotifTitleInput">
+                <span>🏷️</span>
+                <span>عنوان التبليغ الإداري والموضوع:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <input type="text" id="deptNotifTitleInput" class="dept-notif-input" required placeholder="مثال: جدول مواعيد السلامة والصيانة الدورية..." autocomplete="off" />
+            </div>
 
-            <optgroup label="⚡ الوحدات التابعة لإدارة القسم">
-              ${units.map(u => `<option value="UNIT:${u.id}">⚡ ${u.name}</option>`).join('')}
-            </optgroup>
-          </select>
-        </div>
+            <!-- Target Scope & Importance Grid -->
+            <div class="dept-notif-grid-2">
+              <div class="dept-notif-section-card">
+                <label class="dept-notif-label" for="deptNotifTargetSelect">
+                  <span>🌐</span>
+                  <span>الجهة المستلمة والنطاق الموجه له:</span>
+                  <span style="color:#ef4444; font-weight:900;">*</span>
+                </label>
+                <select id="deptNotifTargetSelect" class="dept-notif-select" required>
+                  <option value="ALL_SECTIONS">🌐 تعميم لكافة شعب ووحدات القسم</option>
+                  
+                  <optgroup label="🏢 شعب القسم الإنتاجية والفنية">
+                    ${sections.map(s => `<option value="SECTION:${s.id}">🏢 ${s.name}</option>`).join('')}
+                  </optgroup>
 
-        <div class="form-group">
-          <label class="form-label">درجة الأهمية والأسبقية:</label>
-          <select id="deptNotifImportanceSelect" class="form-control">
-            <option value="NORMAL">عادي</option>
-            <option value="HIGH">هام</option>
-            <option value="URGENT">🔴 عاجل وهام جداً</option>
-          </select>
-        </div>
+                  <optgroup label="⚡ الوحدات التابعة لإدارة القسم">
+                    ${units.map(u => `<option value="UNIT:${u.id}">⚡ ${u.name}</option>`).join('')}
+                  </optgroup>
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label class="form-label">نص ومحتوى التبليغ الرسمي (Text):</label>
-          <textarea id="deptNotifContentInput" class="form-control" rows="5" required placeholder="اكتب تفاصيل التبليغ والتعليمات الصادرة هنا..."></textarea>
-        </div>
+              <div class="dept-notif-section-card">
+                <label class="dept-notif-label" for="deptNotifImportanceSelect">
+                  <span>⚡</span>
+                  <span>درجة الأهمية والأسبقية:</span>
+                </label>
+                <select id="deptNotifImportanceSelect" class="dept-notif-select">
+                  <option value="NORMAL">🟢 عادي (إشعار دوري اعتيادي)</option>
+                  <option value="HIGH">⚠️ هام (يتطلب متابعة سريعة)</option>
+                  <option value="URGENT">🚨 عاجل وهام جداً (توجيه فوري ومثبت)</option>
+                </select>
+              </div>
+            </div>
 
-        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-primary" style="font-weight: 800;">
-            📢 إصدار ونشر التبليغ فوراً
-          </button>
-        </div>
-      </form>
-    `);
+            <!-- Content Body Section -->
+            <div class="dept-notif-section-card">
+              <label class="dept-notif-label" for="deptNotifContentInput">
+                <span>📝</span>
+                <span>نص ومحتوى التبليغ الرسمي والتوجيهات:</span>
+                <span style="color:#ef4444; font-weight:900;">*</span>
+              </label>
+              <textarea id="deptNotifContentInput" class="dept-notif-textarea" rows="6" required placeholder="اكتب تفاصيل التبليغ والتوجيهات والتعليمات الصادرة بدقة للكوادر المعنية..."></textarea>
+            </div>
+
+            <!-- Information Tip Banner -->
+            <div class="dept-notif-info-tip">
+              <span style="font-size:1.25rem;">💡</span>
+              <span>سيتم نشر هذا التبليغ وتعميمه مباشرة في لوحة إعلانات وتبليغات القسم مع إشعار كافة المنتسبين والكوادر التابعة للنطاق المستهدف.</span>
+            </div>
+
+          </div>
+
+          <!-- Pinned Footer -->
+          <div class="dept-notif-footer">
+            <button type="button" class="dept-notif-btn-cancel" onclick="window.app.closeDeptNotificationModal()">إلغاء</button>
+            <button type="submit" class="dept-notif-btn-submit">
+              <span>📢 إصدار ونشر التبليغ فوراً</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  closeDeptNotificationModal() {
+    const modal = document.getElementById('deptNotificationModal');
+    if (modal) {
+      modal.remove();
+    }
   }
 
   handleSaveDeptNotification(e) {
@@ -9296,110 +12046,504 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const isSectionContext = !!defaultSectionId || (actorUser.role === 'SECTION_MANAGER' && actorUser.sectionId);
     const initialAffiliation = defaultAffiliation || (isSectionContext ? 'SECTION_MGMT' : 'DEPT_MGMT');
 
-    this.showModal('🚘 إضافة سيارة جديدة', `
-      <form onsubmit="window.app.handleSaveCreateVehicle(event)">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <div class="form-group">
-            <label class="form-label">نوع السيارة (طراز المركبة):</label>
-            <input type="text" id="vTypeInput" class="form-control" required placeholder="مثال: تويوتا لاندكروزر / هايلوكس" />
-          </div>
+    const existing = document.getElementById('vehicleModal');
+    if (existing) existing.remove();
 
-          <div class="form-group">
-            <label class="form-label">الصفة:</label>
-            <select id="vOwnershipSelect" class="form-control" onchange="window.app.onVehicleOwnershipChange()" required>
-              <option value="GOVERNMENT">حكومي</option>
-              <option value="RENTAL">مؤجرة</option>
-            </select>
-          </div>
+    const overlay = document.createElement('div');
+    overlay.id = 'vehicleModal';
+    overlay.className = 'dept-vehicle-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeVehicleModal();
+    };
 
-          <div class="form-group">
-            <label class="form-label" id="vSideNoLabel">الرقم الجانبي (إجباري للحكومي):</label>
-            <input type="text" id="vSideNoInput" class="form-control" required placeholder="مثال: 105" style="font-family: monospace; font-weight: 700;" />
-          </div>
+    overlay.innerHTML = `
+      <style>
+        #vehicleModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #vehicleModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
 
-          <div class="form-group">
-            <label class="form-label">رقم لوحة السيارة:</label>
-            <input type="text" id="vPlateNoInput" class="form-control" required placeholder="مثال: 12490 - بصرة / حكومي" />
-          </div>
+        .dept-vehicle-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 860px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: deptVehicleModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-          <div class="form-group">
-            <label class="form-label">جهة الارتباط:</label>
-            <select id="vAffiliationSelect" class="form-control" onchange="window.app.onVehicleAffiliationChange()" required>
-              ${!isSectionContext ? '<option value="DEPT_MGMT">إدارة القسم</option>' : ''}
-              <option value="SECTION_MGMT" ${initialAffiliation === 'SECTION_MGMT' ? 'selected' : ''}>إدارة الشعبة</option>
-              <option value="STATION" ${initialAffiliation === 'STATION' ? 'selected' : ''}>محطة</option>
-            </select>
-          </div>
+        @keyframes deptVehicleModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
 
-          <div class="form-group" id="vSectionGroup" style="${initialAffiliation === 'DEPT_MGMT' ? 'display: none;' : ''}">
-            <label class="form-label">الشعبة التابعة لها:</label>
-            <select id="vSectionSelect" class="form-control" onchange="window.app.onVehicleSectionChange()">
-              ${sections.map(s => `<option value="${s.id}" ${s.id === targetSecId ? 'selected' : ''}>${s.name}</option>`).join('')}
-            </select>
-          </div>
-        </div>
+        .dept-vehicle-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
 
-        <div class="form-group" id="vStationGroup" style="display: none;">
-          <label class="form-label">المحطة التابعة للشعبة (محطات الشعبة الحالية فقط):</label>
-          <select id="vStationSelect" class="form-control">
-            ${stations.length > 0 ? stations.map(st => `<option value="${st.id}">${st.name}</option>`).join('') : '<option value="">لا توجد محطات مسجلة لهذه الشعبة</option>'}
-          </select>
-        </div>
+        .dept-vehicle-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
 
-        <!-- Shift Drivers for Station Affiliated Cars -->
-        <div id="vShiftDriversContainer" style="display: none; background: var(--md-sys-color-surface-variant); padding: 0.85rem; border-radius: var(--radius-sm); margin-top: 0.75rem;">
-          <h5 style="margin: 0 0 0.5rem 0; font-size: 0.88rem; color: var(--md-sys-color-primary); font-weight: 700;">
-            👥 سائقو النوبات (A, B, C, D) — حد أقصى 4 سائقين (يمكن ترك أي نوبة غير مخصصة):
-          </h5>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة A:</label>
-              <input type="text" id="vDriverShiftA" class="form-control" style="font-size: 0.82rem;" placeholder="اسم السائق أو اتركه فارغاً" />
+        .dept-vehicle-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .dept-vehicle-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .dept-vehicle-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .dept-vehicle-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .dept-vehicle-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .dept-vehicle-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .dept-vehicle-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dept-vehicle-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .dept-vehicle-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.92rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-vehicle-input,
+        .dept-vehicle-select {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .dept-vehicle-input:focus,
+        .dept-vehicle-select:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .dept-vehicle-input::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dept-vehicle-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .dept-vehicle-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-vehicle-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+          flex-wrap: wrap;
+        }
+
+        .dept-vehicle-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-vehicle-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .dept-vehicle-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .dept-vehicle-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .dept-vehicle-modal-overlay {
+          background: rgba(15, 23, 42, 0.65);
+        }
+        [data-theme="light"] .dept-vehicle-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-vehicle-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .dept-vehicle-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .dept-vehicle-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .dept-vehicle-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .dept-vehicle-input,
+        [data-theme="light"] .dept-vehicle-select {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .dept-vehicle-input:focus,
+        [data-theme="light"] .dept-vehicle-select:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-vehicle-input::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .dept-vehicle-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .dept-vehicle-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .dept-vehicle-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-vehicle-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-vehicle-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+      </style>
+
+      <div class="dept-vehicle-modal-card" dir="rtl">
+        <!-- Luxury Top Banner -->
+        <div class="dept-vehicle-banner">
+          <div class="dept-vehicle-banner-info">
+            <div class="dept-vehicle-badge">🚘</div>
+            <div class="dept-vehicle-title-wrap">
+              <h3>إضافة مركبة / سيارة جديدة للمنظومة</h3>
+              <p>إدارة وتوثيق أسطول المركبات والآليات، تخصيص السائقين، وتتبع الجاهزية التشغيلية</p>
             </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة B:</label>
-              <input type="text" id="vDriverShiftB" class="form-control" style="font-size: 0.82rem;" placeholder="اسم السائق أو اتركه فارغاً" />
-            </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة C:</label>
-              <input type="text" id="vDriverShiftC" class="form-control" style="font-size: 0.82rem;" placeholder="اسم السائق أو اتركه فارغاً" />
-            </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة D:</label>
-              <input type="text" id="vDriverShiftD" class="form-control" style="font-size: 0.82rem;" placeholder="اسم السائق أو اتركه فارغاً" />
-            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <span class="badge badge-primary" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; font-weight: 800; border-radius: 10px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
+              أسطول النقل والخدمات
+            </span>
+            <button type="button" class="dept-vehicle-close-btn" onclick="window.app.closeVehicleModal()" title="إغلاق النافذة">✕</button>
           </div>
         </div>
 
-        <!-- Single Driver for Dept/Section MGMT -->
-        <div id="vSingleDriverContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem;">
-          <div class="form-group">
-            <label class="form-label">اسم السائق المسؤول:</label>
-            <input type="text" id="vSingleDriverName" class="form-control" placeholder="اسم السائق المعتمد" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">رقم هاتف السائق:</label>
-            <input type="text" id="vSingleDriverPhone" class="form-control" placeholder="0770XXXXXXX" />
-          </div>
-        </div>
+        <form onsubmit="window.app.handleSaveCreateVehicle(event)" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <!-- Contained Luxury Scrollbody -->
+          <div class="dept-vehicle-scroll-body">
+            <!-- بطاقة 1: البيانات الأساسية للمركبة -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🚘</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">البيانات الأساسية وهوية المركبة</span>
+              </div>
 
-        <div class="form-group" style="margin-top: 0.75rem;">
-          <label class="form-label">الحالة التشغيلية للسيارة:</label>
-          <select id="vOperationalStateSelect" class="form-control" required>
-            <option value="OPERATIONAL">🟢 أخضر — عاملة</option>
-            <option value="IN_REPAIR">🟡 أصفر — في التصليح</option>
-            <option value="STOPPED">🔴 أحمر — متوقفة</option>
-          </select>
-        </div>
+              <div class="dept-vehicle-grid-2">
+                <div>
+                  <label class="dept-vehicle-label">نوع السيارة (طراز المركبة): <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="vTypeInput" class="dept-vehicle-input" required placeholder="مثال: تويوتا لاندكروزر / هايلوكس" style="font-weight:700;" />
+                </div>
 
-        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-primary" style="font-weight: 800;">
-            💾 حفظ بيانات السيارة
-          </button>
-        </div>
-      </form>
-    `);
+                <div>
+                  <label class="dept-vehicle-label">الصفة: <span style="color:#ef4444;">*</span></label>
+                  <select id="vOwnershipSelect" class="dept-vehicle-select" onchange="window.app.onVehicleOwnershipChange()" required style="font-weight:700;">
+                    <option value="GOVERNMENT">حكومي</option>
+                    <option value="RENTAL">مؤجرة</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="dept-vehicle-label" id="vSideNoLabel">الرقم الجانبي (إجباري للحكومي): <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="vSideNoInput" class="dept-vehicle-input" required placeholder="مثال: 105" style="font-family: monospace; font-weight: 700;" />
+                </div>
+
+                <div>
+                  <label class="dept-vehicle-label">رقم لوحة السيارة: <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="vPlateNoInput" class="dept-vehicle-input" required placeholder="مثال: 12490 - بصرة / حكومي" style="font-weight:700;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- بطاقة 2: جهة الارتباط والتوزيع الميداني -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🏛️</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">جهة الارتباط والتوزيع الميداني</span>
+              </div>
+
+              <div class="dept-vehicle-grid-2">
+                <div>
+                  <label class="dept-vehicle-label">جهة الارتباط: <span style="color:#ef4444;">*</span></label>
+                  <select id="vAffiliationSelect" class="dept-vehicle-select" onchange="window.app.onVehicleAffiliationChange()" required style="font-weight:700;">
+                    ${!isSectionContext ? '<option value="DEPT_MGMT">إدارة القسم</option>' : ''}
+                    <option value="SECTION_MGMT" ${initialAffiliation === 'SECTION_MGMT' ? 'selected' : ''}>إدارة الشعبة</option>
+                    <option value="STATION" ${initialAffiliation === 'STATION' ? 'selected' : ''}>محطة</option>
+                  </select>
+                </div>
+
+                <div id="vSectionGroup" style="${initialAffiliation === 'DEPT_MGMT' ? 'display: none;' : ''}">
+                  <label class="dept-vehicle-label">الشعبة التابعة لها: <span style="color:#ef4444;">*</span></label>
+                  <select id="vSectionSelect" class="dept-vehicle-select" onchange="window.app.onVehicleSectionChange()" style="font-weight:700;">
+                    ${sections.map(s => `<option value="${s.id}" ${s.id === targetSecId ? 'selected' : ''}>${s.name}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+
+              <div id="vStationGroup" style="display: none; margin-top: 1rem;">
+                <label class="dept-vehicle-label">المحطة التابعة للشعبة (محطات الشعبة الحالية فقط):</label>
+                <select id="vStationSelect" class="dept-vehicle-select" style="font-weight:700;">
+                  ${stations.length > 0 ? stations.map(st => `<option value="${st.id}">${st.name}</option>`).join('') : '<option value="">لا توجد محطات مسجلة لهذه الشعبة</option>'}
+                </select>
+              </div>
+            </div>
+
+            <!-- بطاقة 3: تخصيص وتعيين السائقين -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">👥</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">تخصيص وتعيين السائقين المسؤولين</span>
+              </div>
+
+              <!-- Single Driver for Dept/Section MGMT -->
+              <div id="vSingleDriverContainer" class="dept-vehicle-grid-2">
+                <div>
+                  <label class="dept-vehicle-label">اسم السائق المسؤول:</label>
+                  <input type="text" id="vSingleDriverName" class="dept-vehicle-input" placeholder="اسم السائق المعتمد" style="font-weight:700;" />
+                </div>
+                <div>
+                  <label class="dept-vehicle-label">رقم هاتف السائق:</label>
+                  <input type="text" id="vSingleDriverPhone" class="dept-vehicle-input" placeholder="0770XXXXXXX" style="font-family: monospace; font-weight: 700;" />
+                </div>
+              </div>
+
+              <!-- Shift Drivers for Station Affiliated Cars -->
+              <div id="vShiftDriversContainer" style="display: none;">
+                <div style="font-size: 0.85rem; color: #38bdf8; font-weight: 700; margin-bottom: 0.75rem;">
+                  👥 سائقو النوبات (A, B, C, D) — حد أقصى 4 سائقين (يمكن ترك أي نوبة غير مخصصة):
+                </div>
+                <div class="dept-vehicle-grid-2">
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة A:</label>
+                    <input type="text" id="vDriverShiftA" class="dept-vehicle-input" placeholder="اسم السائق أو اتركه فارغاً" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة B:</label>
+                    <input type="text" id="vDriverShiftB" class="dept-vehicle-input" placeholder="اسم السائق أو اتركه فارغاً" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة C:</label>
+                    <input type="text" id="vDriverShiftC" class="dept-vehicle-input" placeholder="اسم السائق أو اتركه فارغاً" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة D:</label>
+                    <input type="text" id="vDriverShiftD" class="dept-vehicle-input" placeholder="اسم السائق أو اتركه فارغاً" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- بطاقة 4: الحالة التشغيلية -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🚦</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">الحالة التشغيلية والجاهزية الفنية</span>
+              </div>
+
+              <div>
+                <label class="dept-vehicle-label">الحالة التشغيلية الحالية: <span style="color:#ef4444;">*</span></label>
+                <select id="vOperationalStateSelect" class="dept-vehicle-select" required style="font-weight:700;">
+                  <option value="OPERATIONAL">🟢 أخضر — عاملة (جاهزية تامة)</option>
+                  <option value="IN_REPAIR">🟡 أصفر — في التصليح (صيانة)</option>
+                  <option value="STOPPED">🔴 أحمر — متوقفة (خارج الخدمة)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- شريط الإجراءات السفلي -->
+          <div class="dept-vehicle-footer">
+            <div style="font-size: 0.84rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.45rem;">
+              <span>🛡️</span>
+              <span>سيتم توثيق بيانات المركبة في السجل الرقمي لمرآب قسم الإنتاج الجنوبي.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <button type="button" class="dept-vehicle-btn-cancel" onclick="window.app.closeVehicleModal()">
+                إلغاء
+              </button>
+              <button type="submit" class="dept-vehicle-btn-submit">
+                <span>💾</span>
+                <span>حفظ بيانات المركبة</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
   }
 
   onVehicleOwnershipChange() {
@@ -9528,110 +12672,504 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const sC = v.shiftDrivers?.shiftC?.driverName || '';
     const sD = v.shiftDrivers?.shiftD?.driverName || '';
 
-    this.showModal(`✏️ تعديل بيانات السيارة ${v.vehicleType} (${v.vehicleNumber})`, `
-      <form onsubmit="window.app.handleSaveEditVehicle(event, '${v.id}')">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <div class="form-group">
-            <label class="form-label">نوع السيارة:</label>
-            <input type="text" id="editVType" class="form-control" required value="${v.vehicleType || ''}" />
-          </div>
+    const existing = document.getElementById('vehicleModal');
+    if (existing) existing.remove();
 
-          <div class="form-group">
-            <label class="form-label">الصفة:</label>
-            <select id="editVOwnership" class="form-control" required>
-              <option value="GOVERNMENT" ${isGov ? 'selected' : ''}>حكومي</option>
-              <option value="RENTAL" ${!isGov ? 'selected' : ''}>مؤجرة</option>
-            </select>
-          </div>
+    const overlay = document.createElement('div');
+    overlay.id = 'vehicleModal';
+    overlay.className = 'dept-vehicle-modal-overlay';
+    overlay.setAttribute('style', 'position:fixed; inset:0; z-index:10000; background:rgba(2,6,23,0.88); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%); padding:1.25rem 1rem; overflow-y:auto; scrollbar-width:none; display:flex; align-items:center; justify-content:center;');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) this.closeVehicleModal();
+    };
 
-          <div class="form-group">
-            <label class="form-label">الرقم الجانبي:</label>
-            <input type="text" id="editVSideNo" class="form-control" value="${v.sideNumber || ''}" style="font-family: monospace; font-weight: 700;" />
-          </div>
+    overlay.innerHTML = `
+      <style>
+        #vehicleModal {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        #vehicleModal::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
 
-          <div class="form-group">
-            <label class="form-label">رقم السيارة:</label>
-            <input type="text" id="editVPlateNo" class="form-control" required value="${v.vehicleNumber || ''}" />
-          </div>
+        .dept-vehicle-modal-card {
+          background: linear-gradient(180deg, #0b152d 0%, #080e1e 100%);
+          border: 1.5px solid rgba(245, 158, 11, 0.45);
+          border-radius: 24px;
+          max-width: 860px;
+          width: 95vw;
+          max-height: 90vh;
+          margin: auto;
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+          overflow: hidden;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: deptVehicleModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-          <div class="form-group">
-            <label class="form-label">جهة الارتباط:</label>
-            <select id="editVAffiliation" class="form-control" onchange="window.app.onEditVehicleAffiliationChange()" required>
-              <option value="DEPT_MGMT" ${isDept ? 'selected' : ''}>إدارة القسم</option>
-              <option value="SECTION_MGMT" ${v.affiliationType === 'SECTION_MGMT' ? 'selected' : ''}>إدارة الشعبة</option>
-              <option value="STATION" ${isStation ? 'selected' : ''}>محطة</option>
-            </select>
-          </div>
+        @keyframes deptVehicleModalPop {
+          0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
 
-          <div class="form-group" id="editVSectionGroup" style="${isDept ? 'display: none;' : ''}">
-            <label class="form-label">الشعبة التابعة لها:</label>
-            <select id="editVSection" class="form-control" onchange="window.app.onEditVehicleSectionChange()">
-              ${sections.map(s => `<option value="${s.id}" ${s.id === v.sectionId ? 'selected' : ''}>${s.name}</option>`).join('')}
-            </select>
-          </div>
-        </div>
+        .dept-vehicle-banner {
+          flex-shrink: 0;
+          background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.7) 45%, rgba(180, 83, 9, 0.45) 100%);
+          padding: 1.4rem 1.85rem;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.25rem;
+          position: relative;
+        }
 
-        <div class="form-group" id="editVStationGroup" style="${!isStation ? 'display: none;' : ''}">
-          <label class="form-label">المحطة التابعة للشعبة:</label>
-          <select id="editVStation" class="form-control">
-            ${stations.map(st => `<option value="${st.id}" ${st.id === v.stationId ? 'selected' : ''}>${st.name}</option>`).join('')}
-          </select>
-        </div>
+        .dept-vehicle-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
 
-        <!-- Shift Drivers for Station Affiliated Cars -->
-        <div id="editVShiftDriversContainer" style="${!isStation ? 'display: none;' : ''}; background: var(--md-sys-color-surface-variant); padding: 0.85rem; border-radius: var(--radius-sm); margin-top: 0.75rem;">
-          <h5 style="margin: 0 0 0.5rem 0; font-size: 0.88rem; color: var(--md-sys-color-primary); font-weight: 700;">
-            👥 سائقو النوبات (A, B, C, D) — حد أقصى 4 سائقين (يمكن ترك أي نوبة غير مخصصة):
-          </h5>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة A:</label>
-              <input type="text" id="editVDriverA" class="form-control" style="font-size: 0.82rem;" value="${sA}" placeholder="اسم السائق أو غير مخصص" />
+        .dept-vehicle-badge {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.18));
+          border: 1.5px solid rgba(245, 158, 11, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .dept-vehicle-title-wrap h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .dept-vehicle-title-wrap p {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.85);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        .dept-vehicle-close-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          flex-shrink: 0;
+        }
+        .dept-vehicle-close-btn:hover {
+          background: rgba(239, 68, 68, 0.3) !important;
+          border-color: rgba(239, 68, 68, 0.7) !important;
+          transform: rotate(90deg) scale(1.08);
+          color: #ffffff !important;
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .dept-vehicle-scroll-body {
+          flex: 1 1 auto;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 1.6rem 1.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          scrollbar-width: thin !important;
+          scrollbar-color: #f59e0b rgba(15, 23, 42, 0.6) !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar {
+          width: 9px !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-track {
+          background: rgba(10, 18, 36, 0.75) !important;
+          border-radius: 8px !important;
+          margin: 6px 0 !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+          border-radius: 8px !important;
+          border: 2px solid rgba(15, 23, 42, 0.4) !important;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+        }
+        .dept-vehicle-scroll-body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #fbbf24, #f59e0b) !important;
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.75) !important;
+        }
+
+        .dept-vehicle-section-card {
+          background: rgba(15, 23, 42, 0.65);
+          border: 1.2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.2rem 1.4rem;
+          backdrop-filter: blur(14px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dept-vehicle-section-card:hover {
+          border-color: rgba(245, 158, 11, 0.35);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+        }
+
+        .dept-vehicle-label {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-weight: 800;
+          font-size: 0.92rem;
+          color: #f1f5f9;
+          margin-bottom: 0.55rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-vehicle-input,
+        .dept-vehicle-select {
+          width: 100%;
+          background: rgba(10, 18, 36, 0.85);
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          color: #ffffff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+          box-sizing: border-box;
+        }
+        .dept-vehicle-input:focus,
+        .dept-vehicle-select:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+          background: rgba(13, 24, 48, 0.95);
+        }
+        .dept-vehicle-input::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dept-vehicle-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 640px) {
+          .dept-vehicle-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .dept-vehicle-footer {
+          flex-shrink: 0;
+          background: rgba(11, 20, 42, 0.95);
+          border-top: 1.5px solid rgba(245, 158, 11, 0.3);
+          padding: 1.15rem 1.85rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+          flex-wrap: wrap;
+        }
+
+        .dept-vehicle-btn-cancel {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          border-radius: 12px;
+          padding: 0.75rem 1.6rem;
+          font-weight: 800;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dept-vehicle-btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .dept-vehicle-btn-submit {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+          border: none;
+          color: #020617;
+          border-radius: 12px;
+          padding: 0.75rem 2rem;
+          font-weight: 900;
+          font-size: 0.98rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+          transition: all 0.22s ease;
+        }
+        .dept-vehicle-btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+        }
+
+        /* LIGHT MODE THEME OVERRIDES */
+        [data-theme="light"] .dept-vehicle-modal-overlay {
+          background: rgba(15, 23, 42, 0.65);
+        }
+        [data-theme="light"] .dept-vehicle-modal-card {
+          background: #ffffff;
+          border-color: rgba(217, 119, 6, 0.5);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35), 0 0 35px rgba(217, 119, 6, 0.15);
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-vehicle-banner {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #b45309 100%);
+          border-bottom-color: rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .dept-vehicle-section-card {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .dept-vehicle-section-card:hover {
+          border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .dept-vehicle-label {
+          color: #1e293b;
+          text-shadow: none;
+        }
+        [data-theme="light"] .dept-vehicle-input,
+        [data-theme="light"] .dept-vehicle-select {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .dept-vehicle-input:focus,
+        [data-theme="light"] .dept-vehicle-select:focus {
+          border-color: #d97706;
+          background: #ffffff;
+          box-shadow: 0 0 12px rgba(217, 119, 6, 0.35);
+        }
+        [data-theme="light"] .dept-vehicle-input::placeholder {
+          color: #94a3b8;
+        }
+        [data-theme="light"] .dept-vehicle-footer {
+          background: #f8fafc;
+          border-top-color: #e2e8f0;
+        }
+        [data-theme="light"] .dept-vehicle-btn-cancel {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+        [data-theme="light"] .dept-vehicle-btn-cancel:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+        [data-theme="light"] .dept-vehicle-scroll-body {
+          scrollbar-color: #d97706 #f1f5f9 !important;
+        }
+        [data-theme="light"] .dept-vehicle-scroll-body::-webkit-scrollbar-track {
+          background: #f1f5f9 !important;
+        }
+      </style>
+
+      <div class="dept-vehicle-modal-card" dir="rtl">
+        <!-- Luxury Top Banner -->
+        <div class="dept-vehicle-banner">
+          <div class="dept-vehicle-banner-info">
+            <div class="dept-vehicle-badge">✏️</div>
+            <div class="dept-vehicle-title-wrap">
+              <h3>تعديل بيانات السيارة: ${v.vehicleType} (${v.vehicleNumber})</h3>
+              <p>تحديث وتوثيق جهة الارتباط، بيانات السائقين، وتحديث الحالة التشغيلية للمركبة</p>
             </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة B:</label>
-              <input type="text" id="editVDriverB" class="form-control" style="font-size: 0.82rem;" value="${sB}" placeholder="اسم السائق أو غير مخصص" />
-            </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة C:</label>
-              <input type="text" id="editVDriverC" class="form-control" style="font-size: 0.82rem;" value="${sC}" placeholder="اسم السائق أو غير مخصص" />
-            </div>
-            <div class="form-group" style="margin-bottom: 0.35rem;">
-              <label class="form-label" style="font-size: 0.78rem;">سائق النوبة D:</label>
-              <input type="text" id="editVDriverD" class="form-control" style="font-size: 0.82rem;" value="${sD}" placeholder="اسم السائق أو غير مخصص" />
-            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <span class="badge badge-info" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; font-weight: 800; border-radius: 10px; background: rgba(14, 165, 233, 0.2); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8;">
+              الجانبي: ${v.sideNumber || '—'}
+            </span>
+            <button type="button" class="dept-vehicle-close-btn" onclick="window.app.closeVehicleModal()" title="إغلاق النافذة">✕</button>
           </div>
         </div>
 
-        <!-- Single Driver for Dept/Section MGMT -->
-        <div id="editVSingleDriverContainer" style="${isStation ? 'display: none;' : 'display: grid;'}; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem;">
-          <div class="form-group">
-            <label class="form-label">اسم السائق المسؤول:</label>
-            <input type="text" id="editVSingleDriverName" class="form-control" value="${v.driverName || ''}" placeholder="اسم السائق المعتمد" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">رقم هاتف السائق:</label>
-            <input type="text" id="editVSingleDriverPhone" class="form-control" value="${v.driverPhone || ''}" placeholder="0770XXXXXXX" />
-          </div>
-        </div>
+        <form onsubmit="window.app.handleSaveEditVehicle(event, '${v.id}')" style="display:flex; flex-direction:column; flex:1 1 auto; overflow:hidden; margin:0;">
+          <!-- Contained Luxury Scrollbody -->
+          <div class="dept-vehicle-scroll-body">
+            <!-- بطاقة 1: البيانات الأساسية للمركبة -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🚘</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">البيانات الأساسية وهوية المركبة</span>
+              </div>
 
-        <div class="form-group" style="margin-top: 0.75rem;">
-          <label class="form-label">الحالة التشغيلية للسيارة:</label>
-          <select id="editVState" class="form-control" required>
-            <option value="OPERATIONAL" ${v.operationalState === 'OPERATIONAL' || v.operationalState === 'عاملة' ? 'selected' : ''}>🟢 أخضر — عاملة</option>
-            <option value="IN_REPAIR" ${v.operationalState === 'IN_REPAIR' || v.operationalState === 'في التصليح' ? 'selected' : ''}>🟡 أصفر — في التصليح</option>
-            <option value="STOPPED" ${v.operationalState === 'STOPPED' || v.operationalState === 'متوقفة' ? 'selected' : ''}>🔴 أحمر — متوقفة</option>
-          </select>
-        </div>
+              <div class="dept-vehicle-grid-2">
+                <div>
+                  <label class="dept-vehicle-label">نوع السيارة (طراز المركبة): <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="editVType" class="dept-vehicle-input" required value="${v.vehicleType || ''}" style="font-weight:700;" />
+                </div>
 
-        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button type="button" class="btn btn-outline" onclick="window.app.closeModal()">إلغاء</button>
-          <button type="submit" class="btn btn-primary" style="font-weight: 800;">
-            💾 حفظ التعديلات
-          </button>
-        </div>
-      </form>
-    `);
+                <div>
+                  <label class="dept-vehicle-label">الصفة: <span style="color:#ef4444;">*</span></label>
+                  <select id="editVOwnership" class="dept-vehicle-select" required style="font-weight:700;">
+                    <option value="GOVERNMENT" ${isGov ? 'selected' : ''}>حكومي</option>
+                    <option value="RENTAL" ${!isGov ? 'selected' : ''}>مؤجرة</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="dept-vehicle-label">الرقم الجانبي: <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="editVSideNo" class="dept-vehicle-input" value="${v.sideNumber || ''}" style="font-family: monospace; font-weight: 700;" />
+                </div>
+
+                <div>
+                  <label class="dept-vehicle-label">رقم السيارة: <span style="color:#ef4444;">*</span></label>
+                  <input type="text" id="editVPlateNo" class="dept-vehicle-input" required value="${v.vehicleNumber || ''}" style="font-weight:700;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- بطاقة 2: جهة الارتباط والتوزيع الميداني -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🏛️</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">جهة الارتباط والتوزيع الميداني</span>
+              </div>
+
+              <div class="dept-vehicle-grid-2">
+                <div>
+                  <label class="dept-vehicle-label">جهة الارتباط: <span style="color:#ef4444;">*</span></label>
+                  <select id="editVAffiliation" class="dept-vehicle-select" onchange="window.app.onEditVehicleAffiliationChange()" required style="font-weight:700;">
+                    <option value="DEPT_MGMT" ${isDept ? 'selected' : ''}>إدارة القسم</option>
+                    <option value="SECTION_MGMT" ${v.affiliationType === 'SECTION_MGMT' ? 'selected' : ''}>إدارة الشعبة</option>
+                    <option value="STATION" ${isStation ? 'selected' : ''}>محطة</option>
+                  </select>
+                </div>
+
+                <div id="editVSectionGroup" style="${isDept ? 'display: none;' : ''}">
+                  <label class="dept-vehicle-label">الشعبة التابعة لها: <span style="color:#ef4444;">*</span></label>
+                  <select id="editVSection" class="dept-vehicle-select" onchange="window.app.onEditVehicleSectionChange()" style="font-weight:700;">
+                    ${sections.map(s => `<option value="${s.id}" ${s.id === v.sectionId ? 'selected' : ''}>${s.name}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+
+              <div id="editVStationGroup" style="${!isStation ? 'display: none;' : ''}; margin-top: 1rem;">
+                <label class="dept-vehicle-label">المحطة التابعة للشعبة:</label>
+                <select id="editVStation" class="dept-vehicle-select" style="font-weight:700;">
+                  ${stations.map(st => `<option value="${st.id}" ${st.id === v.stationId ? 'selected' : ''}>${st.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- بطاقة 3: تخصيص وتعيين السائقين -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">👥</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">تخصيص وتعيين السائقين المسؤولين</span>
+              </div>
+
+              <!-- Single Driver for Dept/Section MGMT -->
+              <div id="editVSingleDriverContainer" class="dept-vehicle-grid-2" style="${isStation ? 'display: none;' : ''}">
+                <div>
+                  <label class="dept-vehicle-label">اسم السائق المسؤول:</label>
+                  <input type="text" id="editVSingleDriverName" class="dept-vehicle-input" value="${v.driverName || ''}" placeholder="اسم السائق المعتمد" style="font-weight:700;" />
+                </div>
+                <div>
+                  <label class="dept-vehicle-label">رقم هاتف السائق:</label>
+                  <input type="text" id="editVSingleDriverPhone" class="dept-vehicle-input" value="${v.driverPhone || ''}" placeholder="0770XXXXXXX" style="font-family: monospace; font-weight: 700;" />
+                </div>
+              </div>
+
+              <!-- Shift Drivers for Station Affiliated Cars -->
+              <div id="editVShiftDriversContainer" style="${!isStation ? 'display: none;' : ''};">
+                <div style="font-size: 0.85rem; color: #38bdf8; font-weight: 700; margin-bottom: 0.75rem;">
+                  👥 سائقو النوبات (A, B, C, D) — حد أقصى 4 سائقين (يمكن ترك أي نوبة غير مخصصة):
+                </div>
+                <div class="dept-vehicle-grid-2">
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة A:</label>
+                    <input type="text" id="editVDriverA" class="dept-vehicle-input" style="font-size: 0.88rem;" value="${sA}" placeholder="اسم السائق أو غير مخصص" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة B:</label>
+                    <input type="text" id="editVDriverB" class="dept-vehicle-input" style="font-size: 0.88rem;" value="${sB}" placeholder="اسم السائق أو غير مخصص" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة C:</label>
+                    <input type="text" id="editVDriverC" class="dept-vehicle-input" style="font-size: 0.88rem;" value="${sC}" placeholder="اسم السائق أو غير مخصص" />
+                  </div>
+                  <div>
+                    <label class="dept-vehicle-label" style="font-size: 0.84rem;">سائق النوبة D:</label>
+                    <input type="text" id="editVDriverD" class="dept-vehicle-input" style="font-size: 0.88rem;" value="${sD}" placeholder="اسم السائق أو غير مخصص" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- بطاقة 4: الحالة التشغيلية -->
+            <div class="dept-vehicle-section-card">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span style="font-size: 1.15rem;">🚦</span>
+                <span style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">الحالة التشغيلية والجاهزية الفنية</span>
+              </div>
+
+              <div>
+                <label class="dept-vehicle-label">الحالة التشغيلية للمركبة: <span style="color:#ef4444;">*</span></label>
+                <select id="editVState" class="dept-vehicle-select" required style="font-weight:700;">
+                  <option value="OPERATIONAL" ${v.operationalState === 'OPERATIONAL' || v.operationalState === 'عاملة' ? 'selected' : ''}>🟢 أخضر — عاملة (جاهزية تامة)</option>
+                  <option value="IN_REPAIR" ${v.operationalState === 'IN_REPAIR' || v.operationalState === 'في التصليح' ? 'selected' : ''}>🟡 أصفر — في التصليح (صيانة)</option>
+                  <option value="STOPPED" ${v.operationalState === 'STOPPED' || v.operationalState === 'متوقفة' ? 'selected' : ''}>🔴 أحمر — متوقفة (خارج الخدمة)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- شريط الإجراءات السفلي -->
+          <div class="dept-vehicle-footer">
+            <div style="font-size: 0.84rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.45rem;">
+              <span>🛡️</span>
+              <span>سيتم توثيق وتحديث بيانات المركبة في السجل المركزي لمرآب قسم الإنتاج الجنوبي.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <button type="button" class="dept-vehicle-btn-cancel" onclick="window.app.closeVehicleModal()">
+                إلغاء
+              </button>
+              <button type="submit" class="dept-vehicle-btn-submit">
+                <span>💾</span>
+                <span>حفظ التعديلات</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
   }
 
   onEditVehicleAffiliationChange() {
@@ -11384,6 +14922,465 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     }
 
     alert(`✅ تم حفظ وتحديث بيانات المنتسب (${empId}) بنجاح.`);
+    if (typeof this.render === 'function') {
+      this.render();
+    }
+  }
+
+  // =========================================================================
+  // --- Station Technical & Operational Profile Engine Modals & Handlers ---
+  // =========================================================================
+  openEditStationTechnicalModal(stationId) {
+    this.closeEditStationTechnicalModal();
+
+    const db = window.store.getDb ? window.store.getDb() : {};
+    const station = (window.store.getStationById ? window.store.getStationById(stationId) : null) ||
+                    (db.stations || []).find(s => s.id === stationId) || { id: stationId, name: 'المحطة' };
+    const profile = window.store.getStationTechnicalProfile(stationId);
+
+    const wells = profile.wells || {};
+    const manifolds = profile.manifolds || {};
+    const banks = profile.banks || {};
+    const banksList = banks.banksList || [];
+    const rotating = profile.rotatingEquipment || {};
+    const control = profile.controlSystem || {};
+    const salts = profile.salts || {};
+    const power = profile.powerAndFuel || {};
+    const compressors = profile.compressors || {};
+    const customFields = profile.customFields || [];
+
+    const modalHtml = `
+      <div id="editStationTechnicalModal" class="sec-notif-modal-overlay sec-notif-overlay tech-modal-overlay" style="position: fixed !important; inset: 0 !important; z-index: 10000 !important; display: flex !important; align-items: center !important; justify-content: center !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; padding: 1rem !important; overflow-y: auto !important;">
+        <div class="sec-notif-modal-card" style="width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; background: var(--md-sys-color-surface, #ffffff); border-radius: 20px; border: 1.5px solid var(--md-sys-color-surface-variant); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); margin: auto; display: flex; flex-direction: column;">
+          
+          <!-- Header -->
+          <div style="padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(11, 87, 208, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%);">
+            <div>
+              <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>⚙️</span>
+                <span>تحديث المواصفات الفنية والتشغيلية للمحطة</span>
+              </h3>
+              <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--md-sys-color-outline);">
+                موقع: <strong>${station.name}</strong> (${station.code || station.id})
+              </p>
+            </div>
+            <button type="button" class="btn-close" onclick="window.app.closeEditStationTechnicalModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--md-sys-color-outline);" title="إغلاق">✕</button>
+          </div>
+
+          <!-- Form Body -->
+          <form id="editStationTechnicalForm" onsubmit="window.app.handleSaveStationTechnicalProfile(event, '${stationId}')" style="padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- 1. قطاع الآبار والدمامات ومجمعات الإنتاج -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>🛢️</span>
+                <span>1. منظومة الآبار، الدمامات، ومجمعات الإنتاج</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 0.75rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #059669; display: block; margin-bottom: 4px;">🟢 عدد الآبار العاملة:</label>
+                  <input type="number" id="techWellsOperating" class="sec-notif-input form-control" value="${wells.operating ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #dc2626; display: block; margin-bottom: 4px;">🔴 عدد الآبار المتوقفة:</label>
+                  <input type="number" id="techWellsStopped" class="sec-notif-input form-control" value="${wells.stopped ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #d97706; display: block; margin-bottom: 4px;">🎛️ عدد الدمامات (Manifolds):</label>
+                  <input type="number" id="techManifoldsCount" class="sec-notif-input form-control" value="${manifolds.count ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #7c3aed; display: block; margin-bottom: 4px;">🔀 كم مجمع آبار (Gathering Headers):</label>
+                  <input type="number" id="techGatheringHeaders" class="sec-notif-input form-control" value="${manifolds.gatheringHeaders ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">ملاحظات منظومة الآبار والمكامن:</label>
+                <input type="text" id="techWellsNotes" class="sec-notif-input form-control" value="${wells.notes || ''}" placeholder="ملاحظات تشغيلية عن الآبار والضغوط" style="width: 100%;">
+              </div>
+            </div>
+
+            <!-- 2. قطاع الضفاف والطاقات الإنتاجية (نفط / ماء / غاز) -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                  <span>🏭</span>
+                  <span>2. الضفاف والقدرات التصميمية والتشغيلية (كم ضفة، طاقة كل ضفة، الطاقة الكلية)</span>
+                </h4>
+                <button type="button" class="btn btn-sm btn-outline" onclick="window.app.addBankDetailRow()" style="font-size: 0.8rem; font-weight: 700;">➕ إضافة ضفة عازلة</button>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🔢 كم ضفة بالمحطة (عدد الضفاف):</label>
+                  <input type="number" id="techBanksCount" class="sec-notif-input form-control" value="${banks.count ?? banksList.length}" min="1" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🛢️ الطاقة الكلية للنفط:</label>
+                  <input type="text" id="techTotalOilCapacity" class="sec-notif-input form-control" value="${banks.totalOilCapacity || station.capacity || ''}" placeholder="مثال: 150,000 برميل/يوم" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">💧 الطاقة الكلية للماء المصاحب:</label>
+                  <input type="text" id="techTotalWaterCapacity" class="sec-notif-input form-control" value="${banks.totalWaterCapacity || ''}" placeholder="مثال: 45,000 برميل/يوم" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🔥 الطاقة الكلية للغاز:</label>
+                  <input type="text" id="techTotalGasCapacity" class="sec-notif-input form-control" value="${banks.totalGasCapacity || ''}" placeholder="مثال: 65 مقمق/يوم" required style="width: 100%;">
+                </div>
+              </div>
+
+              <!-- قائمة الضفاف الفردية -->
+              <div style="font-size: 0.85rem; font-weight: 750; color: var(--md-sys-color-primary); margin-bottom: 0.5rem;">تفاصيل طاقة وأملاح كل ضفة على حدة:</div>
+              <div id="techBanksListContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                <!-- Filled via loop or addBankDetailRow -->
+              </div>
+            </div>
+
+            <!-- 3. منظومة السيطرة والتحكم الآلي DCS -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>💻</span>
+                <span>3. منظومة السيطرة والتحكم الآلي (المحطة DCS كلها أو بعضها أو تقليدي)</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">تغطية نظام التحكم:</label>
+                  <select id="techDcsType" class="sec-notif-select form-control" style="width: 100%; font-weight: 800;">
+                    <option value="FULL_DCS" ${control.type === 'FULL_DCS' ? 'selected' : ''}>🟢 المحطة DCS بالكامل (تغطية كلية شاملة)</option>
+                    <option value="PARTIAL_DCS" ${control.type === 'PARTIAL_DCS' ? 'selected' : ''}>🟡 المحطة DCS بعضها (تغطية جزئية)</option>
+                    <option value="CONVENTIONAL" ${control.type === 'CONVENTIONAL' ? 'selected' : ''}>⚪ نظام سيطرة ومراقبة تقليدي (Conventional)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مواصفات وتفاصيل منظومة DCS والسيطرة:</label>
+                  <input type="text" id="techDcsDesc" class="sec-notif-input form-control" value="${control.coverageDescription || ''}" placeholder="وصف منظومة السيطرة المركزية وغرف التحكم" style="width: 100%;">
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. المعدات الدوارة (المين بم، البوسترات، التوربينات) -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>⚙️</span>
+                <span>4. المعدات الدوارة (مضخات المين بم، البوسترات، التوربينات)</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مضخات المين بم (Main Export Pumps):</label>
+                  <input type="text" id="techMainPumps" class="sec-notif-input form-control" value="${rotating.mainPumps || ''}" placeholder="مثال: 4 مضخات رئيسية (3 بالخدمة + 1 احتياط)" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مضخات البوسترات (Booster Pumps):</label>
+                  <input type="text" id="techBoosterPumps" class="sec-notif-input form-control" value="${rotating.boosterPumps || ''}" placeholder="مثال: 3 مضخات تعزيز الضغط (2 بالخدمة + 1 احتياط)" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">التوربينات (Turbines):</label>
+                  <input type="text" id="techTurbines" class="sec-notif-input form-control" value="${rotating.turbines || ''}" placeholder="مثال: 2 توربين غازي بقدرة تشغيلية كاملة" required style="width: 100%;">
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. الأملاح وجودة النفط وفحص الخط الرئيسي MAIN LINE -->
+            <div style="padding: 1.1rem; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; background: rgba(245, 158, 11, 0.03);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: #d97706; display: flex; align-items: center; gap: 0.4rem;">
+                <span>🧪</span>
+                <span>5. الأملاح وجودة النفط (الأملاح في كل ضفة والكلي والأملاح عند MAIN LINE)</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 0.75rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #b45309; display: block; margin-bottom: 4px;">⚡ الأملاح عند MAIN LINE:</label>
+                  <input type="text" id="techMainLineSalts" class="sec-notif-input form-control" value="${salts.mainLineSalts || ''}" placeholder="مثال: 26.5 PTB" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">متوسط أملاح الضفاف (الكلي):</label>
+                  <input type="text" id="techBanksAvgSalts" class="sec-notif-input form-control" value="${salts.banksAverage || ''}" placeholder="مثال: 26.0 PTB" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">نسبة الرواسب والماء (BS&W):</label>
+                  <input type="text" id="techBsw" class="sec-notif-input form-control" value="${salts.bsw || ''}" placeholder="مثال: 0.12 %" required style="width: 100%;">
+                </div>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">ملاحظات الفحوصات المختبرية للأملاح:</label>
+                <input type="text" id="techSaltsNotes" class="sec-notif-input form-control" value="${salts.notes || ''}" placeholder="ملاحظات مطابقة المواصفات التصديرية" style="width: 100%;">
+              </div>
+            </div>
+
+            <!-- 6. الطاقة، المولدات الديزل، ونسبة الكاز -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>⚡</span>
+                <span>6. منظومة الطاقة، المولدة الديزل، ونسبة الكاز (وقود الديزل)</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 1rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">المولدة الديزل والقدرة:</label>
+                  <input type="text" id="techDieselGen" class="sec-notif-input form-control" value="${power.dieselGenerators || ''}" placeholder="مثال: 3 مولدات ديزل بقدرة 1500 KVA لكل منها" required style="width: 100%;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: block; margin-bottom: 4px;">🛢️ نسبة الكاز المتبقي (%):</label>
+                  <input type="number" id="techFuelPct" class="sec-notif-input form-control" value="${power.fuelPercentage ?? 80}" min="0" max="100" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">موقف وحالة خزين الوقود:</label>
+                  <input type="text" id="techFuelStatus" class="sec-notif-input form-control" value="${power.fuelStatusText || ''}" placeholder="مثال: كافٍ للتشغيل المستمر لأكثر من 14 يوماً" style="width: 100%;">
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. منظومة الضاغطات وموقف ضاغطة الديزل الاحتياطية -->
+            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>💨</span>
+                <span>7. منظومة الضاغطات وموقف ضاغطة الديزل الاحتياطية</span>
+              </h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 1rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">إجمالي عدد الضاغطات:</label>
+                  <input type="number" id="techCompressorsTotal" class="sec-notif-input form-control" value="${compressors.totalCount ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #059669; display: block; margin-bottom: 4px;">عدد الضاغطات العاملة:</label>
+                  <input type="number" id="techCompressorsOperating" class="sec-notif-input form-control" value="${compressors.operatingCount ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #dc2626; display: block; margin-bottom: 4px;">🚨 موقف ضاغطة الديزل الاحتياطية:</label>
+                  <input type="text" id="techDieselBackupStatus" class="sec-notif-input form-control" value="${compressors.dieselBackupStatus || ''}" placeholder="مثال: جاهزة للعمل الفوري بنظام التشغيل التلقائي" required style="width: 100%; font-weight: 750;">
+                </div>
+              </div>
+            </div>
+
+            <!-- 8. إضافة معلومات ومعايير فنية مخصصة جديدة (Dynamic Custom Fields) -->
+            <div style="padding: 1.1rem; border: 1.5px dashed var(--md-sys-color-primary); border-radius: 14px; background: rgba(11, 87, 208, 0.02);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
+                    <span>➕</span>
+                    <span>8. إضافة وتخصيص معلومات ومعايير فنية جديدة</span>
+                  </h4>
+                  <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--md-sys-color-outline);">
+                    أضف أي معيار فني أو منظومة خاصة بالموقع (مثال: محطة حقن كيمياويات، خزانات الترقيد، منظومة الحماية الكاثودية).
+                  </p>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="window.app.addCustomTechnicalFieldRow()" style="font-size: 0.82rem; font-weight: 750;">
+                  ➕ إضافة معلومة فنية جديدة
+                </button>
+              </div>
+
+              <div id="techCustomFieldsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Filled via loop or addCustomTechnicalFieldRow -->
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--md-sys-color-surface-variant);">
+              <button type="button" class="btn btn-outline" onclick="window.app.closeEditStationTechnicalModal()" style="padding: 0.6rem 1.5rem; font-weight: 750;">
+                إلغاء
+              </button>
+              <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.75rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <span>💾</span>
+                <span>حفظ وتثبيت المواصفات الفنية</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Populate initial bank rows
+    if (banksList.length > 0) {
+      banksList.forEach(b => this.addBankDetailRow(b));
+    } else {
+      this.addBankDetailRow({ name: 'الضفة الأولى (Bank A)', capacity: '50,000 برميل/يوم', salts: '24 PTB' });
+    }
+
+    // Populate initial custom fields
+    if (customFields.length > 0) {
+      customFields.forEach(cf => this.addCustomTechnicalFieldRow(cf));
+    }
+  }
+
+  closeEditStationTechnicalModal() {
+    const modal = document.getElementById('editStationTechnicalModal');
+    if (modal && typeof modal.remove === 'function') {
+      modal.remove();
+    }
+  }
+
+  addBankDetailRow(bankData = null) {
+    const container = document.getElementById('techBanksListContainer');
+    if (!container) return;
+
+    const rowId = 'bank-row-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    const nameVal = bankData ? (bankData.name || '') : '';
+    const capVal = bankData ? (bankData.capacity || '') : '';
+    const saltsVal = bankData ? (bankData.salts || '') : '';
+
+    const rowHtml = `
+      <div id="${rowId}" class="tech-bank-row" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr auto; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 8px;">
+        <input type="text" class="sec-notif-input form-control tech-bank-name" value="${nameVal}" placeholder="تسمية الضفة (مثال: الضفة A)" required style="font-size: 0.85rem;">
+        <input type="text" class="sec-notif-input form-control tech-bank-cap" value="${capVal}" placeholder="طاقة الضفة (مثال: 50,000 برميل/يوم)" required style="font-size: 0.85rem;">
+        <input type="text" class="sec-notif-input form-control tech-bank-salts" value="${saltsVal}" placeholder="أملاح الضفة (مثال: 25 PTB)" required style="font-size: 0.85rem;">
+        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeBankDetailRow('${rowId}')" style="color: #dc2626; border-color: #dc2626; padding: 0.35rem 0.6rem;" title="حذف الضفة">✕</button>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', rowHtml);
+  }
+
+  removeBankDetailRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row && typeof row.remove === 'function') {
+      row.remove();
+    }
+  }
+
+  addCustomTechnicalFieldRow(fieldData = null) {
+    const container = document.getElementById('techCustomFieldsContainer');
+    if (!container) return;
+
+    const rowId = 'cust-row-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    const labelVal = fieldData ? (fieldData.label || '') : '';
+    const valVal = fieldData ? (fieldData.value || '') : '';
+    const unitVal = fieldData ? (fieldData.unit || '') : '';
+
+    const rowHtml = `
+      <div id="${rowId}" class="tech-custom-row" style="display: grid; grid-template-columns: 2fr 2fr 2fr auto; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.6rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px;">
+        <input type="text" class="sec-notif-input form-control tech-cust-label" value="${labelVal}" placeholder="اسم المعيار (مثال: ضاغطة هواء الآلات)" required style="font-size: 0.85rem; font-weight: 750;">
+        <input type="text" class="sec-notif-input form-control tech-cust-value" value="${valVal}" placeholder="القيمة (مثال: 2 عاملة + 1 احتياط)" required style="font-size: 0.85rem;">
+        <input type="text" class="sec-notif-input form-control tech-cust-unit" value="${unitVal}" placeholder="الوحدة أو الملاحظة (مثال: 7 بار)" style="font-size: 0.85rem;">
+        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeCustomTechnicalFieldRow('${rowId}')" style="color: #dc2626; border-color: #dc2626; padding: 0.4rem 0.75rem;" title="حذف المعيار">✕</button>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', rowHtml);
+  }
+
+  removeCustomTechnicalFieldRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row && typeof row.remove === 'function') {
+      row.remove();
+    }
+  }
+
+  handleSaveStationTechnicalProfile(e, stationId) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+
+    // 1. Wells
+    const wellsOperating = Number(document.getElementById('techWellsOperating')?.value || 0);
+    const wellsStopped = Number(document.getElementById('techWellsStopped')?.value || 0);
+    const wellsNotes = document.getElementById('techWellsNotes')?.value || '';
+
+    // 2. Manifolds
+    const manifoldsCount = Number(document.getElementById('techManifoldsCount')?.value || 0);
+    const gatheringHeaders = Number(document.getElementById('techGatheringHeaders')?.value || 0);
+
+    // 3. Banks
+    const banksCount = Number(document.getElementById('techBanksCount')?.value || 0);
+    const totalOilCapacity = document.getElementById('techTotalOilCapacity')?.value || '';
+    const totalWaterCapacity = document.getElementById('techTotalWaterCapacity')?.value || '';
+    const totalGasCapacity = document.getElementById('techTotalGasCapacity')?.value || '';
+
+    const bankRows = document.querySelectorAll('.tech-bank-row');
+    const banksList = [];
+    bankRows.forEach(row => {
+      const name = row.querySelector('.tech-bank-name')?.value?.trim();
+      const capacity = row.querySelector('.tech-bank-cap')?.value?.trim();
+      const salts = row.querySelector('.tech-bank-salts')?.value?.trim();
+      if (name) {
+        banksList.push({ name, capacity, salts });
+      }
+    });
+
+    // 4. Control System DCS
+    const dcsType = document.getElementById('techDcsType')?.value || 'FULL_DCS';
+    const dcsDesc = document.getElementById('techDcsDesc')?.value || '';
+
+    // 5. Rotating Equipment
+    const mainPumps = document.getElementById('techMainPumps')?.value || '';
+    const boosterPumps = document.getElementById('techBoosterPumps')?.value || '';
+    const turbines = document.getElementById('techTurbines')?.value || '';
+
+    // 6. Salts & Crude Quality
+    const mainLineSalts = document.getElementById('techMainLineSalts')?.value || '';
+    const banksAverage = document.getElementById('techBanksAvgSalts')?.value || '';
+    const bsw = document.getElementById('techBsw')?.value || '';
+    const saltsNotes = document.getElementById('techSaltsNotes')?.value || '';
+
+    // 7. Power & Fuel
+    const dieselGenerators = document.getElementById('techDieselGen')?.value || '';
+    const fuelPercentage = Number(document.getElementById('techFuelPct')?.value || 0);
+    const fuelStatusText = document.getElementById('techFuelStatus')?.value || '';
+
+    // 8. Compressors
+    const compressorsTotal = Number(document.getElementById('techCompressorsTotal')?.value || 0);
+    const compressorsOperating = Number(document.getElementById('techCompressorsOperating')?.value || 0);
+    const dieselBackupStatus = document.getElementById('techDieselBackupStatus')?.value || '';
+
+    // 9. Custom Dynamic Fields
+    const customRows = document.querySelectorAll('.tech-custom-row');
+    const customFields = [];
+    customRows.forEach((row, idx) => {
+      const label = row.querySelector('.tech-cust-label')?.value?.trim();
+      const value = row.querySelector('.tech-cust-value')?.value?.trim();
+      const unit = row.querySelector('.tech-cust-unit')?.value?.trim() || '';
+      if (label && value) {
+        customFields.push({ id: `cust-${Date.now()}-${idx}`, label, value, unit });
+      }
+    });
+
+    const payload = {
+      wells: {
+        operating: wellsOperating,
+        stopped: wellsStopped,
+        notes: wellsNotes
+      },
+      manifolds: {
+        count: manifoldsCount,
+        gatheringHeaders: gatheringHeaders
+      },
+      banks: {
+        count: banksCount || banksList.length,
+        totalOilCapacity,
+        totalWaterCapacity,
+        totalGasCapacity,
+        banksList
+      },
+      rotatingEquipment: {
+        mainPumps,
+        boosterPumps,
+        turbines
+      },
+      controlSystem: {
+        type: dcsType,
+        coverageDescription: dcsDesc
+      },
+      salts: {
+        mainLineSalts,
+        banksAverage,
+        bsw,
+        notes: saltsNotes
+      },
+      powerAndFuel: {
+        dieselGenerators,
+        fuelPercentage,
+        fuelStatusText
+      },
+      compressors: {
+        totalCount: compressorsTotal,
+        operatingCount: compressorsOperating,
+        dieselBackupStatus
+      },
+      customFields
+    };
+
+    const actorUser = window.auth ? window.auth.getCurrentUser() : null;
+    window.store.updateStationTechnicalProfile(stationId, payload, actorUser);
+
+    this.closeEditStationTechnicalModal();
+    alert('✅ تم حفظ وتثبيت المواصفات والبيانات الفنية للمحطة بنجاح.');
+
     if (typeof this.render === 'function') {
       this.render();
     }

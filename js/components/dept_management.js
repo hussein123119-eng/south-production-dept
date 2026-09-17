@@ -188,7 +188,7 @@ function renderDeptManagementView() {
           📬 <span>البريد</span>
         </button>
         <button class="tab-btn ${activeTab === 'notifs' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('notifs')">
-          📢 <span>التبليغات الرسمية</span> <span class="tab-count-badge">${safeNotifs.length}</span>
+          📢 <span>التبليغات</span> <span class="tab-count-badge">${safeNotifs.length}</span>
         </button>
         <button class="tab-btn ${activeTab === 'forms' ? 'active' : ''}" onclick="window.app.setDeptManagementSubTab('forms')">
           📝 <span>الاستمارات والبيانات</span>
@@ -241,7 +241,7 @@ function renderDeptNotifsTab(notifs, actorUser, sections) {
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
         <div>
           <h4 style="font-weight: 800; color: var(--md-sys-color-primary); margin: 0 0 0.25rem 0;">
-            📢 التبليغات الإدارية والرسمية للقسم (Official Text Notifications)
+            📢 التبليغات الإدارية للقسم
           </h4>
           <p style="color: var(--md-sys-color-outline); font-size: 0.85rem; margin: 0;">
             إصدار ومتابعة وتوجيه الكتب والتعليمات النصية المباشرة لكوادر الشعب والوحدات.

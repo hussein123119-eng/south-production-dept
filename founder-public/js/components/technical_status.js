@@ -96,14 +96,13 @@ function renderSectionTechnicalStatusTab(section, user) {
               <th>الإجراءات المتخذة</th>
               <th>الملاحظات</th>
               <th>مسؤول الموقع / المسجل</th>
-              <th>آخر تحديث</th>
               <th style="text-align: center; min-width: 140px;">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
             ${statuses.length === 0 ? `
               <tr>
-                <td colspan="9" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
+                <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
                   <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚙️</div>
                   <h4>لا يوجد موقف فني مسجل حالياً لهذه الشعبة</h4>
                   <p style="font-size: 0.85rem; max-width: 450px; margin: 0.25rem auto 1.25rem auto;">
@@ -124,7 +123,6 @@ function renderSectionTechnicalStatusTab(section, user) {
               if (opStatus === 'STOPPED') { badgeClass = 'badge-danger'; labelText = '🔴 حرجة / متوقفة'; }
 
               const recordDateStr = s.recordDate ? new Date(s.recordDate).toLocaleDateString('ar-IQ') : '—';
-              const updateTimeStr = (s.updatedAt || s.createdAt) ? new Date(s.updatedAt || s.createdAt).toLocaleDateString('ar-IQ') : '—';
 
               return `
                 <tr class="section-tech-row"
@@ -174,10 +172,6 @@ function renderSectionTechnicalStatusTab(section, user) {
                   <td style="font-size: 0.82rem; white-space: nowrap;">
                     <div><strong>${s.createdByName || 'مسؤول الموقع'}</strong></div>
                     <div style="font-size: 0.72rem; color: var(--md-sys-color-outline);">${s.createdByRole || 'مسؤول الموقع'}</div>
-                  </td>
-
-                  <td style="font-size: 0.78rem; color: var(--md-sys-color-outline); white-space: nowrap;">
-                    ${updateTimeStr}
                   </td>
 
                   <td style="text-align: center;">
@@ -312,14 +306,13 @@ function renderStationTechnicalStatusTab(station, section, user) {
               <th>الملاحظات والتوصيات</th>
               <th>حالة الإرسال للشعبة</th>
               <th>المسجل</th>
-              <th>آخر تحديث</th>
               <th style="text-align: center; min-width: 190px;">الإجراءات المتاحة</th>
             </tr>
           </thead>
           <tbody>
             ${statuses.length === 0 ? `
               <tr>
-                <td colspan="10" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
+                <td colspan="9" style="text-align: center; padding: 3rem 1rem; color: var(--md-sys-color-outline);">
                   <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚙️</div>
                   <h4>لا يوجد موقف فني مسجل لهذه المحطة حتى الآن</h4>
                   <p style="font-size: 0.85rem; max-width: 450px; margin: 0.25rem auto 1.25rem auto;">
@@ -342,7 +335,6 @@ function renderStationTechnicalStatusTab(station, section, user) {
               const isSent = s.isSentToSection === true;
               const forwardStatusKey = isSent ? 'SENT' : 'DRAFT';
               const recordDateStr = s.recordDate ? new Date(s.recordDate).toLocaleDateString('ar-IQ') : '—';
-              const updateTimeStr = (s.updatedAt || s.createdAt) ? new Date(s.updatedAt || s.createdAt).toLocaleDateString('ar-IQ') : '—';
 
               return `
                 <tr class="station-tech-row"
@@ -398,10 +390,6 @@ function renderStationTechnicalStatusTab(station, section, user) {
                   <td style="font-size: 0.82rem; white-space: nowrap;">
                     <div><strong>${s.createdByName || 'مسؤول المحطة'}</strong></div>
                     <div style="font-size: 0.72rem; color: var(--md-sys-color-outline);">${s.createdByRole || 'كادر المحطة'}</div>
-                  </td>
-
-                  <td style="font-size: 0.78rem; color: var(--md-sys-color-outline); white-space: nowrap;">
-                    ${updateTimeStr}
                   </td>
 
                   <td style="text-align: center;">
@@ -540,7 +528,6 @@ function renderTechnicalStatusView() {
               <th>وصف الموقف الفني</th>
               <th>الإجراءات المتخذة</th>
               <th>المسجل</th>
-              <th>آخر تحديث</th>
               <th style="text-align: center;">إجراءات</th>
             </tr>
           </thead>
@@ -566,14 +553,13 @@ function renderTechnicalStatusView() {
                   <td style="max-width: 250px;">${s.description || '—'}</td>
                   <td style="max-width: 200px; font-size: 0.82rem;">${s.actionsTaken || '—'}</td>
                   <td style="font-size: 0.82rem;">${s.createdByName || 'مسؤول الموقع'}</td>
-                  <td style="font-size: 0.78rem; color: var(--md-sys-color-outline);">${new Date(s.updatedAt || s.createdAt).toLocaleDateString('ar-IQ')}</td>
                   <td style="text-align: center;">
                     <button class="btn-action-view" onclick="window.app.openViewTechnicalStatusDetailsModal('${s.id}')" title="معاينة الموقف الفني">معاينة</button>
                   </td>
                 </tr>
               `;
             }).join('')}
-            ${statuses.length === 0 ? '<tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--md-sys-color-outline);">لا توجد مواقف فنية مسجلة حالياً.</td></tr>' : ''}
+            ${statuses.length === 0 ? '<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--md-sys-color-outline);">لا توجد مواقف فنية مسجلة حالياً.</td></tr>' : ''}
           </tbody>
         </table>
       </div>
