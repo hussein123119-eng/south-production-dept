@@ -15266,13 +15266,13 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
               </div>
             </div>
 
-            <!-- 7. منظومة الضاغطات وموقف ضاغطة الديزل الاحتياطية -->
+            <!-- 7. منظومة ضاغطات الهواء وموقف ضاغطة الديزل الاحتياطية -->
             <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
               <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💨</div>
                 <div>
-                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">7. منظومة كبس الغاز وجاهزية الضاغطة الاحتياطية</h4>
-                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">الضاغطات الترددية للغاز المصاحب وموقف ضاغطة الديزل في الطوارئ</span>
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">7. منظومة ضاغطات الهواء وجاهزية الضاغطة الاحتياطية</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">ضاغطات هواء الآلات والخدمة (Instrument & Plant Air) وموقف ضاغطة الديزل الاحتياطية للطوارئ</span>
                 </div>
               </div>
 
@@ -15280,28 +15280,28 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
                 <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.75rem 0.85rem;">
                   <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
                     <span>🔢</span>
-                    <span>إجمالي عدد الضاغطات</span>
+                    <span>إجمالي ضاغطات الهواء</span>
                   </label>
                   <input type="number" id="techCompressorsTotal" class="sec-notif-input form-control" value="${compressors.totalCount ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: var(--md-sys-color-primary);">
-                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">ضاغطة غاز</span>
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">ضاغطة هواء (Air Comp)</span>
                 </div>
 
                 <div style="background: rgba(16, 185, 129, 0.04); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
                   <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
                     <span>🟢</span>
-                    <span>الضاغطات العاملة بالخدمة</span>
+                    <span>ضاغطات الهواء العاملة بالخدمة</span>
                   </label>
                   <input type="number" id="techCompressorsOperating" class="sec-notif-input form-control" value="${compressors.operatingCount ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #059669;">
-                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">عاملة بكفاءة</span>
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">عاملة بكفاءة (هواء آلات)</span>
                 </div>
 
                 <div style="background: rgba(239, 68, 68, 0.04); border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
                   <label class="form-label" style="font-size: 0.82rem; font-weight: 850; color: #dc2626; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
                     <span>🚨</span>
-                    <span>موقف ضاغطة الديزل الاحتياطية (Diesel Standby)</span>
+                    <span>موقف ضاغطة الديزل الاحتياطية لهواء الآلات (Diesel Standby)</span>
                   </label>
-                  <input type="text" id="techDieselBackupStatus" class="sec-notif-input form-control" value="${compressors.dieselBackupStatus || ''}" placeholder="جاهزة للعمل الفوري بنظام الإقلاع التلقائي (Auto-Start)" required style="width: 100%; font-weight: 800; color: #dc2626;">
-                  <span style="font-size: 0.72rem; color: #dc2626; display: block; margin-top: 4px; font-weight: 700;">جاهزية منظومة الطوارئ البديلة</span>
+                  <input type="text" id="techDieselBackupStatus" class="sec-notif-input form-control" value="${compressors.dieselBackupStatus || ''}" placeholder="جاهزة للعمل الفوري بنظام الإقلاع التلقائي (Auto-Start Standby)" required style="width: 100%; font-weight: 800; color: #dc2626;">
+                  <span style="font-size: 0.72rem; color: #dc2626; display: block; margin-top: 4px; font-weight: 700;">جاهزية منظومة هواء الطوارئ البديلة</span>
                 </div>
               </div>
             </div>

@@ -238,7 +238,8 @@ assert(renderedHtml.includes('مجمعات الآبار'), 'عرض مجمعات 
 assert(renderedHtml.includes('الضفة D (جديدة)'), 'عرض تفاصيل الضفة المضافة حديثاً في جدول الضفاف');
 assert(renderedHtml.includes('24.2 PTB') && renderedHtml.includes('MAIN LINE'), 'عرض فحص أملاح الخط الرئيسي MAIN LINE بوضوح');
 assert(renderedHtml.includes('92%'), 'عرض نسبة خزين الكاز 92% في شريط مؤشر الوقود');
-assert(renderedHtml.includes('ضاغطة الديزل الاحتياطية'), 'عرض موقف ضاغطة الديزل الاحتياطية في الواجهة');
+assert(renderedHtml.includes('ضاغطات الهواء'), 'عرض بطاقة منظومة ضاغطات الهواء وهواء الآلات في الواجهة');
+assert(renderedHtml.includes('ضاغطة الديزل الاحتياطية لهواء الآلات'), 'عرض موقف ضاغطة الديزل الاحتياطية لهواء الآلات في الواجهة');
 assert(renderedHtml.includes('وحدة تجفيف الغاز الطبيعي'), 'عرض المعيار الفني المخصص الأول في بطاقات المعايير المخصصة');
 assert(renderedHtml.includes('منظومة الحماية الكاثودية'), 'عرض المعيار الفني المخصص الثاني في بطاقات المعايير المخصصة');
 assert(renderedHtml.includes('تحديث المواصفات الفنية') || renderedHtml.includes('openEditStationTechnicalModal'), 'توفر زر تحديث المواصفات الفنية للمسؤول');
@@ -255,6 +256,7 @@ assert(typeof window.app.handleSaveStationTechnicalProfile === 'function', 'دا
 // التحقق من كود نافذة التعديل في app.js
 const appFileCode = fs.readFileSync(appPath, 'utf8');
 assert(appFileCode.includes('techStationCode'), 'توفر حقل تعديل رمز المحطة الكودي techStationCode في app.js');
+assert(appFileCode.includes('منظومة ضاغطات الهواء'), 'توفر قطاع منظومة ضاغطات الهواء وهواء الآلات في app.js');
 assert(appFileCode.includes('tech-modal-scrollable-body'), 'توفر حاوية التمرير المتطورة tech-modal-scrollable-body في app.js');
 assert(appFileCode.includes('tech-modal-footer'), 'توفر شريط الأزرار المثبت tech-modal-footer في app.js');
 

@@ -1035,28 +1035,28 @@ function renderStationTechnicalTab(station, user) {
           </div>
         </div>
 
-        <!-- بطاقة الضاغطات وموقف ضاغطة الديزل الاحتياطية -->
+        <!-- بطاقة ضاغطات الهواء (هواء الآلات والتشغيل) وموقف ضاغطة الديزل الاحتياطية -->
         <div class="card" style="display: flex; flex-direction: column; gap: 1rem;">
           <div class="card-header" style="border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.65rem; margin-bottom: 0.25rem;">
             <h4 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.45rem;">
               <span>💨</span>
-              <span>الضاغطات وموقف ضاغطة الديزل الاحتياطية</span>
+              <span>منظومة ضاغطات الهواء وهواء الآلات والتشغيل</span>
             </h4>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div style="padding: 0.85rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px; text-align: center; background: var(--md-sys-color-surface);">
-              <div style="font-size: 0.78rem; color: var(--md-sys-color-outline);">إجمالي الضاغطات</div>
+              <div style="font-size: 0.78rem; color: var(--md-sys-color-outline);">إجمالي ضاغطات الهواء</div>
               <div style="font-size: 1.5rem; font-weight: 900; color: var(--md-sys-color-primary);">${compressors.totalCount ?? 0}</div>
             </div>
             <div style="padding: 0.85rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px; text-align: center; background: var(--md-sys-color-surface);">
-              <div style="font-size: 0.78rem; color: #059669;">الضاغطات العاملة</div>
+              <div style="font-size: 0.78rem; color: #059669;">ضاغطات الهواء العاملة</div>
               <div style="font-size: 1.5rem; font-weight: 900; color: #059669;">${compressors.operatingCount ?? 0}</div>
             </div>
           </div>
 
           <div style="padding: 1rem; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%); border: 1.5px solid rgba(16, 185, 129, 0.3);">
-            <div style="font-size: 0.82rem; font-weight: 800; color: #059669; margin-bottom: 4px;">🚨 موقف ضاغطة الديزل الاحتياطية (Diesel Standby Compressor):</div>
+            <div style="font-size: 0.82rem; font-weight: 800; color: #059669; margin-bottom: 4px;">🚨 موقف ضاغطة الديزل الاحتياطية لهواء الآلات (Diesel Standby Air Compressor):</div>
             <div style="font-size: 0.94rem; font-weight: 750; color: var(--md-sys-color-on-surface); line-height: 1.6;">
               ${compressors.dieselBackupStatus || 'غير مسجل'}
             </div>

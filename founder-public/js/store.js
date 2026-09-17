@@ -4059,11 +4059,11 @@ class StoreManager {
         fuelPercentage: 82, // percentage 0 - 100
         fuelStatusText: '82% - خزان الوقود في وضع تشغيلي آمن وممتلئ'
       },
-      // 8. الضاغطات والغاز
+      // 8. منظومة ضاغطات الهواء (هواء الآلات الدقيقة والتشغيل)
       compressors: {
         totalCount: isCentral ? 4 : 2,
         operatingCount: isCentral ? 3 : 2,
-        dieselBackupStatus: 'جاهزة وتعمل تلقائياً عند انقطاع التيار (STANDBY READY)'
+        dieselBackupStatus: 'ضاغطة الديزل الاحتياطية لهواء الآلات جاهزة وتعمل تلقائياً عند انقطاع التيار (STANDBY READY)'
       },
       // 9. الحقول المخصصة الإضافية
       customFields: [
@@ -5481,7 +5481,7 @@ class StoreManager {
       compressors: {
         totalCount: 4,
         operatingCount: 3,
-        dieselBackupStatus: 'ضاغطة الديزل الاحتياطية جاهزة بنسبة 100% مع نظام التشغيل التلقائي (Auto-Start Standby) عند انقطاع التيار.'
+        dieselBackupStatus: 'ضاغطة الديزل الاحتياطية لهواء الآلات جاهزة بنسبة 100% مع نظام التشغيل التلقائي (Auto-Start Standby) عند انقطاع التيار.'
       },
       customFields: [
         { id: 'cust-1', label: 'محطة حقن مانع التآكل والترسبات', value: '25 لتر/يوم', unit: 'تعمل باستمرار على خط التجميع الرئيسي' },
