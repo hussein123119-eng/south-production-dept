@@ -36,15 +36,15 @@ class AppController {
 
       if (syncing) {
         pill.className = 'topbar-network-pill net-online';
-        label.textContent = 'مزامنة...';
+        label.textContent = 'Syncing...';
         if (dot) dot.className = 'net-status-dot dot-syncing';
       } else if (online) {
         pill.className = 'topbar-network-pill net-online';
-        label.textContent = pendingCount > 0 ? `متصل (${pendingCount})` : 'متصل';
+        label.textContent = pendingCount > 0 ? `Online (${pendingCount})` : 'Online';
         if (dot) dot.className = 'net-status-dot dot-green';
       } else {
         pill.className = 'topbar-network-pill net-offline';
-        label.textContent = pendingCount > 0 ? `أوفلاين (${pendingCount})` : 'أوفلاين';
+        label.textContent = pendingCount > 0 ? `Offline (${pendingCount})` : 'Offline';
         if (dot) dot.className = 'net-status-dot dot-amber';
       }
     });
@@ -4218,7 +4218,7 @@ class AppController {
             </div>
             <span style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: 800; font-size: 0.8rem; background: ${isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)'}; color: ${isOnline ? '#10b981' : '#f59e0b'}; border: 1px solid ${isOnline ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'};">
               <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isOnline ? '#10b981' : '#f59e0b'};"></span>
-              ${isOnline ? '🟢 متصل ومزامن' : '🟠 وضع الأوفلاين (حفظ محلي)'}
+              ${isOnline ? '🟢 Online (متصل ومزامن)' : '🟠 Offline (حفظ محلي)'}
             </span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; font-size: 0.82rem;">

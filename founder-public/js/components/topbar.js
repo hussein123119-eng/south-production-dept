@@ -139,7 +139,7 @@ function renderTopbar() {
              onclick="window.app.openNetworkStorageModal()" 
              title="${isOnline ? 'المنظومة متصلة ومزامنة بالكامل - انقر لمعاينة حالة التخزين والذاكرة' : 'وضع العمل دون إنترنت (أوفلاين) - انقر لمعاينة طابور الإجراءات والحفظ المحلي'}">
           <span class="net-status-dot ${isOnline ? 'dot-green' : 'dot-amber'}" id="topbarNetworkStatusDot"></span>
-          <span class="net-status-label" id="topbarNetworkStatusLabel">${isOnline ? 'متصل' : 'أوفلاين'}</span>
+          <span class="net-status-label" id="topbarNetworkStatusLabel">${isOnline ? 'Online' : 'Offline'}</span>
         </div>
 
         <div class="topbar-actions">
