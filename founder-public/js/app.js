@@ -674,7 +674,7 @@ class AppController {
                 🛠️ بيئة التطوير المحلي (تعبئة الرقم الوظيفي السريع)
               </div>
               <div style="display: flex; gap: 0.35rem; justify-content: center; flex-wrap: wrap;">
-                <button type="button" class="glass-dev-chip-btn" onclick="window.app.quickFillLogin('EMP-0000')" style="background: rgba(245, 158, 11, 0.22); border-color: rgba(245, 158, 11, 0.5); color: #fbbf24; font-weight: 800;">👑 المؤسس (EMP-0000)</button>
+                <button type="button" class="glass-dev-chip-btn" onclick="window.app.quickFillLogin('hussein123119@gmail.com')" style="background: rgba(245, 158, 11, 0.22); border-color: rgba(245, 158, 11, 0.5); color: #fbbf24; font-weight: 800;">👑 المؤسس (البريد السيادي)</button>
                 <button type="button" class="glass-dev-chip-btn" onclick="window.app.quickFillLogin('EMP-2024-001')">👔 مدير القسم (EMP-2024-001)</button>
                 <button type="button" class="glass-dev-chip-btn" onclick="window.app.quickFillLogin('EMP-2024-002')">🏢 الشعبة 1 (EMP-2024-002)</button>
                 <button type="button" class="glass-dev-chip-btn" onclick="window.app.quickFillLogin('EMP-2024-005')">⚙️ الوحدة الفنية (EMP-2024-005)</button>

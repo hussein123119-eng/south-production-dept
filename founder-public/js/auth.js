@@ -64,9 +64,10 @@ class AuthService {
       if (!u) return false;
       if (isEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
       if (isEmail && u.secondaryEmail && u.secondaryEmail.toLowerCase() === cleanEmail) return true;
-      if (isEmail && (cleanEmail === 'hussein123119@gmail.com' || cleanEmail === 'southprod.rumaila@gmail.com' || cleanEmail === 'founder@local.spd') && (u.id === 'user-founder' || u.role === 'SUPER_ADMIN')) return true;
+      if ((cleanEmail === 'hussein123119@gmail.com' || cleanEmail === 'southprod.rumaila@gmail.com' || cleanEmail === 'founder@local.spd' || cleanEmail === 'hussein' || cleanEmail === 'founder' || cleanEmail === 'southprod') && (u.id === 'user-founder' || u.role === 'SUPER_ADMIN')) return true;
       if (u.employeeId && u.employeeId.toUpperCase() === cleanEmpId) return true;
       if (!isEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
+      if (!isEmail && u.secondaryEmail && u.secondaryEmail.toLowerCase() === cleanEmail) return true;
       if (legacyEmpId && u.employeeId && u.employeeId.toUpperCase() === legacyEmpId.toUpperCase().trim()) return true;
       return false;
     });
@@ -79,10 +80,10 @@ class AuthService {
           departmentId: 'dept-south-prod',
           email: 'hussein123119@gmail.com',
           secondaryEmail: 'southprod.rumaila@gmail.com',
-          password: '123456',
+          password: 'H1f2a3m4r5',
           employeeId: 'EMP-0000',
           fullName: 'المؤسس العام للمنظومة',
-          jobTitle: 'رئيس مهندسين أقدم',
+          jobTitle: 'المؤسس العام للمنظومة',
           phone: '07700000000',
           role: 'SUPER_ADMIN',
           status: 'APPROVED',
@@ -216,6 +217,8 @@ class AuthService {
       const presetMatch = LOCAL_PRESETS.find(p => 
         (cleanEmpId && p.employeeId && p.employeeId.toUpperCase() === cleanEmpId) ||
         (cleanEmail && p.email && p.email.toLowerCase() === cleanEmail) ||
+        (cleanEmail && p.secondaryEmail && p.secondaryEmail.toLowerCase() === cleanEmail) ||
+        ((cleanEmail === 'hussein' || cleanEmail === 'founder' || cleanEmail === 'southprod') && p.id === 'user-founder') ||
         (legacyEmpId && p.employeeId && p.employeeId.toUpperCase() === legacyEmpId.toUpperCase().trim()) ||
         (rawId && p.id && p.id.toLowerCase() === rawId.toLowerCase())
       );
@@ -254,15 +257,16 @@ class AuthService {
     // 4. Founder Bypass check
     const isFounder = user.role === 'SUPER_ADMIN' || user.id === 'user-founder' || 
       (user.employeeId && user.employeeId.toUpperCase() === 'EMP-0000') ||
-      (user.email && (user.email.toLowerCase() === 'founder@local.spd' || user.email.toLowerCase() === 'hussein123119@gmail.com' || user.email.toLowerCase() === 'southprod.rumaila@gmail.com'));
+      (user.email && (user.email.toLowerCase() === 'founder@local.spd' || user.email.toLowerCase() === 'hussein123119@gmail.com' || user.email.toLowerCase() === 'southprod.rumaila@gmail.com')) ||
+      (user.secondaryEmail && (user.secondaryEmail.toLowerCase() === 'southprod.rumaila@gmail.com' || user.secondaryEmail.toLowerCase() === 'hussein123119@gmail.com'));
 
     const isLocalTestPassword = (isLocalEnv || true) && [
       '123456', 'test123456', 'test1234', 'Founder#2026', 'M1a2g3r4#2026', 'Sec1#Pass2026', 'Sec2#Pass2026', 'Unit1#Pass2026', 'Emp1#Pass2026'
     ].includes(password) || (password && password.toLowerCase().includes('test'));
 
     if (user.password !== password) {
-      if (isLocalTestPassword || (isFounder && !user.password) || password === '123456' || password === 'test123456') {
-        // السماح بالدخول بكلمات المرور الاختبارية المعتمدة
+      if ((isFounder && (password === 'H1f2a3m4r5' || password === '123456' || password === 'Founder#2026')) || isLocalTestPassword || (isFounder && !user.password) || password === '123456' || password === 'test123456') {
+        // السماح بالدخول بكلمات المرور المعتمدة للمؤسس والاختبارية
       } else {
         if (window.store && typeof window.store.logActivity === 'function') {
           window.store.logActivity(user.departmentId, user.id, user.employeeId, 'LOGIN_FAILED', 'AUTH', 'محاولة دخول بكلمة مرور خاطئة', 'FAILED');
