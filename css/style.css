@@ -9921,10 +9921,61 @@ body[data-theme="dark"],
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(15, 23, 42, 0.75) !important;
+  background: rgba(15, 23, 42, 0.8) !important;
   backdrop-filter: blur(8px) !important;
   padding: 1rem !important;
   overflow-y: auto !important;
+}
+
+.tech-modal-card {
+  max-width: 980px !important;
+  width: 95vw !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 35px rgba(11, 87, 208, 0.2) !important;
+  background: var(--md-sys-color-surface, #0f172a) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
+  overflow: hidden !important;
+}
+
+.tech-modal-header {
+  border-radius: 18px 18px 0 0 !important;
+}
+
+.tech-section-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.tech-section-card:hover {
+  border-color: rgba(11, 87, 208, 0.4) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Symmetrical grids for luxury layout */
+.tech-4col-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.tech-3col-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .tech-4col-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .tech-3col-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .tech-4col-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .tech-bank-row, .tech-custom-row {
@@ -9933,7 +9984,24 @@ body[data-theme="dark"],
 
 .tech-bank-row:hover, .tech-custom-row:hover {
   border-color: var(--md-sys-color-primary) !important;
-  box-shadow: 0 2px 8px rgba(11, 87, 208, 0.08);
+  box-shadow: 0 2px 8px rgba(11, 87, 208, 0.12);
+}
+
+[data-theme="light"] .tech-modal-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18), 0 0 25px rgba(11, 87, 208, 0.12) !important;
+}
+
+[data-theme="light"] .tech-section-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .tech-section-card:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.08) !important;
 }
 
 [data-theme="light"] .tech-bank-row,

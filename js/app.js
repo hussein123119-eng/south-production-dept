@@ -14950,237 +14950,392 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const customFields = profile.customFields || [];
 
     const modalHtml = `
-      <div id="editStationTechnicalModal" class="sec-notif-modal-overlay sec-notif-overlay tech-modal-overlay" style="position: fixed !important; inset: 0 !important; z-index: 10000 !important; display: flex !important; align-items: center !important; justify-content: center !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; padding: 1rem !important; overflow-y: auto !important;">
-        <div class="sec-notif-modal-card" style="width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; background: var(--md-sys-color-surface, #ffffff); border-radius: 20px; border: 1.5px solid var(--md-sys-color-surface-variant); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); margin: auto; display: flex; flex-direction: column;">
+      <div id="editStationTechnicalModal" class="sec-notif-modal-overlay sec-notif-overlay tech-modal-overlay">
+        <div class="tech-modal-card sec-notif-modal-card">
           
-          <!-- Header -->
-          <div style="padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(11, 87, 208, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%);">
-            <div>
-              <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem;">
-                <span>⚙️</span>
-                <span>تحديث المواصفات الفنية والتشغيلية للمحطة</span>
-              </h3>
-              <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--md-sys-color-outline);">
-                موقع: <strong>${station.name}</strong> (${station.code || station.id})
-              </p>
+          <!-- Executive Royal Banner Header -->
+          <div class="tech-modal-header" style="padding: 1.4rem 1.85rem; border-bottom: 2px solid #f59e0b; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #091e42 0%, #0f3d75 50%, #0369a1 100%); border-radius: 20px 20px 0 0; color: #ffffff;">
+            <div style="display: flex; align-items: center; gap: 0.9rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                ⚙️
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 3px;">
+                  <h3 style="margin: 0; font-size: 1.3rem; font-weight: 900; color: #ffffff; letter-spacing: -0.2px;">
+                    تحديث المواصفات والبيانات الفنية والتشغيلية المعتمدة
+                  </h3>
+                  <span style="background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b; color: #fef08a; font-size: 0.74rem; font-weight: 800; padding: 2px 10px; border-radius: 999px;">
+                    سجل هندسي موقعي
+                  </span>
+                </div>
+                <p style="margin: 0; font-size: 0.86rem; color: #cbd5e1; display: flex; align-items: center; gap: 0.45rem;">
+                  <span>الموقع الميداني:</span>
+                  <strong style="color: #ffffff; font-weight: 800;">${station.name}</strong>
+                  <span style="opacity: 0.75; font-family: monospace;">(${station.code || station.id})</span>
+                </p>
+              </div>
             </div>
-            <button type="button" class="btn-close" onclick="window.app.closeEditStationTechnicalModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--md-sys-color-outline);" title="إغلاق">✕</button>
+            <button type="button" class="btn-close" onclick="window.app.closeEditStationTechnicalModal()" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;" title="إغلاق">✕</button>
           </div>
 
           <!-- Form Body -->
-          <form id="editStationTechnicalForm" onsubmit="window.app.handleSaveStationTechnicalProfile(event, '${stationId}')" style="padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 1.5rem;">
+          <form id="editStationTechnicalForm" onsubmit="window.app.handleSaveStationTechnicalProfile(event, '${stationId}')" style="padding: 1.6rem 1.85rem; display: flex; flex-direction: column; gap: 1.4rem;">
             
             <!-- 1. قطاع الآبار والدمامات ومجمعات الإنتاج -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                <span>🛢️</span>
-                <span>1. منظومة الآبار، الدمامات، ومجمعات الإنتاج</span>
-              </h4>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 0.75rem;">
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🛢️</div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #059669; display: block; margin-bottom: 4px;">🟢 عدد الآبار العاملة:</label>
-                  <input type="number" id="techWellsOperating" class="sec-notif-input form-control" value="${wells.operating ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
-                </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #dc2626; display: block; margin-bottom: 4px;">🔴 عدد الآبار المتوقفة:</label>
-                  <input type="number" id="techWellsStopped" class="sec-notif-input form-control" value="${wells.stopped ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
-                </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #d97706; display: block; margin-bottom: 4px;">🎛️ عدد الدمامات (Manifolds):</label>
-                  <input type="number" id="techManifoldsCount" class="sec-notif-input form-control" value="${manifolds.count ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
-                </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #7c3aed; display: block; margin-bottom: 4px;">🔀 كم مجمع آبار (Gathering Headers):</label>
-                  <input type="number" id="techGatheringHeaders" class="sec-notif-input form-control" value="${manifolds.gatheringHeaders ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">1. منظومة الآبار، الدمامات، ومجمعات الإنتاج</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">إحصائيات الآبار المربوطة والمجمعات السطحية ومكامن النفط</span>
                 </div>
               </div>
+
+              <!-- 4-Column Balanced Grid -->
+              <div class="tech-4col-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                <div style="background: rgba(16, 185, 129, 0.04); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🟢</span>
+                    <span>الآبار العاملة بالإنتاج</span>
+                  </label>
+                  <input type="number" id="techWellsOperating" class="sec-notif-input form-control" value="${wells.operating ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #059669;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">بئر منتج</span>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.04); border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #dc2626; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔴</span>
+                    <span>الآبار المتوقفة عن العمل</span>
+                  </label>
+                  <input type="number" id="techWellsStopped" class="sec-notif-input form-control" value="${wells.stopped ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #dc2626;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">بئر مغلق / صيانة</span>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.04); border: 1.5px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #d97706; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🎛️</span>
+                    <span>عدد الدمامات (Manifolds)</span>
+                  </label>
+                  <input type="number" id="techManifoldsCount" class="sec-notif-input form-control" value="${manifolds.count ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #d97706;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">دمام عزل وتوزيع</span>
+                </div>
+
+                <div style="background: rgba(124, 58, 237, 0.04); border: 1.5px solid rgba(124, 58, 237, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #7c3aed; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔀</span>
+                    <span>مجمعات الآبار (Headers)</span>
+                  </label>
+                  <input type="number" id="techGatheringHeaders" class="sec-notif-input form-control" value="${manifolds.gatheringHeaders ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #7c3aed;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">مجمع تجميع حقلي</span>
+                </div>
+              </div>
+
               <div>
-                <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">ملاحظات منظومة الآبار والمكامن:</label>
-                <input type="text" id="techWellsNotes" class="sec-notif-input form-control" value="${wells.notes || ''}" placeholder="ملاحظات تشغيلية عن الآبار والضغوط" style="width: 100%;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 750; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">الملاحظات التشغيلية لحركة الآبار والمكامن:</label>
+                <input type="text" id="techWellsNotes" class="sec-notif-input form-control" value="${wells.notes || ''}" placeholder="ملاحظات حول حالة الآبار وضغوط رؤوس الآبار والموائع المنتجة" style="width: 100%;">
               </div>
             </div>
 
             <!-- 2. قطاع الضفاف والطاقات الإنتاجية (نفط / ماء / غاز) -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                  <span>🏭</span>
-                  <span>2. الضفاف والقدرات التصميمية والتشغيلية (كم ضفة، طاقة كل ضفة، الطاقة الكلية)</span>
-                </h4>
-                <button type="button" class="btn btn-sm btn-outline" onclick="window.app.addBankDetailRow()" style="font-size: 0.8rem; font-weight: 700;">➕ إضافة ضفة عازلة</button>
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(11, 87, 208, 0.12); border: 1px solid rgba(11, 87, 208, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🏭</div>
+                  <div>
+                    <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">2. منظومة الضفاف والطاقات الإنتاجية الكلية</h4>
+                    <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">الطاقات الاستيعابية والتصميمية المقررة لعزل النفط والماء والغاز</span>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="window.app.addBankDetailRow()" style="font-size: 0.82rem; font-weight: 800; border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 8px;">
+                  <span>➕</span>
+                  <span>إضافة ضفة عازلة</span>
+                </button>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🔢 كم ضفة بالمحطة (عدد الضفاف):</label>
-                  <input type="number" id="techBanksCount" class="sec-notif-input form-control" value="${banks.count ?? banksList.length}" min="1" required style="width: 100%; font-weight: 800;">
+              <!-- 4-Column Balanced Grid -->
+              <div class="tech-4col-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem;">
+                <div style="background: rgba(11, 87, 208, 0.04); border: 1.5px solid rgba(11, 87, 208, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔢</span>
+                    <span>عدد الضفاف العازلة</span>
+                  </label>
+                  <input type="number" id="techBanksCount" class="sec-notif-input form-control" value="${banks.count ?? banksList.length}" min="1" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: var(--md-sys-color-primary);">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">ضفاف عزل</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🛢️ الطاقة الكلية للنفط:</label>
-                  <input type="text" id="techTotalOilCapacity" class="sec-notif-input form-control" value="${banks.totalOilCapacity || station.capacity || ''}" placeholder="مثال: 150,000 برميل/يوم" required style="width: 100%;">
+
+                <div style="background: rgba(14, 165, 233, 0.04); border: 1.5px solid rgba(14, 165, 233, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🛢️</span>
+                    <span>الطاقة الكلية للنفط</span>
+                  </label>
+                  <input type="text" id="techTotalOilCapacity" class="sec-notif-input form-control" value="${banks.totalOilCapacity || station.capacity || ''}" placeholder="150,000 برميل/يوم" required style="width: 100%; font-weight: 800; font-size: 0.95rem; text-align: center;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">برميل / يوم</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">💧 الطاقة الكلية للماء المصاحب:</label>
-                  <input type="text" id="techTotalWaterCapacity" class="sec-notif-input form-control" value="${banks.totalWaterCapacity || ''}" placeholder="مثال: 45,000 برميل/يوم" required style="width: 100%;">
+
+                <div style="background: rgba(6, 182, 212, 0.04); border: 1.5px solid rgba(6, 182, 212, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #0891b2; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>💧</span>
+                    <span>طاقة الماء المصاحب</span>
+                  </label>
+                  <input type="text" id="techTotalWaterCapacity" class="sec-notif-input form-control" value="${banks.totalWaterCapacity || ''}" placeholder="45,000 برميل/يوم" required style="width: 100%; font-weight: 800; font-size: 0.95rem; text-align: center;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">برميل / يوم</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">🔥 الطاقة الكلية للغاز:</label>
-                  <input type="text" id="techTotalGasCapacity" class="sec-notif-input form-control" value="${banks.totalGasCapacity || ''}" placeholder="مثال: 65 مقمق/يوم" required style="width: 100%;">
+
+                <div style="background: rgba(245, 158, 11, 0.04); border: 1.5px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #d97706; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔥</span>
+                    <span>طاقة الغاز المصاحب</span>
+                  </label>
+                  <input type="text" id="techTotalGasCapacity" class="sec-notif-input form-control" value="${banks.totalGasCapacity || ''}" placeholder="65 مقمق/يوم" required style="width: 100%; font-weight: 800; font-size: 0.95rem; text-align: center;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">MMSCFD</span>
                 </div>
               </div>
 
-              <!-- قائمة الضفاف الفردية -->
-              <div style="font-size: 0.85rem; font-weight: 750; color: var(--md-sys-color-primary); margin-bottom: 0.5rem;">تفاصيل طاقة وأملاح كل ضفة على حدة:</div>
-              <div id="techBanksListContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
-                <!-- Filled via loop or addBankDetailRow -->
+              <!-- جدول تفاصيل الضفاف الفردية والأملاح -->
+              <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem;">
+                <div style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 45px; gap: 0.6rem; padding: 0 0.5rem 0.5rem 0.5rem; font-size: 0.78rem; font-weight: 800; color: var(--md-sys-color-outline); border-bottom: 1px solid var(--md-sys-color-surface-variant); margin-bottom: 0.65rem;">
+                  <div>تسمية الضفة العازلة</div>
+                  <div>الطاقة الاستيعابية للضفة</div>
+                  <div>تركيز الأملاح في الضفة</div>
+                  <div style="text-align: center;">إجراء</div>
+                </div>
+                <div id="techBanksListContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                  <!-- Filled via addBankDetailRow -->
+                </div>
               </div>
             </div>
 
             <!-- 3. منظومة السيطرة والتحكم الآلي DCS -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                <span>💻</span>
-                <span>3. منظومة السيطرة والتحكم الآلي (المحطة DCS كلها أو بعضها أو تقليدي)</span>
-              </h4>
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💻</div>
+                <div>
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">3. منظومة السيطرة والتحكم الآلي (DCS / SCADA)</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">مستوى أتمتة المحطة، منظومات المراقبة الموقعية وصمامات الأمان والإنذار المبكر ESD</span>
+                </div>
+              </div>
+
               <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">تغطية نظام التحكم:</label>
-                  <select id="techDcsType" class="sec-notif-select form-control" style="width: 100%; font-weight: 800;">
-                    <option value="FULL_DCS" ${control.type === 'FULL_DCS' ? 'selected' : ''}>🟢 المحطة DCS بالكامل (تغطية كلية شاملة)</option>
-                    <option value="PARTIAL_DCS" ${control.type === 'PARTIAL_DCS' ? 'selected' : ''}>🟡 المحطة DCS بعضها (تغطية جزئية)</option>
-                    <option value="CONVENTIONAL" ${control.type === 'CONVENTIONAL' ? 'selected' : ''}>⚪ نظام سيطرة ومراقبة تقليدي (Conventional)</option>
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: block; margin-bottom: 6px;">مستوى تغطية نظام السيطرة:</label>
+                  <select id="techDcsType" class="sec-notif-select form-control" style="width: 100%; font-weight: 800; height: 44px;">
+                    <option value="FULL_DCS" ${control.type === 'FULL_DCS' ? 'selected' : ''}>🟢 تغطية كلية شاملة (Full DCS)</option>
+                    <option value="PARTIAL_DCS" ${control.type === 'PARTIAL_DCS' ? 'selected' : ''}>🟡 تغطية تشغيلية جزئية (Partial DCS)</option>
+                    <option value="CONVENTIONAL" ${control.type === 'CONVENTIONAL' ? 'selected' : ''}>⚪ نظام مراقبة تقليدي (Conventional)</option>
                   </select>
                 </div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مواصفات وتفاصيل منظومة DCS والسيطرة:</label>
-                  <input type="text" id="techDcsDesc" class="sec-notif-input form-control" value="${control.coverageDescription || ''}" placeholder="وصف منظومة السيطرة المركزية وغرف التحكم" style="width: 100%;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: block; margin-bottom: 6px;">مواصفات وتفاصيل منظومة السيطرة وغرف العمليات:</label>
+                  <input type="text" id="techDcsDesc" class="sec-notif-input form-control" value="${control.coverageDescription || ''}" placeholder="نوع المنظومة (مثل: Yokogawa Centum VP / Emerson DeltaV) وتغطية الأجهزة الحقلية" style="width: 100%; height: 44px;">
                 </div>
               </div>
             </div>
 
             <!-- 4. المعدات الدوارة (المين بم، البوسترات، التوربينات) -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                <span>⚙️</span>
-                <span>4. المعدات الدوارة (مضخات المين بم، البوسترات، التوربينات)</span>
-              </h4>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">⚙️</div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مضخات المين بم (Main Export Pumps):</label>
-                  <input type="text" id="techMainPumps" class="sec-notif-input form-control" value="${rotating.mainPumps || ''}" placeholder="مثال: 4 مضخات رئيسية (3 بالخدمة + 1 احتياط)" required style="width: 100%;">
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">4. المعدات الدوارة ومحطات الضخ والتوربينات</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">مضخات التصدير الرئيسية ومضخات التعزيز ووحدات التوليد والتوربينات</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">مضخات البوسترات (Booster Pumps):</label>
-                  <input type="text" id="techBoosterPumps" class="sec-notif-input form-control" value="${rotating.boosterPumps || ''}" placeholder="مثال: 3 مضخات تعزيز الضغط (2 بالخدمة + 1 احتياط)" required style="width: 100%;">
+              </div>
+
+              <div class="tech-3col-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🚀</span>
+                    <span>مضخات الضخ الرئيسي (المين بم)</span>
+                  </label>
+                  <input type="text" id="techMainPumps" class="sec-notif-input form-control" value="${rotating.mainPumps || ''}" placeholder="4 مضخات رئيسية (3 عاملة + 1 احتياط)" required style="width: 100%; font-weight: 750;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; margin-top: 4px;">Main Export Pumps</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">التوربينات (Turbines):</label>
-                  <input type="text" id="techTurbines" class="sec-notif-input form-control" value="${rotating.turbines || ''}" placeholder="مثال: 2 توربين غازي بقدرة تشغيلية كاملة" required style="width: 100%;">
+
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔄</span>
+                    <span>مضخات التعزيز (البوسترات)</span>
+                  </label>
+                  <input type="text" id="techBoosterPumps" class="sec-notif-input form-control" value="${rotating.boosterPumps || ''}" placeholder="3 مضخات بوستر (2 عاملة + 1 احتياط)" required style="width: 100%; font-weight: 750;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; margin-top: 4px;">Booster Pumps</span>
+                </div>
+
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🌀</span>
+                    <span>التوربينات ومحركات الدفع</span>
+                  </label>
+                  <input type="text" id="techTurbines" class="sec-notif-input form-control" value="${rotating.turbines || ''}" placeholder="2 توربين غازي بقدرة تشغيلية كاملة" required style="width: 100%; font-weight: 750;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; margin-top: 4px;">Turbine Drivers</span>
                 </div>
               </div>
             </div>
 
             <!-- 5. الأملاح وجودة النفط وفحص الخط الرئيسي MAIN LINE -->
-            <div style="padding: 1.1rem; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; background: rgba(245, 158, 11, 0.03);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: #d97706; display: flex; align-items: center; gap: 0.4rem;">
-                <span>🧪</span>
-                <span>5. الأملاح وجودة النفط (الأملاح في كل ضفة والكلي والأملاح عند MAIN LINE)</span>
-              </h4>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 0.75rem;">
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 16px; background: rgba(245, 158, 11, 0.03); box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.08);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid rgba(245, 158, 11, 0.25); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🧪</div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #b45309; display: block; margin-bottom: 4px;">⚡ الأملاح عند MAIN LINE:</label>
-                  <input type="text" id="techMainLineSalts" class="sec-notif-input form-control" value="${salts.mainLineSalts || ''}" placeholder="مثال: 26.5 PTB" required style="width: 100%; font-weight: 800;">
-                </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">متوسط أملاح الضفاف (الكلي):</label>
-                  <input type="text" id="techBanksAvgSalts" class="sec-notif-input form-control" value="${salts.banksAverage || ''}" placeholder="مثال: 26.0 PTB" required style="width: 100%;">
-                </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">نسبة الرواسب والماء (BS&W):</label>
-                  <input type="text" id="techBsw" class="sec-notif-input form-control" value="${salts.bsw || ''}" placeholder="مثال: 0.12 %" required style="width: 100%;">
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: #b45309;">5. مواصفات جودة النفط وفحوصات الأملاح والشوائب</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">نتائج فحوصات المختبر لمستويات الأملاح ونسبة الماء والرواسب المعزولة</span>
                 </div>
               </div>
+
+              <div class="tech-3col-grid" style="display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem;">
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.06) 100%); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 900; color: #b45309; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>⚡</span>
+                    <span>الأملاح عند خط التصدير (MAIN LINE)</span>
+                  </label>
+                  <input type="text" id="techMainLineSalts" class="sec-notif-input form-control" value="${salts.mainLineSalts || ''}" placeholder="26.5 PTB" required style="width: 100%; font-weight: 900; font-size: 1.15rem; color: #b45309; text-align: center;">
+                  <span style="font-size: 0.72rem; color: #b45309; display: block; text-align: center; margin-top: 4px; font-weight: 700;">فحص خط التصدير المباشر</span>
+                </div>
+
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>📊</span>
+                    <span>متوسط تركيز أملاح الضفاف</span>
+                  </label>
+                  <input type="text" id="techBanksAvgSalts" class="sec-notif-input form-control" value="${salts.banksAverage || ''}" placeholder="26.0 PTB" required style="width: 100%; font-weight: 800; font-size: 1.05rem; text-align: center;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">متوسط الضفاف العازلة</span>
+                </div>
+
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>💧</span>
+                    <span>نسبة الرواسب والماء (BS&W)</span>
+                  </label>
+                  <input type="text" id="techBsw" class="sec-notif-input form-control" value="${salts.bsw || ''}" placeholder="0.12 %" required style="width: 100%; font-weight: 800; font-size: 1.05rem; text-align: center;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">نسبة مئوية %</span>
+                </div>
+              </div>
+
               <div>
-                <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">ملاحظات الفحوصات المختبرية للأملاح:</label>
-                <input type="text" id="techSaltsNotes" class="sec-notif-input form-control" value="${salts.notes || ''}" placeholder="ملاحظات مطابقة المواصفات التصديرية" style="width: 100%;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 750; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">الملاحظات المختبرية ومطابقة المواصفات التصديرية:</label>
+                <input type="text" id="techSaltsNotes" class="sec-notif-input form-control" value="${salts.notes || ''}" placeholder="ملاحظات مطابقة النفط المصدر للحدود الوطنية القياسية (أقل من 30 PTB)" style="width: 100%;">
               </div>
             </div>
 
             <!-- 6. الطاقة، المولدات الديزل، ونسبة الكاز -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                <span>⚡</span>
-                <span>6. منظومة الطاقة، المولدة الديزل، ونسبة الكاز (وقود الديزل)</span>
-              </h4>
-              <div style="display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 1rem;">
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">⚡</div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">المولدة الديزل والقدرة:</label>
-                  <input type="text" id="techDieselGen" class="sec-notif-input form-control" value="${power.dieselGenerators || ''}" placeholder="مثال: 3 مولدات ديزل بقدرة 1500 KVA لكل منها" required style="width: 100%;">
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">6. منظومة الطاقة والمولدات وخزين وقود التشغيل</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">التغذية الكهربائية للموقع، المولدات الديزل، ومستوى خزين الكاز</span>
                 </div>
+              </div>
+
+              <div class="tech-3col-grid" style="display: grid; grid-template-columns: 1.4fr 1fr 1.4fr; gap: 1rem;">
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: block; margin-bottom: 4px;">🛢️ نسبة الكاز المتبقي (%):</label>
-                  <input type="number" id="techFuelPct" class="sec-notif-input form-control" value="${power.fuelPercentage ?? 80}" min="0" max="100" required style="width: 100%; font-weight: 800;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: block; margin-bottom: 6px;">المولدات الديزل ومصدر التغذية الكهربائية:</label>
+                  <input type="text" id="techDieselGen" class="sec-notif-input form-control" value="${power.dieselGenerators || ''}" placeholder="3 مولدات ديزل بقدرة 1500 KVA ومربوطة بالشبكة الوطنية 33KV" required style="width: 100%;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; margin-top: 4px;">Diesel Generators / National Grid</span>
                 </div>
+
+                <div style="background: rgba(16, 185, 129, 0.04); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🛢️</span>
+                    <span>نسبة خزين الكاز المتبقي</span>
+                  </label>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="number" id="techFuelPct" class="sec-notif-input form-control" value="${power.fuelPercentage ?? 80}" min="0" max="100" required style="width: 70px; font-weight: 900; font-size: 1.15rem; text-align: center; color: #059669;">
+                    <span style="font-weight: 900; font-size: 1.15rem; color: #059669;">%</span>
+                  </div>
+                  <span style="font-size: 0.72rem; color: #059669; display: block; margin-top: 4px; font-weight: 700;">وقود الديزل الجاهز</span>
+                </div>
+
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">موقف وحالة خزين الوقود:</label>
-                  <input type="text" id="techFuelStatus" class="sec-notif-input form-control" value="${power.fuelStatusText || ''}" placeholder="مثال: كافٍ للتشغيل المستمر لأكثر من 14 يوماً" style="width: 100%;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: block; margin-bottom: 6px;">موقف وكفاية خزين الوقود التشغيلي:</label>
+                  <input type="text" id="techFuelStatus" class="sec-notif-input form-control" value="${power.fuelStatusText || ''}" placeholder="خزين كافٍ للتشغيل المستمر لأكثر من 14 يوماً" style="width: 100%;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; margin-top: 4px;">تقدير الأيام التشغيلية الآمنة</span>
                 </div>
               </div>
             </div>
 
             <!-- 7. منظومة الضاغطات وموقف ضاغطة الديزل الاحتياطية -->
-            <div style="padding: 1.1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 14px; background: var(--md-sys-color-surface);">
-              <h4 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                <span>💨</span>
-                <span>7. منظومة الضاغطات وموقف ضاغطة الديزل الاحتياطية</span>
-              </h4>
-              <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 1rem;">
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 16px; background: var(--md-sys-color-surface); box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.04);">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.15rem; border-bottom: 1px solid var(--md-sys-color-surface-variant); padding-bottom: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💨</div>
                 <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--md-sys-color-outline); display: block; margin-bottom: 4px;">إجمالي عدد الضاغطات:</label>
-                  <input type="number" id="techCompressorsTotal" class="sec-notif-input form-control" value="${compressors.totalCount ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+                  <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">7. منظومة كبس الغاز وجاهزية الضاغطة الاحتياطية</h4>
+                  <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">الضاغطات الترددية للغاز المصاحب وموقف ضاغطة الديزل في الطوارئ</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #059669; display: block; margin-bottom: 4px;">عدد الضاغطات العاملة:</label>
-                  <input type="number" id="techCompressorsOperating" class="sec-notif-input form-control" value="${compressors.operatingCount ?? 0}" min="0" required style="width: 100%; font-weight: 800;">
+              </div>
+
+              <div class="tech-3col-grid" style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 1rem;">
+                <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🔢</span>
+                    <span>إجمالي عدد الضاغطات</span>
+                  </label>
+                  <input type="number" id="techCompressorsTotal" class="sec-notif-input form-control" value="${compressors.totalCount ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: var(--md-sys-color-primary);">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">ضاغطة غاز</span>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #dc2626; display: block; margin-bottom: 4px;">🚨 موقف ضاغطة الديزل الاحتياطية:</label>
-                  <input type="text" id="techDieselBackupStatus" class="sec-notif-input form-control" value="${compressors.dieselBackupStatus || ''}" placeholder="مثال: جاهزة للعمل الفوري بنظام التشغيل التلقائي" required style="width: 100%; font-weight: 750;">
+
+                <div style="background: rgba(16, 185, 129, 0.04); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🟢</span>
+                    <span>الضاغطات العاملة بالخدمة</span>
+                  </label>
+                  <input type="number" id="techCompressorsOperating" class="sec-notif-input form-control" value="${compressors.operatingCount ?? 0}" min="0" required style="width: 100%; font-weight: 900; font-size: 1.2rem; text-align: center; color: #059669;">
+                  <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); display: block; text-align: center; margin-top: 4px;">عاملة بكفاءة</span>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.04); border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 0.75rem 0.85rem;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 850; color: #dc2626; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 6px;">
+                    <span>🚨</span>
+                    <span>موقف ضاغطة الديزل الاحتياطية (Diesel Standby)</span>
+                  </label>
+                  <input type="text" id="techDieselBackupStatus" class="sec-notif-input form-control" value="${compressors.dieselBackupStatus || ''}" placeholder="جاهزة للعمل الفوري بنظام الإقلاع التلقائي (Auto-Start)" required style="width: 100%; font-weight: 800; color: #dc2626;">
+                  <span style="font-size: 0.72rem; color: #dc2626; display: block; margin-top: 4px; font-weight: 700;">جاهزية منظومة الطوارئ البديلة</span>
                 </div>
               </div>
             </div>
 
             <!-- 8. إضافة معلومات ومعايير فنية مخصصة جديدة (Dynamic Custom Fields) -->
-            <div style="padding: 1.1rem; border: 1.5px dashed var(--md-sys-color-primary); border-radius: 14px; background: rgba(11, 87, 208, 0.02);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
-                <div>
-                  <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.4rem;">
-                    <span>➕</span>
-                    <span>8. إضافة وتخصيص معلومات ومعايير فنية جديدة</span>
-                  </h4>
-                  <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--md-sys-color-outline);">
-                    أضف أي معيار فني أو منظومة خاصة بالموقع (مثال: محطة حقن كيمياويات، خزانات الترقيد، منظومة الحماية الكاثودية).
-                  </p>
+            <div class="tech-section-card" style="padding: 1.3rem 1.5rem; border: 1.5px dashed var(--md-sys-color-primary); border-radius: 16px; background: rgba(11, 87, 208, 0.02); box-shadow: 0 4px 14px -2px rgba(11, 87, 208, 0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; border-bottom: 1px solid rgba(11, 87, 208, 0.2); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(11, 87, 208, 0.12); border: 1px solid rgba(11, 87, 208, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">➕</div>
+                  <div>
+                    <h4 style="margin: 0; font-size: 1.08rem; font-weight: 850; color: var(--md-sys-color-primary);">8. المعايير والمواصفات الفنية الميدانية الإضافية</h4>
+                    <span style="font-size: 0.76rem; color: var(--md-sys-color-outline);">إمكانية إضافة أي منظومة أو وحدة هندسية خاصة بالمحطة وحفظها ديناميكياً</span>
+                  </div>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary" onclick="window.app.addCustomTechnicalFieldRow()" style="font-size: 0.82rem; font-weight: 750;">
-                  ➕ إضافة معلومة فنية جديدة
+                <button type="button" class="btn btn-sm btn-primary" onclick="window.app.addCustomTechnicalFieldRow()" style="font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(11, 87, 208, 0.25);">
+                  <span>➕</span>
+                  <span>إضافة معلومة فنية جديدة</span>
                 </button>
               </div>
 
-              <div id="techCustomFieldsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <!-- Filled via loop or addCustomTechnicalFieldRow -->
+              <div style="background: var(--md-sys-color-background, #f8fafc); border: 1px solid var(--md-sys-color-surface-variant); border-radius: 12px; padding: 0.85rem;">
+                <div style="display: grid; grid-template-columns: 2fr 2fr 2fr 45px; gap: 0.6rem; padding: 0 0.5rem 0.5rem 0.5rem; font-size: 0.78rem; font-weight: 800; color: var(--md-sys-color-outline); border-bottom: 1px solid var(--md-sys-color-surface-variant); margin-bottom: 0.65rem;">
+                  <div>اسم المعيار أو المنظومة المضافة</div>
+                  <div>القيمة المسجلة</div>
+                  <div>الوحدة أو الملاحظة الفنية</div>
+                  <div style="text-align: center;">إجراء</div>
+                </div>
+                <div id="techCustomFieldsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <!-- Filled via addCustomTechnicalFieldRow -->
+                </div>
               </div>
             </div>
 
             <!-- Action Buttons -->
-            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--md-sys-color-surface-variant);">
-              <button type="button" class="btn btn-outline" onclick="window.app.closeEditStationTechnicalModal()" style="padding: 0.6rem 1.5rem; font-weight: 750;">
-                إلغاء
-              </button>
-              <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.75rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-                <span>💾</span>
-                <span>حفظ وتثبيت المواصفات الفنية</span>
-              </button>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid var(--md-sys-color-surface-variant); flex-wrap: wrap; gap: 1rem;">
+              <span style="font-size: 0.82rem; color: var(--md-sys-color-outline);">
+                💡 يتم تثبيت التعديلات فوراً وتوثيق اسم المسؤول وتوقيت الحفظ في السجل التدقيقي للمحطة.
+              </span>
+              <div style="display: flex; gap: 0.75rem;">
+                <button type="button" class="btn btn-outline" onclick="window.app.closeEditStationTechnicalModal()" style="padding: 0.65rem 1.6rem; font-weight: 750; border-radius: 10px;">
+                  إلغاء
+                </button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; font-weight: 900; display: flex; align-items: center; gap: 0.6rem; border-radius: 10px; background: linear-gradient(135deg, #0b57d0 0%, #0284c7 100%); box-shadow: 0 4px 16px rgba(11, 87, 208, 0.35);">
+                  <span style="font-size: 1.1rem;">💾</span>
+                  <span>حفظ وتثبيت المواصفات الفنية</span>
+                </button>
+              </div>
             </div>
 
           </form>
@@ -15220,11 +15375,11 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const saltsVal = bankData ? (bankData.salts || '') : '';
 
     const rowHtml = `
-      <div id="${rowId}" class="tech-bank-row" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr auto; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.5rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 8px;">
-        <input type="text" class="sec-notif-input form-control tech-bank-name" value="${nameVal}" placeholder="تسمية الضفة (مثال: الضفة A)" required style="font-size: 0.85rem;">
-        <input type="text" class="sec-notif-input form-control tech-bank-cap" value="${capVal}" placeholder="طاقة الضفة (مثال: 50,000 برميل/يوم)" required style="font-size: 0.85rem;">
-        <input type="text" class="sec-notif-input form-control tech-bank-salts" value="${saltsVal}" placeholder="أملاح الضفة (مثال: 25 PTB)" required style="font-size: 0.85rem;">
-        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeBankDetailRow('${rowId}')" style="color: #dc2626; border-color: #dc2626; padding: 0.35rem 0.6rem;" title="حذف الضفة">✕</button>
+      <div id="${rowId}" class="tech-bank-row" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 45px; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.6rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px;">
+        <input type="text" class="sec-notif-input form-control tech-bank-name" value="${nameVal}" placeholder="تسمية الضفة (مثال: الضفة الأولى A)" required style="font-size: 0.88rem; font-weight: 750;">
+        <input type="text" class="sec-notif-input form-control tech-bank-cap" value="${capVal}" placeholder="الطاقة الاستيعابية (مثال: 50,000 برميل/يوم)" required style="font-size: 0.88rem; font-weight: 750;">
+        <input type="text" class="sec-notif-input form-control tech-bank-salts" value="${saltsVal}" placeholder="تركيز الأملاح (مثال: 24 PTB)" required style="font-size: 0.88rem; font-weight: 750; font-family: monospace;">
+        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeBankDetailRow('${rowId}')" style="color: #dc2626; border-color: #fca5a5; padding: 0.4rem; height: 38px; width: 38px; display: flex; align-items: center; justify-content: center; border-radius: 8px;" title="حذف هذه الضفة">✕</button>
       </div>
     `;
     container.insertAdjacentHTML('beforeend', rowHtml);
@@ -15247,11 +15402,11 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     const unitVal = fieldData ? (fieldData.unit || '') : '';
 
     const rowHtml = `
-      <div id="${rowId}" class="tech-custom-row" style="display: grid; grid-template-columns: 2fr 2fr 2fr auto; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.6rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px;">
-        <input type="text" class="sec-notif-input form-control tech-cust-label" value="${labelVal}" placeholder="اسم المعيار (مثال: ضاغطة هواء الآلات)" required style="font-size: 0.85rem; font-weight: 750;">
-        <input type="text" class="sec-notif-input form-control tech-cust-value" value="${valVal}" placeholder="القيمة (مثال: 2 عاملة + 1 احتياط)" required style="font-size: 0.85rem;">
-        <input type="text" class="sec-notif-input form-control tech-cust-unit" value="${unitVal}" placeholder="الوحدة أو الملاحظة (مثال: 7 بار)" style="font-size: 0.85rem;">
-        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeCustomTechnicalFieldRow('${rowId}')" style="color: #dc2626; border-color: #dc2626; padding: 0.4rem 0.75rem;" title="حذف المعيار">✕</button>
+      <div id="${rowId}" class="tech-custom-row" style="display: grid; grid-template-columns: 2fr 2fr 2fr 45px; gap: 0.6rem; align-items: center; background: var(--md-sys-color-surface); padding: 0.6rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: 10px;">
+        <input type="text" class="sec-notif-input form-control tech-cust-label" value="${labelVal}" placeholder="اسم المعيار أو المنظومة (مثال: وحدة حقن مانع التآكل)" required style="font-size: 0.88rem; font-weight: 750;">
+        <input type="text" class="sec-notif-input form-control tech-cust-value" value="${valVal}" placeholder="القيمة الميدانية (مثال: 25 لتر/يوم)" required style="font-size: 0.88rem; font-weight: 750;">
+        <input type="text" class="sec-notif-input form-control tech-cust-unit" value="${unitVal}" placeholder="الوحدة أو الملاحظة (مثال: مستمرة على خط التجميع)" style="font-size: 0.88rem;">
+        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.removeCustomTechnicalFieldRow('${rowId}')" style="color: #dc2626; border-color: #fca5a5; padding: 0.4rem; height: 38px; width: 38px; display: flex; align-items: center; justify-content: center; border-radius: 8px;" title="حذف هذا المعيار">✕</button>
       </div>
     `;
     container.insertAdjacentHTML('beforeend', rowHtml);
