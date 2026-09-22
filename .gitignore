@@ -26,3 +26,8 @@ Thumbs.db
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+
+# Local Sync & Backup
+backup_to_gdrive.ps1
+sync_status.json
+
