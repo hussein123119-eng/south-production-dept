@@ -105,30 +105,77 @@ function renderUserManagementView() {
 // الهيكل: المستخدم | الرقم الوظيفي | جهة الارتباط | العنوان الوظيفي | حالة الحساب | الدور | إجراءات / الصلاحيات | الإضبارة
 // ==========================================================================
 function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
-  const rolesList = [
-    { key: 'DEPT_MANAGER', name: 'مدير قسم' },
-    { key: 'DEPUTY_DEPT_MANAGER', name: 'وكيل مدير قسم' },
-    { key: 'ADMIN_MANAGER', name: 'مدير إدارة' },
-    { key: 'SECTION_MANAGER', name: 'مسؤول شعبة' },
-    { key: 'DEPUTY_SECTION_MANAGER', name: 'وكيل مسؤول شعبة' },
-    { key: 'UNIT_MANAGER', name: 'مسؤول وحدة' },
-    { key: 'STATION_MANAGER', name: 'مسؤول موقع' },
-    { key: 'DEPUTY_STATION_MANAGER', name: 'وكيل مسؤول موقع' },
-    { key: 'STATION_SUPERVISOR', name: 'مشرف محطة' },
-    { key: 'ADMINISTRATOR', name: 'إداري مخول' },
-    { key: 'SHIFT_ENGINEER', name: 'مهندس مناوب' },
-    { key: 'SHIFT_SUPERVISOR', name: 'مشرف نوبة' },
-    { key: 'OPERATOR', name: 'مشغل' },
-    { key: 'AUTHORIZED_DRIVER', name: 'سائق مخول' },
-    { key: 'DRIVER', name: 'سائق' }
-  ];
-
+  // Pre-calculate hash maps for instant O(1) lookups
   const secMap = {};
   (sections || []).forEach(s => { if (s && s.id) secMap[s.id] = s; });
   const unitMap = {};
   (units || []).forEach(u => { if (u && u.id) unitMap[u.id] = u; });
   const staMap = {};
   (stations || []).forEach(st => { if (st && st.id) staMap[st.id] = st; });
+
+  // Dynamic Auto-Discovery of Affiliations from roster
+  const discoveredSections = [...(sections || [])];
+  const discoveredUnits = [...(units || [])];
+  const discoveredStations = [...(stations || [])];
+
+  (roster || []).forEach(emp => {
+    if (emp.sectionId && !secMap[emp.sectionId]) {
+      const newSec = { id: emp.sectionId, name: emp.sectionName || emp.section || emp.sectionId };
+      secMap[emp.sectionId] = newSec;
+      discoveredSections.push(newSec);
+    }
+    if (emp.unitId && !unitMap[emp.unitId]) {
+      const newUnit = { id: emp.unitId, name: emp.unitName || emp.unit || emp.unitId };
+      unitMap[emp.unitId] = newUnit;
+      discoveredUnits.push(newUnit);
+    }
+    if (emp.stationId && !staMap[emp.stationId]) {
+      const newSta = { id: emp.stationId, name: emp.stationName || emp.station || emp.stationId };
+      staMap[emp.stationId] = newSta;
+      discoveredStations.push(newSta);
+    }
+  });
+
+  // Dynamic Comprehensive Roles List from RBAC and Roster
+  const rbacRoles = (window.rbac && window.rbac.roles) ? window.rbac.roles : {};
+  const defaultRolesList = [
+    { key: 'SUPER_ADMIN', name: '👑 المؤسس / Super Admin' },
+    { key: 'DEPT_MANAGER', name: '🏛️ مدير قسم' },
+    { key: 'DEPUTY_DEPT_MANAGER', name: '🏛️ وكيل مدير قسم' },
+    { key: 'ADMIN_MANAGER', name: '📋 مدير إدارة' },
+    { key: 'SECTION_MANAGER', name: '📂 مسؤول شعبة' },
+    { key: 'DEPUTY_SECTION_MANAGER', name: '📂 وكيل مسؤول شعبة' },
+    { key: 'UNIT_MANAGER', name: '⚙️ مسؤول وحدة' },
+    { key: 'STATION_MANAGER', name: '⛽ مسؤول موقع / محطة' },
+    { key: 'DEPUTY_STATION_MANAGER', name: '⛽ وكيل مسؤول موقع' },
+    { key: 'STATION_SUPERVISOR', name: '⛽ مشرف محطة' },
+    { key: 'ADMINISTRATOR', name: '🛡️ إداري مخول' },
+    { key: 'SHIFT_ENGINEER', name: '⚡ مهندس مناوب' },
+    { key: 'SHIFT_SUPERVISOR', name: '⏱️ مشرف نوبة' },
+    { key: 'OPERATOR', name: '🔧 مشغل موقع / محطة' },
+    { key: 'AUTHORIZED_DRIVER', name: '🚗 سائق مخول' },
+    { key: 'DRIVER', name: '🚗 سائق' },
+    { key: 'EMPLOYEE', name: '👤 موظف / كادر عام' }
+  ];
+
+  const rolesMap = {};
+  defaultRolesList.forEach(r => { rolesMap[r.key] = r; });
+
+  Object.keys(rbacRoles).forEach(k => {
+    if (!rolesMap[k]) {
+      const rObj = rbacRoles[k];
+      rolesMap[k] = { key: k, name: rObj.name || k };
+    }
+  });
+
+  (roster || []).forEach(emp => {
+    const rKey = emp.role;
+    if (rKey && !rolesMap[rKey]) {
+      rolesMap[rKey] = { key: rKey, name: rKey };
+    }
+  });
+
+  const rolesList = Object.values(rolesMap);
 
   if (typeof window !== 'undefined') {
     if (!window.app) window.app = {};
@@ -145,18 +192,64 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
   const searchTokens = rawQ.trim().split(/\s+/).filter(Boolean);
   const filtered = roster.filter(emp => {
     if (state.section !== 'ALL') {
-      if (state.section === 'NONE' && emp.sectionId) return false;
-      if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
+      if (state.section === 'DEPT') {
+        const isDept = (!emp.sectionId && !emp.unitId && !emp.stationId) ||
+                       (emp.sectionName === 'إدارة القسم') ||
+                       (emp.section === 'إدارة القسم') ||
+                       (emp.departmentId && !emp.sectionId && !emp.unitId);
+        if (!isDept) return false;
+      } else if (state.section === 'NONE') {
+        const hasScope = emp.sectionId || emp.unitId || emp.stationId ||
+                         (emp.sectionName && emp.sectionName !== 'إدارة القسم') ||
+                         (emp.section && emp.section !== 'إدارة القسم');
+        if (hasScope) return false;
+      } else if (state.section.startsWith('sec-')) {
+        const targetSec = secMap[state.section];
+        const matchesSec = (emp.sectionId === state.section) ||
+                           (targetSec && (emp.sectionName === targetSec.name || emp.section === targetSec.name));
+        if (!matchesSec) return false;
+      } else if (state.section.startsWith('unit-')) {
+        const targetUnit = unitMap[state.section];
+        const matchesUnit = (emp.unitId === state.section) ||
+                            (targetUnit && (
+                              emp.unitName === targetUnit.name ||
+                              emp.unit === targetUnit.name ||
+                              (emp.sectionName && emp.sectionName.includes(targetUnit.name))
+                            ));
+        if (!matchesUnit) return false;
+      } else if (state.section.startsWith('st-')) {
+        const targetSta = staMap[state.section];
+        const matchesSta = (emp.stationId === state.section) ||
+                           (targetSta && (emp.stationName === targetSta.name || emp.station === targetSta.name));
+        if (!matchesSta) return false;
+      } else {
+        const matchesGeneric = (emp.sectionId === state.section) ||
+                               (emp.unitId === state.section) ||
+                               (emp.stationId === state.section) ||
+                               (emp.sectionName === state.section) ||
+                               (emp.section === state.section);
+        if (!matchesGeneric) return false;
+      }
     }
     if (state.status !== 'ALL' && emp.accountStatus !== state.status) return false;
-    if (state.role !== 'ALL' && (emp.role || '') !== state.role) return false;
+    if (state.role !== 'ALL') {
+      const targetRole = state.role;
+      if (targetRole === 'EMPLOYEE' || targetRole === 'STAFF') {
+        const isEmp = emp.role === 'EMPLOYEE' || emp.role === 'STAFF' || !emp.role;
+        if (!isEmp) return false;
+      } else if ((emp.role || '') !== targetRole) {
+        return false;
+      }
+    }
     if (searchTokens.length > 0) {
       const name = (emp.fullName || emp.name || '').toLowerCase();
       const empid = (emp.employeeId || '').toLowerCase();
       const email = (emp.userEmail || emp.emailPersonal || '').toLowerCase();
       const title = (emp.jobTitle || '').toLowerCase();
       const secName = (emp.sectionName || (secMap[emp.sectionId] ? secMap[emp.sectionId].name : '')).toLowerCase();
-      const haystack = `${name} ${empid} ${email} ${title} ${secName}`;
+      const staName = (emp.stationName || (staMap[emp.stationId] ? staMap[emp.stationId].name : '')).toLowerCase();
+      const unitName = (emp.unitName || (unitMap[emp.unitId] ? unitMap[emp.unitId].name : '')).toLowerCase();
+      const haystack = `${name} ${empid} ${email} ${title} ${secName} ${staName} ${unitName}`;
       const allMatch = searchTokens.every(t => haystack.includes(t));
       if (!allMatch) return false;
     }
@@ -182,12 +275,31 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
           <input type="text" id="unifiedRosterSearchInput" class="form-control" value="${(state.search !== undefined ? state.search : '').replace(/"/g, '&quot;')}" placeholder="🔍 بحث بالاسم، الرقم الوظيفي، أو العنوان الوظيفي..." oninput="window.app.filterUnifiedRosterTable()">
         </div>
 
-        <!-- Filter 1: Linked Scope / Section -->
-        <div style="flex: 1.2; min-width: 150px;">
+        <!-- Filter 1: Linked Scope / Section (شجرة جهات الارتباط الهرمية والديناميكية) -->
+        <div style="flex: 1.3; min-width: 170px;">
           <select id="unifiedRosterSectionFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
             <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
-            <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون شعبة --</option>
-            ${sections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+            <option value="DEPT" ${state.section === 'DEPT' ? 'selected' : ''}>🏢 إدارة القسم المركزية</option>
+            
+            ${discoveredSections.length > 0 ? `
+              <optgroup label="📁 الشُعب الإنتاجية والرأسية">
+                ${discoveredSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>📁 ${s.name}</option>`).join('')}
+              </optgroup>
+            ` : ''}
+
+            ${discoveredUnits.length > 0 ? `
+              <optgroup label="⚙️ الوحدات الإدارية والفنية">
+                ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
+              </optgroup>
+            ` : ''}
+
+            ${discoveredStations.length > 0 ? `
+              <optgroup label="⛽ محطات الإنتاج الميدانية">
+                ${discoveredStations.map(st => `<option value="${st.id}" ${state.section === st.id ? 'selected' : ''}>⛽ ${st.name}</option>`).join('')}
+              </optgroup>
+            ` : ''}
+
+            <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون جهة ارتباط محددة --</option>
           </select>
         </div>
 
@@ -204,8 +316,8 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
           </select>
         </div>
 
-        <!-- Filter 3: Role (الدور) -->
-        <div style="flex: 1; min-width: 130px;">
+        <!-- Filter 3: Role (الأدوار والصلاحيات الرسمية الشاملة) -->
+        <div style="flex: 1.2; min-width: 150px;">
           <select id="unifiedRosterRoleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
             <option value="ALL" ${state.role === 'ALL' ? 'selected' : ''}>كافة الأدوار</option>
             ${rolesList.map(r => `<option value="${r.key}" ${state.role === r.key ? 'selected' : ''}>${r.name}</option>`).join('')}
