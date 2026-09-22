@@ -188,6 +188,36 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
     ? window.app.userRegistryState
     : { page: 1, pageSize: 25, search: '', section: 'ALL', status: 'ALL', role: 'ALL' };
 
+  // Selected labels for luxury dropdown triggers
+  let selectedSectionLabel = '👥 كافة جهات الارتباط';
+  if (state.section === 'DEPT') {
+    selectedSectionLabel = '🏢 إدارة القسم المركزية';
+  } else if (state.section === 'NONE') {
+    selectedSectionLabel = '-- بدون جهة ارتباط محددة --';
+  } else if (secMap[state.section]) {
+    selectedSectionLabel = `📁 ${secMap[state.section].name}`;
+  } else if (unitMap[state.section]) {
+    const u = unitMap[state.section];
+    selectedSectionLabel = `⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}`;
+  } else if (staMap[state.section]) {
+    selectedSectionLabel = `⛽ ${staMap[state.section].name}`;
+  }
+
+  const statusLabelsMap = {
+    'ALL': '📋 كافة حالات الحساب',
+    'ACTIVE': '🟢 نشط',
+    'NO_ACCOUNT': '⚪ غير مسجل',
+    'PENDING': '🟡 بانتظار الموافقة',
+    'SUSPENDED': '⏸️ معلق',
+    'DISABLED': '🔴 غير نشط / معطل',
+    'REJECTED': '🔴 مرفوض'
+  };
+  const selectedStatusLabel = statusLabelsMap[state.status] || '📋 كافة حالات الحساب';
+
+  const selectedRoleLabel = state.role === 'ALL'
+    ? '🎭 كافة الأدوار'
+    : (rolesMap[state.role]?.name || state.role);
+
   const rawQ = (state.search || '').toLowerCase();
   const searchTokens = rawQ.trim().split(/\s+/).filter(Boolean);
   const filtered = roster.filter(emp => {
@@ -276,52 +306,198 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
         </div>
 
         <!-- Filter 1: Linked Scope / Section (شجرة جهات الارتباط الهرمية والديناميكية) -->
-        <div style="flex: 1.3; min-width: 170px;">
-          <select id="unifiedRosterSectionFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
-            <option value="DEPT" ${state.section === 'DEPT' ? 'selected' : ''}>🏢 إدارة القسم المركزية</option>
-            
-            ${discoveredSections.length > 0 ? `
-              <optgroup label="📁 الشُعب الإنتاجية والرأسية">
-                ${discoveredSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>📁 ${s.name}</option>`).join('')}
-              </optgroup>
-            ` : ''}
+        <div style="flex: 1.3; min-width: 175px;">
+          <div class="luxury-dropdown-container" id="unifiedRosterSectionFilterContainer">
+            <!-- Native select preserved for compatibility with tests & store -->
+            <select id="unifiedRosterSectionFilter" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;" onchange="window.app.filterUnifiedRosterTable()">
+              <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
+              <option value="DEPT" ${state.section === 'DEPT' ? 'selected' : ''}>🏢 إدارة القسم المركزية</option>
+              
+              ${discoveredSections.length > 0 ? `
+                <optgroup label="📁 الشُعب الإنتاجية والرأسية">
+                  ${discoveredSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>📁 ${s.name}</option>`).join('')}
+                </optgroup>
+              ` : ''}
 
-            ${discoveredUnits.length > 0 ? `
-              <optgroup label="⚙️ الوحدات الإدارية والفنية">
-                ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
-              </optgroup>
-            ` : ''}
+              ${discoveredUnits.length > 0 ? `
+                <optgroup label="⚙️ الوحدات الإدارية والفنية">
+                  ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
+                </optgroup>
+              ` : ''}
 
-            ${discoveredStations.length > 0 ? `
-              <optgroup label="⛽ محطات الإنتاج الميدانية">
-                ${discoveredStations.map(st => `<option value="${st.id}" ${state.section === st.id ? 'selected' : ''}>⛽ ${st.name}</option>`).join('')}
-              </optgroup>
-            ` : ''}
+              ${discoveredStations.length > 0 ? `
+                <optgroup label="⛽ محطات الإنتاج الميدانية">
+                  ${discoveredStations.map(st => `<option value="${st.id}" ${state.section === st.id ? 'selected' : ''}>⛽ ${st.name}</option>`).join('')}
+                </optgroup>
+              ` : ''}
 
-            <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون جهة ارتباط محددة --</option>
-          </select>
+              <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون جهة ارتباط محددة --</option>
+            </select>
+
+            <!-- Trigger Button (يفتح القائمة دائماً للأسفل) -->
+            <button type="button" 
+                    id="unifiedRosterSectionFilterTrigger"
+                    class="luxury-dropdown-trigger"
+                    onclick="window.app.toggleLuxuryDropdown('unifiedRosterSectionFilterContainer', event)"
+                    style="height: 38px; padding: 0.38rem 0.85rem; font-size: 0.86rem;">
+              <span class="luxury-dropdown-selected-label">
+                ${selectedSectionLabel}
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </button>
+
+            <!-- Custom Dropdown Menu that strictly opens downwards -->
+            <div class="luxury-dropdown-menu" id="unifiedRosterSectionFilterMenu" style="display: none; min-width: 230px;">
+              <div class="luxury-dropdown-item ${state.section === 'ALL' ? 'active-item' : ''}" 
+                   data-value="ALL" 
+                   onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', 'ALL', 'filterUnifiedRosterTable', '👥 كافة جهات الارتباط')">
+                <span>👥 كافة جهات الارتباط</span>
+                ${state.section === 'ALL' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+              
+              <div class="luxury-dropdown-item ${state.section === 'DEPT' ? 'active-item' : ''}" 
+                   data-value="DEPT" 
+                   onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', 'DEPT', 'filterUnifiedRosterTable', '🏢 إدارة القسم المركزية')">
+                <span>🏢 إدارة القسم المركزية</span>
+                ${state.section === 'DEPT' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+
+              ${discoveredSections.length > 0 ? `
+                <div class="luxury-dropdown-header">📁 الشُعب الإنتاجية والرأسية</div>
+                ${discoveredSections.map(s => `
+                  <div class="luxury-dropdown-item ${state.section === s.id ? 'active-item' : ''}" 
+                       data-value="${s.id}" 
+                       onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', '${s.id}', 'filterUnifiedRosterTable', '📁 ${s.name.replace(/'/g, "\\'")}')">
+                    <span>📁 ${s.name}</span>
+                    ${state.section === s.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                  </div>
+                `).join('')}
+              ` : ''}
+
+              ${discoveredUnits.length > 0 ? `
+                <div class="luxury-dropdown-header">⚙️ الوحدات الإدارية والفنية</div>
+                ${discoveredUnits.map(u => {
+                  const uLabel = u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name);
+                  return `
+                    <div class="luxury-dropdown-item ${state.section === u.id ? 'active-item' : ''}" 
+                         data-value="${u.id}" 
+                         onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', '${u.id}', 'filterUnifiedRosterTable', '⚙️ ${uLabel.replace(/'/g, "\\'")}')">
+                      <span>⚙️ ${uLabel}</span>
+                      ${state.section === u.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                    </div>
+                  `;
+                }).join('')}
+              ` : ''}
+
+              ${discoveredStations.length > 0 ? `
+                <div class="luxury-dropdown-header">⛽ محطات الإنتاج الميدانية</div>
+                ${discoveredStations.map(st => `
+                  <div class="luxury-dropdown-item ${state.section === st.id ? 'active-item' : ''}" 
+                       data-value="${st.id}" 
+                       onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', '${st.id}', 'filterUnifiedRosterTable', '⛽ ${st.name.replace(/'/g, "\\'")}')">
+                    <span>⛽ ${st.name}</span>
+                    ${state.section === st.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                  </div>
+                `).join('')}
+              ` : ''}
+
+              <div class="luxury-dropdown-item ${state.section === 'NONE' ? 'active-item' : ''}" 
+                   data-value="NONE" 
+                   onclick="window.app.selectLuxuryDropdownOption('unifiedRosterSectionFilterContainer', 'unifiedRosterSectionFilter', 'NONE', 'filterUnifiedRosterTable', '-- بدون جهة ارتباط محددة --')">
+                <span>-- بدون جهة ارتباط محددة --</span>
+                ${state.section === 'NONE' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Filter 2: Account Status (حالة الحساب) -->
-        <div style="flex: 1; min-width: 130px;">
-          <select id="unifiedRosterStatusFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL" ${state.status === 'ALL' ? 'selected' : ''}>كافة حالات الحساب</option>
-            <option value="ACTIVE" ${state.status === 'ACTIVE' ? 'selected' : ''}>🟢 نشط</option>
-            <option value="NO_ACCOUNT" ${state.status === 'NO_ACCOUNT' ? 'selected' : ''}>⚪ غير نشط</option>
-            <option value="PENDING" ${state.status === 'PENDING' ? 'selected' : ''}>🟡 بانتظار الموافقة</option>
-            <option value="SUSPENDED" ${state.status === 'SUSPENDED' ? 'selected' : ''}>⏸️ معلق</option>
-            <option value="DISABLED" ${state.status === 'DISABLED' ? 'selected' : ''}>🔴 غير نشط / معطل</option>
-            <option value="REJECTED" ${state.status === 'REJECTED' ? 'selected' : ''}>🔴 مرفوض</option>
-          </select>
+        <div style="flex: 1; min-width: 135px;">
+          <div class="luxury-dropdown-container" id="unifiedRosterStatusFilterContainer">
+            <!-- Native select preserved for compatibility with tests & store -->
+            <select id="unifiedRosterStatusFilter" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;" onchange="window.app.filterUnifiedRosterTable()">
+              <option value="ALL" ${state.status === 'ALL' ? 'selected' : ''}>كافة حالات الحساب</option>
+              <option value="ACTIVE" ${state.status === 'ACTIVE' ? 'selected' : ''}>🟢 نشط</option>
+              <option value="NO_ACCOUNT" ${state.status === 'NO_ACCOUNT' ? 'selected' : ''}>⚪ غير نشط</option>
+              <option value="PENDING" ${state.status === 'PENDING' ? 'selected' : ''}>🟡 بانتظار الموافقة</option>
+              <option value="SUSPENDED" ${state.status === 'SUSPENDED' ? 'selected' : ''}>⏸️ معلق</option>
+              <option value="DISABLED" ${state.status === 'DISABLED' ? 'selected' : ''}>🔴 غير نشط / معطل</option>
+              <option value="REJECTED" ${state.status === 'REJECTED' ? 'selected' : ''}>🔴 مرفوض</option>
+            </select>
+
+            <!-- Trigger Button (يفتح القائمة دائماً للأسفل) -->
+            <button type="button" 
+                    id="unifiedRosterStatusFilterTrigger"
+                    class="luxury-dropdown-trigger"
+                    onclick="window.app.toggleLuxuryDropdown('unifiedRosterStatusFilterContainer', event)"
+                    style="height: 38px; padding: 0.38rem 0.85rem; font-size: 0.86rem;">
+              <span class="luxury-dropdown-selected-label">
+                ${selectedStatusLabel}
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </button>
+
+            <!-- Custom Dropdown Menu that strictly opens downwards -->
+            <div class="luxury-dropdown-menu" id="unifiedRosterStatusFilterMenu" style="display: none; min-width: 180px;">
+              ${[
+                { val: 'ALL', label: '📋 كافة حالات الحساب' },
+                { val: 'ACTIVE', label: '🟢 نشط' },
+                { val: 'NO_ACCOUNT', label: '⚪ غير نشط' },
+                { val: 'PENDING', label: '🟡 بانتظار الموافقة' },
+                { val: 'SUSPENDED', label: '⏸️ معلق' },
+                { val: 'DISABLED', label: '🔴 غير نشط / معطل' },
+                { val: 'REJECTED', label: '🔴 مرفوض' }
+              ].map(stItem => `
+                <div class="luxury-dropdown-item ${state.status === stItem.val ? 'active-item' : ''}" 
+                     data-value="${stItem.val}" 
+                     onclick="window.app.selectLuxuryDropdownOption('unifiedRosterStatusFilterContainer', 'unifiedRosterStatusFilter', '${stItem.val}', 'filterUnifiedRosterTable', '${stItem.label}')">
+                  <span>${stItem.label}</span>
+                  ${state.status === stItem.val ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
         </div>
 
         <!-- Filter 3: Role (الأدوار والصلاحيات الرسمية الشاملة) -->
-        <div style="flex: 1.2; min-width: 150px;">
-          <select id="unifiedRosterRoleFilter" class="form-control filter-select" onchange="window.app.filterUnifiedRosterTable()">
-            <option value="ALL" ${state.role === 'ALL' ? 'selected' : ''}>كافة الأدوار</option>
-            ${rolesList.map(r => `<option value="${r.key}" ${state.role === r.key ? 'selected' : ''}>${r.name}</option>`).join('')}
-          </select>
+        <div style="flex: 1.2; min-width: 155px;">
+          <div class="luxury-dropdown-container" id="unifiedRosterRoleFilterContainer">
+            <!-- Native select preserved for compatibility with tests & store -->
+            <select id="unifiedRosterRoleFilter" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;" onchange="window.app.filterUnifiedRosterTable()">
+              <option value="ALL" ${state.role === 'ALL' ? 'selected' : ''}>كافة الأدوار</option>
+              ${rolesList.map(r => `<option value="${r.key}" ${state.role === r.key ? 'selected' : ''}>${r.name}</option>`).join('')}
+            </select>
+
+            <!-- Trigger Button (يفتح القائمة دائماً للأسفل) -->
+            <button type="button" 
+                    id="unifiedRosterRoleFilterTrigger"
+                    class="luxury-dropdown-trigger"
+                    onclick="window.app.toggleLuxuryDropdown('unifiedRosterRoleFilterContainer', event)"
+                    style="height: 38px; padding: 0.38rem 0.85rem; font-size: 0.86rem;">
+              <span class="luxury-dropdown-selected-label">
+                ${selectedRoleLabel}
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </button>
+
+            <!-- Custom Dropdown Menu that strictly opens downwards -->
+            <div class="luxury-dropdown-menu" id="unifiedRosterRoleFilterMenu" style="display: none; min-width: 220px;">
+              <div class="luxury-dropdown-item ${state.role === 'ALL' ? 'active-item' : ''}" 
+                   data-value="ALL" 
+                   onclick="window.app.selectLuxuryDropdownOption('unifiedRosterRoleFilterContainer', 'unifiedRosterRoleFilter', 'ALL', 'filterUnifiedRosterTable', '🎭 كافة الأدوار')">
+                <span>🎭 كافة الأدوار</span>
+                ${state.role === 'ALL' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+              ${rolesList.map(r => `
+                <div class="luxury-dropdown-item ${state.role === r.key ? 'active-item' : ''}" 
+                     data-value="${r.key}" 
+                     onclick="window.app.selectLuxuryDropdownOption('unifiedRosterRoleFilterContainer', 'unifiedRosterRoleFilter', '${r.key}', 'filterUnifiedRosterTable', '${r.name.replace(/'/g, "\\'")}')">
+                  <span>${r.name}</span>
+                  ${state.role === r.key ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
         </div>
       </div>
 

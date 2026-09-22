@@ -8110,6 +8110,99 @@ class AppController {
     this.onModalRoleSelectChange(roleKey);
   }
 
+  toggleLuxuryDropdown(containerId, event) {
+    if (event && event.stopPropagation) event.stopPropagation();
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const menu = container.querySelector('.luxury-dropdown-menu');
+    const arrow = container.querySelector('.luxury-dropdown-arrow');
+    if (!menu) return;
+
+    // Close any other open luxury dropdowns first
+    document.querySelectorAll('.luxury-dropdown-container.open').forEach(other => {
+      if (other !== container) {
+        other.classList.remove('open');
+        const m = other.querySelector('.luxury-dropdown-menu');
+        const a = other.querySelector('.luxury-dropdown-arrow');
+        if (m) m.style.display = 'none';
+        if (a) a.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    const isClosed = menu.style.display === 'none' || !menu.style.display;
+    if (isClosed) {
+      container.classList.add('open');
+      menu.style.display = 'block';
+      if (arrow) arrow.style.transform = 'rotate(180deg)';
+
+      const closeHandler = (e) => {
+        const c = document.getElementById(containerId);
+        if (c && !c.contains(e.target)) {
+          c.classList.remove('open');
+          const m = c.querySelector('.luxury-dropdown-menu');
+          const a = c.querySelector('.luxury-dropdown-arrow');
+          if (m) m.style.display = 'none';
+          if (a) a.style.transform = 'rotate(0deg)';
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closeHandler), 10);
+    } else {
+      container.classList.remove('open');
+      menu.style.display = 'none';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  selectLuxuryDropdownOption(containerId, selectId, value, callbackName, displayText) {
+    const container = document.getElementById(containerId);
+    const select = document.getElementById(selectId);
+    if (select) {
+      select.value = value;
+      if (typeof select.onchange === 'function') {
+        select.onchange();
+      } else {
+        try {
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        } catch (e) {}
+        if (callbackName && typeof this[callbackName] === 'function') {
+          this[callbackName]();
+        }
+      }
+    } else if (callbackName && typeof this[callbackName] === 'function') {
+      this[callbackName]();
+    }
+
+    if (container) {
+      const labelEl = container.querySelector('.luxury-dropdown-selected-label');
+      if (labelEl && displayText) {
+        labelEl.innerHTML = displayText;
+      }
+      container.querySelectorAll('.luxury-dropdown-item').forEach(item => {
+        const itemVal = item.getAttribute('data-value');
+        const isMatch = itemVal === value;
+        item.classList.toggle('active-item', isMatch);
+        let check = item.querySelector('.luxury-dropdown-check');
+        if (isMatch) {
+          if (!check) {
+            const checkSpan = document.createElement('span');
+            checkSpan.className = 'luxury-dropdown-check';
+            checkSpan.textContent = '✓';
+            item.appendChild(checkSpan);
+          }
+        } else if (check) {
+          check.remove();
+        }
+      });
+
+      const menu = container.querySelector('.luxury-dropdown-menu');
+      const arrow = container.querySelector('.luxury-dropdown-arrow');
+      container.classList.remove('open');
+      if (menu) menu.style.display = 'none';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+  }
+
   setModalSelectedRole(roleKey) {
     const sel = document.getElementById('editUserRoleSelect');
     if (sel) {

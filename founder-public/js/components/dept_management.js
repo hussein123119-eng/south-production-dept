@@ -75,6 +75,16 @@ function renderDeptManagementView() {
       : [];
     const safeSections = Array.isArray(sections) ? sections : [];
 
+    const units = (window.store && typeof window.store.getUnits === 'function') 
+      ? window.store.getUnits(actorUser.departmentId) 
+      : [];
+    const safeUnits = Array.isArray(units) ? units : [];
+
+    const stations = (window.store && typeof window.store.getStations === 'function') 
+      ? window.store.getStations(actorUser.departmentId) 
+      : [];
+    const safeStations = Array.isArray(stations) ? stations : [];
+
     // Safely retrieve data collections
     let notifs = [];
     if (window.store && typeof window.store.getOfficialNotifications === 'function') {
@@ -207,7 +217,7 @@ function renderDeptManagementView() {
       <!-- Sub-Tab Content View -->
       <div id="deptSubTabContainer">
         ${activeTab === 'notifs' ? renderDeptNotifsTab(safeNotifs, actorUser, safeSections) : ''}
-        ${activeTab === 'staff' ? renderDeptStaffTab(safeStaff, actorUser, safeSections) : ''}
+        ${activeTab === 'staff' ? renderDeptStaffTab(safeStaff, actorUser, safeSections, safeUnits, safeStations) : ''}
         ${activeTab === 'forms' ? renderDeptFormsTab(actorUser) : ''}
         ${activeTab === 'docs' ? renderDeptDocsTab(safeDocs, actorUser, safeSections) : ''}
         ${activeTab === 'interviews' ? renderDeptInterviewsTab(safeInterviews, actorUser) : ''}
@@ -355,6 +365,21 @@ function renderDeptStaffTableAndPagination(staff, actorUser, sections) {
   const unitMap = {};
   units.forEach(u => { if (u && u.id) unitMap[u.id] = u; });
 
+  const safeStaffList = Array.isArray(staff) ? staff : [];
+
+  // Dynamic Auto-Discovery of Affiliations from staff list
+  safeStaffList.forEach(emp => {
+    if (emp.sectionId && !secMap[emp.sectionId]) {
+      secMap[emp.sectionId] = { id: emp.sectionId, name: emp.sectionName || emp.section || emp.sectionId };
+    }
+    if (emp.unitId && !unitMap[emp.unitId]) {
+      unitMap[emp.unitId] = { id: emp.unitId, name: emp.unitName || emp.unit || emp.unitId };
+    }
+    if (emp.stationId && !staMap[emp.stationId]) {
+      staMap[emp.stationId] = { id: emp.stationId, name: emp.stationName || emp.station || emp.stationId };
+    }
+  });
+
   const state = (typeof window !== 'undefined' && window.app && window.app.deptStaffState)
     ? window.app.deptStaffState
     : { page: 1, pageSize: 25, search: '', section: 'ALL' };
@@ -363,11 +388,46 @@ function renderDeptStaffTableAndPagination(staff, actorUser, sections) {
   const rawQ = (state.search || '').toLowerCase();
   const searchTokens = rawQ.trim().split(/\s+/).filter(Boolean);
 
-  const safeStaffList = Array.isArray(staff) ? staff : [];
   const filtered = safeStaffList.filter(emp => {
     if (state.section !== 'ALL') {
-      if (state.section === 'NONE' && emp.sectionId) return false;
-      if (state.section !== 'NONE' && emp.sectionId !== state.section) return false;
+      if (state.section === 'DEPT') {
+        const isDept = (!emp.sectionId && !emp.unitId && !emp.stationId) ||
+                       (emp.sectionName === 'إدارة القسم') ||
+                       (emp.section === 'إدارة القسم') ||
+                       (emp.departmentId && !emp.sectionId && !emp.unitId);
+        if (!isDept) return false;
+      } else if (state.section === 'NONE') {
+        const hasScope = emp.sectionId || emp.unitId || emp.stationId ||
+                         (emp.sectionName && emp.sectionName !== 'إدارة القسم') ||
+                         (emp.section && emp.section !== 'إدارة القسم');
+        if (hasScope) return false;
+      } else if (state.section.startsWith('sec-')) {
+        const targetSec = secMap[state.section];
+        const matchesSec = (emp.sectionId === state.section) ||
+                           (targetSec && (emp.sectionName === targetSec.name || emp.section === targetSec.name));
+        if (!matchesSec) return false;
+      } else if (state.section.startsWith('unit-')) {
+        const targetUnit = unitMap[state.section];
+        const matchesUnit = (emp.unitId === state.section) ||
+                            (targetUnit && (
+                              emp.unitName === targetUnit.name ||
+                              emp.unit === targetUnit.name ||
+                              (emp.sectionName && emp.sectionName.includes(targetUnit.name))
+                            ));
+        if (!matchesUnit) return false;
+      } else if (state.section.startsWith('st-')) {
+        const targetSta = staMap[state.section];
+        const matchesSta = (emp.stationId === state.section) ||
+                           (targetSta && (emp.stationName === targetSta.name || emp.station === targetSta.name));
+        if (!matchesSta) return false;
+      } else {
+        const matchesGeneric = (emp.sectionId === state.section) ||
+                               (emp.unitId === state.section) ||
+                               (emp.stationId === state.section) ||
+                               (emp.sectionName === state.section) ||
+                               (emp.section === state.section);
+        if (!matchesGeneric) return false;
+      }
     }
     if (searchTokens.length > 0) {
       const name = (emp.fullName || emp.name || '').toLowerCase();
@@ -600,8 +660,41 @@ function renderDeptStaffTableAndPagination(staff, actorUser, sections) {
   `;
 }
 
-function renderDeptStaffTab(staff, actorUser, sections) {
-  const safeSections = Array.isArray(sections) ? sections : [];
+function renderDeptStaffTab(staff, actorUser, sections, units, stations) {
+  const safeStaff = Array.isArray(staff) ? staff : [];
+
+  const rawSections = Array.isArray(sections) ? sections : ((window.store && typeof window.store.getSections === 'function') ? window.store.getSections(actorUser?.departmentId) : []);
+  const rawUnits = Array.isArray(units) ? units : ((window.store && typeof window.store.getUnits === 'function') ? window.store.getUnits(actorUser?.departmentId) : []);
+  const rawStations = Array.isArray(stations) ? stations : ((window.store && typeof window.store.getStations === 'function') ? window.store.getStations(actorUser?.departmentId) : []);
+
+  const secMap = {};
+  rawSections.forEach(s => { if (s && s.id) secMap[s.id] = s; });
+  const unitMap = {};
+  rawUnits.forEach(u => { if (u && u.id) unitMap[u.id] = u; });
+  const staMap = {};
+  rawStations.forEach(st => { if (st && st.id) staMap[st.id] = st; });
+
+  const discoveredSections = [...rawSections];
+  const discoveredUnits = [...rawUnits];
+  const discoveredStations = [...rawStations];
+
+  safeStaff.forEach(emp => {
+    if (emp.sectionId && !secMap[emp.sectionId]) {
+      const newSec = { id: emp.sectionId, name: emp.sectionName || emp.section || emp.sectionId };
+      secMap[emp.sectionId] = newSec;
+      discoveredSections.push(newSec);
+    }
+    if (emp.unitId && !unitMap[emp.unitId]) {
+      const newUnit = { id: emp.unitId, name: emp.unitName || emp.unit || emp.unitId };
+      unitMap[emp.unitId] = newUnit;
+      discoveredUnits.push(newUnit);
+    }
+    if (emp.stationId && !staMap[emp.stationId]) {
+      const newSta = { id: emp.stationId, name: emp.stationName || emp.station || emp.stationId };
+      staMap[emp.stationId] = newSta;
+      discoveredStations.push(newSta);
+    }
+  });
 
   if (typeof window !== 'undefined') {
     if (!window.app) window.app = {};
@@ -613,6 +706,21 @@ function renderDeptStaffTab(staff, actorUser, sections) {
   const state = (typeof window !== 'undefined' && window.app && window.app.deptStaffState)
     ? window.app.deptStaffState
     : { page: 1, pageSize: 25, search: '', section: 'ALL' };
+
+  // Calculate current display label for trigger button
+  let selectedSectionLabel = '👥 كافة جهات الارتباط';
+  if (state.section === 'DEPT') {
+    selectedSectionLabel = '🏢 إدارة القسم المركزية';
+  } else if (state.section === 'NONE') {
+    selectedSectionLabel = '-- بدون جهة ارتباط محددة --';
+  } else if (secMap[state.section]) {
+    selectedSectionLabel = `📁 ${secMap[state.section].name}`;
+  } else if (unitMap[state.section]) {
+    const u = unitMap[state.section];
+    selectedSectionLabel = `⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}`;
+  } else if (staMap[state.section]) {
+    selectedSectionLabel = `⛽ ${staMap[state.section].name}`;
+  }
 
   return `
     <div class="card" id="deptStaffTabCard">
@@ -627,10 +735,110 @@ function renderDeptStaffTab(staff, actorUser, sections) {
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
           <input type="text" id="deptStaffSearchInput" class="form-control" style="width: 180px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" value="${(state.search !== undefined ? state.search : '').replace(/"/g, '&quot;')}" placeholder="🔍 بحث بالاسم أو الرقم..." oninput="window.app.filterDeptStaff()">
-          <select id="deptStaffSectionFilter" class="form-control" style="width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterDeptStaff()">
-            <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة الشعب</option>
-            ${safeSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
-          </select>
+          
+          <!-- Luxury Custom Downward Dropdown (شجرة جهات الارتباط الهرمية والديناميكية) -->
+          <div class="luxury-dropdown-container" id="deptStaffSectionFilterContainer" style="width: 190px;">
+            <!-- Native select preserved for compatibility with tests & store -->
+            <select id="deptStaffSectionFilter" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;" onchange="window.app.filterDeptStaff()">
+              <option value="ALL" ${state.section === 'ALL' ? 'selected' : ''}>كافة جهات الارتباط</option>
+              <option value="DEPT" ${state.section === 'DEPT' ? 'selected' : ''}>🏢 إدارة القسم المركزية</option>
+              
+              ${discoveredSections.length > 0 ? `
+                <optgroup label="📁 الشُعب الإنتاجية والرأسية">
+                  ${discoveredSections.map(s => `<option value="${s.id}" ${state.section === s.id ? 'selected' : ''}>📁 ${s.name}</option>`).join('')}
+                </optgroup>
+              ` : ''}
+
+              ${discoveredUnits.length > 0 ? `
+                <optgroup label="⚙️ الوحدات الإدارية والفنية">
+                  ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
+                </optgroup>
+              ` : ''}
+
+              ${discoveredStations.length > 0 ? `
+                <optgroup label="⛽ محطات الإنتاج الميدانية">
+                  ${discoveredStations.map(st => `<option value="${st.id}" ${state.section === st.id ? 'selected' : ''}>⛽ ${st.name}</option>`).join('')}
+                </optgroup>
+              ` : ''}
+
+              <option value="NONE" ${state.section === 'NONE' ? 'selected' : ''}>-- بدون جهة ارتباط محددة --</option>
+            </select>
+
+            <!-- Trigger Button (يفتح القائمة دائماً للأسفل) -->
+            <button type="button" 
+                    id="deptStaffSectionFilterTrigger"
+                    class="luxury-dropdown-trigger"
+                    onclick="window.app.toggleLuxuryDropdown('deptStaffSectionFilterContainer', event)"
+                    style="height: 36px; padding: 0.35rem 0.75rem; font-size: 0.84rem;">
+              <span class="luxury-dropdown-selected-label">
+                ${selectedSectionLabel}
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </button>
+
+            <!-- Custom Dropdown Menu that strictly opens downwards -->
+            <div class="luxury-dropdown-menu" id="deptStaffSectionFilterMenu" style="display: none; min-width: 230px;">
+              <div class="luxury-dropdown-item ${state.section === 'ALL' ? 'active-item' : ''}" 
+                   data-value="ALL" 
+                   onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', 'ALL', 'filterDeptStaff', '👥 كافة جهات الارتباط')">
+                <span>👥 كافة جهات الارتباط</span>
+                ${state.section === 'ALL' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+              
+              <div class="luxury-dropdown-item ${state.section === 'DEPT' ? 'active-item' : ''}" 
+                   data-value="DEPT" 
+                   onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', 'DEPT', 'filterDeptStaff', '🏢 إدارة القسم المركزية')">
+                <span>🏢 إدارة القسم المركزية</span>
+                ${state.section === 'DEPT' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+
+              ${discoveredSections.length > 0 ? `
+                <div class="luxury-dropdown-header">📁 الشُعب الإنتاجية والرأسية</div>
+                ${discoveredSections.map(s => `
+                  <div class="luxury-dropdown-item ${state.section === s.id ? 'active-item' : ''}" 
+                       data-value="${s.id}" 
+                       onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', '${s.id}', 'filterDeptStaff', '📁 ${s.name.replace(/'/g, "\\'")}')">
+                    <span>📁 ${s.name}</span>
+                    ${state.section === s.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                  </div>
+                `).join('')}
+              ` : ''}
+
+              ${discoveredUnits.length > 0 ? `
+                <div class="luxury-dropdown-header">⚙️ الوحدات الإدارية والفنية</div>
+                ${discoveredUnits.map(u => {
+                  const uLabel = u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name);
+                  return `
+                    <div class="luxury-dropdown-item ${state.section === u.id ? 'active-item' : ''}" 
+                         data-value="${u.id}" 
+                         onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', '${u.id}', 'filterDeptStaff', '⚙️ ${uLabel.replace(/'/g, "\\'")}')">
+                      <span>⚙️ ${uLabel}</span>
+                      ${state.section === u.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                    </div>
+                  `;
+                }).join('')}
+              ` : ''}
+
+              ${discoveredStations.length > 0 ? `
+                <div class="luxury-dropdown-header">⛽ محطات الإنتاج الميدانية</div>
+                ${discoveredStations.map(st => `
+                  <div class="luxury-dropdown-item ${state.section === st.id ? 'active-item' : ''}" 
+                       data-value="${st.id}" 
+                       onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', '${st.id}', 'filterDeptStaff', '⛽ ${st.name.replace(/'/g, "\\'")}')">
+                    <span>⛽ ${st.name}</span>
+                    ${state.section === st.id ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+                  </div>
+                `).join('')}
+              ` : ''}
+
+              <div class="luxury-dropdown-item ${state.section === 'NONE' ? 'active-item' : ''}" 
+                   data-value="NONE" 
+                   onclick="window.app.selectLuxuryDropdownOption('deptStaffSectionFilterContainer', 'deptStaffSectionFilter', 'NONE', 'filterDeptStaff', '-- بدون جهة ارتباط محددة --')">
+                <span>-- بدون جهة ارتباط محددة --</span>
+                ${state.section === 'NONE' ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+              </div>
+            </div>
+          </div>
           
           <!-- Custom Data Export & Print Tool Button -->
           <button type="button" class="btn btn-glass-primary" onclick="window.app.openCustomStaffExportModal()" title="أضبارة القسم المركزية - تصدير وطباعة بيانات كادر القسم (PDF, Word, Excel)" style="padding: 0.38rem 0.9rem; font-size: 0.85rem;">
