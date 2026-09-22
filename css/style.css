@@ -10096,3 +10096,284 @@ body[data-theme="dark"],
   border-color: #3b82f6 !important;
 }
 
+/* ==========================================================================
+   37. Incentive Calculator Luxury System (Jewel Frosted Glass & RBAC Layout)
+   ========================================================================== */
+.inc-mode-switcher-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.inc-mode-switcher {
+  display: inline-flex;
+  padding: 0.35rem;
+  background: rgba(15, 23, 42, 0.06);
+  border: 1.5px solid rgba(13, 110, 253, 0.2);
+  border-radius: 999px;
+  gap: 0.35rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .inc-mode-switcher {
+  background: rgba(14, 25, 52, 0.7);
+  border-color: rgba(0, 223, 216, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.inc-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  transition: all 0.25s ease;
+}
+
+.inc-mode-btn.active-auto {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b57d0 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(13, 110, 253, 0.35);
+}
+
+[data-theme="dark"] .inc-mode-btn.active-auto {
+  background: linear-gradient(135deg, #00dfd8 0%, #0099ff 100%);
+  color: #0b1528 !important;
+  box-shadow: 0 4px 18px rgba(0, 223, 216, 0.4);
+}
+
+.inc-mode-btn.active-manual {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+[data-theme="dark"] .inc-mode-btn.active-manual {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.4);
+}
+
+.inc-mode-btn:hover:not(.active-auto):not(.active-manual) {
+  background: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
+}
+
+/* Crystal Grid */
+.inc-crystal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .inc-crystal-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .inc-crystal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inc-crystal-card {
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.inc-crystal-card:hover {
+  transform: translateY(-3px);
+}
+
+.inc-card-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.inc-card-value {
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0.4rem 0 0.2rem 0;
+}
+
+.inc-card-detail {
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+}
+
+/* Card Themes Light */
+.inc-crystal-points {
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.95) 0%, rgba(224, 231, 255, 0.75) 100%);
+  border: 1.5px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+}
+.inc-crystal-points .inc-card-title { color: #4338ca; }
+.inc-crystal-points .inc-card-value { color: #3730a3; }
+.inc-crystal-points .inc-card-detail { color: #4f46e5; }
+.inc-crystal-points:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.2);
+}
+
+.inc-crystal-gross {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.75) 100%);
+  border: 1.5px solid rgba(13, 110, 253, 0.25);
+  box-shadow: 0 4px 20px rgba(13, 110, 253, 0.1);
+}
+.inc-crystal-gross .inc-card-title { color: #1e40af; }
+.inc-crystal-gross .inc-card-value { color: #0b57d0; }
+.inc-crystal-gross .inc-card-detail { color: #2563eb; }
+.inc-crystal-gross:hover {
+  border-color: rgba(13, 110, 253, 0.5);
+  box-shadow: 0 8px 28px rgba(13, 110, 253, 0.2);
+}
+
+.inc-crystal-deductions {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 226, 226, 0.75) 100%);
+  border: 1.5px solid rgba(220, 53, 69, 0.25);
+  box-shadow: 0 4px 20px rgba(220, 53, 69, 0.1);
+}
+.inc-crystal-deductions .inc-card-title { color: #991b1b; }
+.inc-crystal-deductions .inc-card-value { color: #dc3545; }
+.inc-crystal-deductions .inc-card-detail { color: #b91c1c; }
+.inc-crystal-deductions:hover {
+  border-color: rgba(220, 53, 69, 0.5);
+  box-shadow: 0 8px 28px rgba(220, 53, 69, 0.2);
+}
+
+.inc-crystal-net {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.95) 0%, rgba(220, 252, 231, 0.8) 100%);
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.15);
+}
+.inc-crystal-net .inc-card-title { color: #065f46; }
+.inc-crystal-net .inc-card-value { color: #047857; font-size: 1.6rem; }
+.inc-crystal-net .inc-card-detail { color: #065f46; }
+.inc-crystal-net:hover {
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 10px 32px rgba(16, 185, 129, 0.25);
+}
+
+/* Dark Mode Overrides for Crystals */
+[data-theme="dark"] .inc-crystal-points {
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(49, 46, 129, 0.6) 100%);
+  border-color: rgba(129, 140, 248, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .inc-crystal-points .inc-card-title { color: #c7d2fe; }
+[data-theme="dark"] .inc-crystal-points .inc-card-value { color: #e0e7ff; text-shadow: 0 0 16px rgba(129, 140, 248, 0.5); }
+[data-theme="dark"] .inc-crystal-points .inc-card-detail { color: #a5b4fc; }
+
+[data-theme="dark"] .inc-crystal-gross {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.5) 100%);
+  border-color: rgba(96, 165, 250, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .inc-crystal-gross .inc-card-title { color: #bfdbfe; }
+[data-theme="dark"] .inc-crystal-gross .inc-card-value { color: #60a5fa; text-shadow: 0 0 16px rgba(96, 165, 250, 0.5); }
+[data-theme="dark"] .inc-crystal-gross .inc-card-detail { color: #93c5fd; }
+
+[data-theme="dark"] .inc-crystal-deductions {
+  background: linear-gradient(135deg, rgba(45, 10, 15, 0.85) 0%, rgba(88, 28, 35, 0.5) 100%);
+  border-color: rgba(248, 113, 113, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .inc-crystal-deductions .inc-card-title { color: #fecaca; }
+[data-theme="dark"] .inc-crystal-deductions .inc-card-value { color: #f87171; text-shadow: 0 0 16px rgba(248, 113, 113, 0.5); }
+[data-theme="dark"] .inc-crystal-deductions .inc-card-detail { color: #fca5a5; }
+
+[data-theme="dark"] .inc-crystal-net {
+  background: linear-gradient(135deg, rgba(6, 44, 30, 0.9) 0%, rgba(6, 78, 59, 0.6) 100%);
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+[data-theme="dark"] .inc-crystal-net .inc-card-title { color: #a7f3d0; }
+[data-theme="dark"] .inc-crystal-net .inc-card-value { color: #34d399; text-shadow: 0 0 20px rgba(52, 211, 153, 0.6); }
+[data-theme="dark"] .inc-crystal-net .inc-card-detail { color: #6ee7b7; }
+
+/* Privacy Banner */
+.inc-privacy-banner {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(14, 165, 233, 0.03) 100%);
+  border: 1.5px solid rgba(2, 132, 199, 0.25);
+  border-radius: 12px;
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+[data-theme="dark"] .inc-privacy-banner {
+  background: linear-gradient(135deg, rgba(14, 25, 52, 0.85) 0%, rgba(8, 47, 73, 0.4) 100%);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* Dossier Card */
+.inc-dossier-card {
+  background: linear-gradient(145deg, var(--md-sys-color-surface), rgba(13, 110, 253, 0.03));
+  border: 1.5px solid var(--md-sys-color-outline-variant);
+  border-radius: 14px;
+  padding: 1.1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .inc-dossier-card {
+  background: linear-gradient(145deg, rgba(14, 25, 52, 0.9), rgba(10, 18, 38, 0.95));
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Presets Bar */
+.inc-presets-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.inc-preset-btn {
+  font-size: 0.78rem;
+  font-weight: 750;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+}
+
+.inc-preset-btn:hover {
+  transform: translateY(-1.5px);
+}
+
+

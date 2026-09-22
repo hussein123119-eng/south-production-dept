@@ -7,9 +7,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const url = require('url');
-const nodemailer = require('nodemailer');
-
-// Load local .env if exists
+let nodemailer = null;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  // Optional dependency in local development
+}
 const ENV_FILE = path.join(__dirname, '.env');
 if (fs.existsSync(ENV_FILE)) {
   const envContent = fs.readFileSync(ENV_FILE, 'utf8');
@@ -60,6 +63,7 @@ setInterval(() => {
 
 // --- Official Email Service (Gmail SMTP & Nodemailer) ---
 function getMailTransporter() {
+  if (!nodemailer) return null;
   const settingsSmtp = memoryDb?.systemSettings?.smtp || {};
   const user = (process.env.SMTP_USER || settingsSmtp.user || 'southprod.rumaila@gmail.com').trim();
   const pass = (process.env.SMTP_PASS || settingsSmtp.pass || '').replace(/\s+/g, '');
