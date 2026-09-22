@@ -72,16 +72,61 @@ function renderSectionTechnicalStatusTab(section, user) {
       <!-- Search & Filters -->
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
         <input type="text" id="sectionTechSearchInput" class="form-control" style="flex: 2; min-width: 200px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" placeholder="🔍 بحث بالوصف، الإجراءات، أو الموقع..." oninput="window.app.filterSectionTechStatus()">
-        <select id="sectionTechStationFilter" class="form-control" style="flex: 1; min-width: 150px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterSectionTechStatus()">
-          <option value="ALL">كافة المواقع والمحطات</option>
-          ${stations.map(st => `<option value="${st.id}">${st.name}</option>`).join('')}
-        </select>
-        <select id="sectionTechStatusFilter" class="form-control" style="flex: 1; min-width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterSectionTechStatus()">
-          <option value="ALL">كافة الحالات الفنية</option>
-          <option value="OPERATIONAL">🟢 مستقرة / بالعمل</option>
-          <option value="PARTIAL">🟡 قيد المتابعة</option>
-          <option value="STOPPED">🔴 حرجة / متوقفة</option>
-        </select>
+        <!-- Luxury Station Dropdown Filter -->
+        <div class="luxury-dropdown-container" id="sectionTechStationFilterContainer" style="flex: 1; min-width: 170px;">
+          <div class="luxury-dropdown-trigger" id="sectionTechStationFilterTrigger" onclick="window.app.toggleLuxuryDropdown('sectionTechStationFilterContainer', event)">
+            <span class="luxury-dropdown-selected-label" id="sectionTechStationFilterLabel">
+              <span>⛽ كافة المواقع والمحطات</span>
+            </span>
+            <span class="luxury-dropdown-arrow">▼</span>
+          </div>
+          <div class="luxury-dropdown-menu" id="sectionTechStationFilterMenu">
+            <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('sectionTechStationFilterContainer', 'sectionTechStationFilter', 'ALL', 'filterSectionTechStatus', '⛽ كافة المواقع والمحطات')">
+              <span>⛽ كافة المواقع والمحطات</span>
+              <span class="luxury-dropdown-check">✓</span>
+            </div>
+            ${stations.map(st => `
+              <div class="luxury-dropdown-item" data-value="${st.id}" onclick="window.app.selectLuxuryDropdownOption('sectionTechStationFilterContainer', 'sectionTechStationFilter', '${st.id}', 'filterSectionTechStatus', '${st.name.replace(/'/g, "\\'")}')">
+                <span>${st.name}</span>
+              </div>
+            `).join('')}
+          </div>
+          <select id="sectionTechStationFilter" style="display:none;" onchange="window.app.filterSectionTechStatus()">
+            <option value="ALL">كافة المواقع والمحطات</option>
+            ${stations.map(st => `<option value="${st.id}">${st.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <!-- Luxury Status Dropdown Filter -->
+        <div class="luxury-dropdown-container" id="sectionTechStatusFilterContainer" style="flex: 1; min-width: 155px;">
+          <div class="luxury-dropdown-trigger" id="sectionTechStatusFilterTrigger" onclick="window.app.toggleLuxuryDropdown('sectionTechStatusFilterContainer', event)">
+            <span class="luxury-dropdown-selected-label" id="sectionTechStatusFilterLabel">
+              <span>📊 كافة الحالات الفنية</span>
+            </span>
+            <span class="luxury-dropdown-arrow">▼</span>
+          </div>
+          <div class="luxury-dropdown-menu" id="sectionTechStatusFilterMenu">
+            <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('sectionTechStatusFilterContainer', 'sectionTechStatusFilter', 'ALL', 'filterSectionTechStatus', '📊 كافة الحالات الفنية')">
+              <span>📊 كافة الحالات الفنية</span>
+              <span class="luxury-dropdown-check">✓</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="OPERATIONAL" onclick="window.app.selectLuxuryDropdownOption('sectionTechStatusFilterContainer', 'sectionTechStatusFilter', 'OPERATIONAL', 'filterSectionTechStatus', '🟢 مستقرة / بالعمل')">
+              <span>🟢 مستقرة / بالعمل</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="PARTIAL" onclick="window.app.selectLuxuryDropdownOption('sectionTechStatusFilterContainer', 'sectionTechStatusFilter', 'PARTIAL', 'filterSectionTechStatus', '🟡 قيد المتابعة')">
+              <span>🟡 قيد المتابعة</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="STOPPED" onclick="window.app.selectLuxuryDropdownOption('sectionTechStatusFilterContainer', 'sectionTechStatusFilter', 'STOPPED', 'filterSectionTechStatus', '🔴 حرجة / متوقفة')">
+              <span>🔴 حرجة / متوقفة</span>
+            </div>
+          </div>
+          <select id="sectionTechStatusFilter" style="display:none;" onchange="window.app.filterSectionTechStatus()">
+            <option value="ALL">كافة الحالات الفنية</option>
+            <option value="OPERATIONAL">🟢 مستقرة / بالعمل</option>
+            <option value="PARTIAL">🟡 قيد المتابعة</option>
+            <option value="STOPPED">🔴 حرجة / متوقفة</option>
+          </select>
+        </div>
       </div>
 
       <!-- Technical Status Table -->
@@ -280,17 +325,63 @@ function renderStationTechnicalStatusTab(station, section, user) {
       <!-- Search & Filters -->
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
         <input type="text" id="stationTechSearchInput" class="form-control" style="flex: 2; min-width: 200px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" placeholder="🔍 بحث بالمعدات، الوصف، الإجراءات، أو الملاحظات..." oninput="window.app.filterStationTechStatus()">
-        <select id="stationTechStatusFilter" class="form-control" style="flex: 1; min-width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterStationTechStatus()">
-          <option value="ALL">كافة الحالات التشغيلية</option>
-          <option value="OPERATIONAL">🟢 مستقرة / بالعمل</option>
-          <option value="PARTIAL">🟡 قيد المتابعة</option>
-          <option value="STOPPED">🔴 حرجة / متوقفة</option>
-        </select>
-        <select id="stationTechForwardFilter" class="form-control" style="flex: 1; min-width: 140px; font-size: 0.85rem; padding: 0.35rem 0.75rem;" onchange="window.app.filterStationTechStatus()">
-          <option value="ALL">كافة حالات الإرسال</option>
-          <option value="SENT">📤 تم الإرسال للشعبة</option>
-          <option value="DRAFT">📝 مسودة بالمحطة</option>
-        </select>
+        <!-- Luxury Status Dropdown Filter -->
+        <div class="luxury-dropdown-container" id="stationTechStatusFilterContainer" style="flex: 1; min-width: 155px;">
+          <div class="luxury-dropdown-trigger" id="stationTechStatusFilterTrigger" onclick="window.app.toggleLuxuryDropdown('stationTechStatusFilterContainer', event)">
+            <span class="luxury-dropdown-selected-label" id="stationTechStatusFilterLabel">
+              <span>📊 كافة الحالات التشغيلية</span>
+            </span>
+            <span class="luxury-dropdown-arrow">▼</span>
+          </div>
+          <div class="luxury-dropdown-menu" id="stationTechStatusFilterMenu">
+            <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('stationTechStatusFilterContainer', 'stationTechStatusFilter', 'ALL', 'filterStationTechStatus', '📊 كافة الحالات التشغيلية')">
+              <span>📊 كافة الحالات التشغيلية</span>
+              <span class="luxury-dropdown-check">✓</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="OPERATIONAL" onclick="window.app.selectLuxuryDropdownOption('stationTechStatusFilterContainer', 'stationTechStatusFilter', 'OPERATIONAL', 'filterStationTechStatus', '🟢 مستقرة / بالعمل')">
+              <span>🟢 مستقرة / بالعمل</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="PARTIAL" onclick="window.app.selectLuxuryDropdownOption('stationTechStatusFilterContainer', 'stationTechStatusFilter', 'PARTIAL', 'filterStationTechStatus', '🟡 قيد المتابعة')">
+              <span>🟡 قيد المتابعة</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="STOPPED" onclick="window.app.selectLuxuryDropdownOption('stationTechStatusFilterContainer', 'stationTechStatusFilter', 'STOPPED', 'filterStationTechStatus', '🔴 حرجة / متوقفة')">
+              <span>🔴 حرجة / متوقفة</span>
+            </div>
+          </div>
+          <select id="stationTechStatusFilter" style="display:none;" onchange="window.app.filterStationTechStatus()">
+            <option value="ALL">كافة الحالات التشغيلية</option>
+            <option value="OPERATIONAL">🟢 مستقرة / بالعمل</option>
+            <option value="PARTIAL">🟡 قيد المتابعة</option>
+            <option value="STOPPED">🔴 حرجة / متوقفة</option>
+          </select>
+        </div>
+
+        <!-- Luxury Forward Dropdown Filter -->
+        <div class="luxury-dropdown-container" id="stationTechForwardFilterContainer" style="flex: 1; min-width: 150px;">
+          <div class="luxury-dropdown-trigger" id="stationTechForwardFilterTrigger" onclick="window.app.toggleLuxuryDropdown('stationTechForwardFilterContainer', event)">
+            <span class="luxury-dropdown-selected-label" id="stationTechForwardFilterLabel">
+              <span>📤 كافة حالات الإرسال</span>
+            </span>
+            <span class="luxury-dropdown-arrow">▼</span>
+          </div>
+          <div class="luxury-dropdown-menu" id="stationTechForwardFilterMenu">
+            <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('stationTechForwardFilterContainer', 'stationTechForwardFilter', 'ALL', 'filterStationTechStatus', '📤 كافة حالات الإرسال')">
+              <span>📤 كافة حالات الإرسال</span>
+              <span class="luxury-dropdown-check">✓</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="SENT" onclick="window.app.selectLuxuryDropdownOption('stationTechForwardFilterContainer', 'stationTechForwardFilter', 'SENT', 'filterStationTechStatus', '📤 تم الإرسال للشعبة')">
+              <span>📤 تم الإرسال للشعبة</span>
+            </div>
+            <div class="luxury-dropdown-item" data-value="DRAFT" onclick="window.app.selectLuxuryDropdownOption('stationTechForwardFilterContainer', 'stationTechForwardFilter', 'DRAFT', 'filterStationTechStatus', '📝 مسودة بالمحطة')">
+              <span>📝 مسودة بالمحطة</span>
+            </div>
+          </div>
+          <select id="stationTechForwardFilter" style="display:none;" onchange="window.app.filterStationTechStatus()">
+            <option value="ALL">كافة حالات الإرسال</option>
+            <option value="SENT">📤 تم الإرسال للشعبة</option>
+            <option value="DRAFT">📝 مسودة بالمحطة</option>
+          </select>
+        </div>
       </div>
 
       <!-- Technical Status Table -->

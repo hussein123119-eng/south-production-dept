@@ -157,21 +157,75 @@ function renderActiveMovementsTab(activeMovements, canManage) {
           <input type="text" id="vehMovementSearchInput" class="form-control" placeholder="🔍 بحث بالسائق / رقم الآلية / الرقم الجانبي..." 
                  oninput="window.app.filterActiveVehiclesMovements()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 220px;">
           
-          <select id="vehAffiliationFilter" class="form-control" onchange="window.app.filterActiveVehiclesMovements()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 140px;">
-            <option value="ALL">كافة الارتباطات</option>
-            <option value="DEPT_MGMT">إدارة القسم</option>
-            <option value="SECTION_MGMT">إدارة الشعبة</option>
-            <option value="STATION">المحطات</option>
-          </select>
+          <!-- Luxury Affiliation Dropdown Filter -->
+          <div class="luxury-dropdown-container" id="vehAffiliationFilterContainer" style="width: 145px; min-width: 140px;">
+            <div class="luxury-dropdown-trigger" id="vehAffiliationFilterTrigger" onclick="window.app.toggleLuxuryDropdown('vehAffiliationFilterContainer', event)">
+              <span class="luxury-dropdown-selected-label" id="vehAffiliationFilterLabel">
+                <span>🏢 كافة الارتباطات</span>
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </div>
+            <div class="luxury-dropdown-menu" id="vehAffiliationFilterMenu">
+              <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('vehAffiliationFilterContainer', 'vehAffiliationFilter', 'ALL', 'filterActiveVehiclesMovements', '🏢 كافة الارتباطات')">
+                <span>🏢 كافة الارتباطات</span>
+                <span class="luxury-dropdown-check">✓</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="DEPT_MGMT" onclick="window.app.selectLuxuryDropdownOption('vehAffiliationFilterContainer', 'vehAffiliationFilter', 'DEPT_MGMT', 'filterActiveVehiclesMovements', '🏛️ إدارة القسم')">
+                <span>🏛️ إدارة القسم</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="SECTION_MGMT" onclick="window.app.selectLuxuryDropdownOption('vehAffiliationFilterContainer', 'vehAffiliationFilter', 'SECTION_MGMT', 'filterActiveVehiclesMovements', '📂 إدارة الشعبة')">
+                <span>📂 إدارة الشعبة</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="STATION" onclick="window.app.selectLuxuryDropdownOption('vehAffiliationFilterContainer', 'vehAffiliationFilter', 'STATION', 'filterActiveVehiclesMovements', '⛽ المحطات')">
+                <span>⛽ المحطات</span>
+              </div>
+            </div>
+            <select id="vehAffiliationFilter" style="display:none;" onchange="window.app.filterActiveVehiclesMovements()">
+              <option value="ALL">كافة الارتباطات</option>
+              <option value="DEPT_MGMT">إدارة القسم</option>
+              <option value="SECTION_MGMT">إدارة الشعبة</option>
+              <option value="STATION">المحطات</option>
+            </select>
+          </div>
 
-          <select id="vehShiftFilter" class="form-control" onchange="window.app.filterActiveVehiclesMovements()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 110px;">
-            <option value="ALL">كافة النوبات</option>
-            <option value="A">نوبة A</option>
-            <option value="B">نوبة B</option>
-            <option value="C">نوبة C</option>
-            <option value="D">نوبة D</option>
-            <option value="نهار">نهاري</option>
-          </select>
+          <!-- Luxury Shift Dropdown Filter -->
+          <div class="luxury-dropdown-container" id="vehShiftFilterContainer" style="width: 125px; min-width: 110px;">
+            <div class="luxury-dropdown-trigger" id="vehShiftFilterTrigger" onclick="window.app.toggleLuxuryDropdown('vehShiftFilterContainer', event)">
+              <span class="luxury-dropdown-selected-label" id="vehShiftFilterLabel">
+                <span>⏱️ كافة النوبات</span>
+              </span>
+              <span class="luxury-dropdown-arrow">▼</span>
+            </div>
+            <div class="luxury-dropdown-menu" id="vehShiftFilterMenu">
+              <div class="luxury-dropdown-item active-item" data-value="ALL" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'ALL', 'filterActiveVehiclesMovements', '⏱️ كافة النوبات')">
+                <span>⏱️ كافة النوبات</span>
+                <span class="luxury-dropdown-check">✓</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="A" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'A', 'filterActiveVehiclesMovements', '🅰️ نوبة A')">
+                <span>🅰️ نوبة A</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="B" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'B', 'filterActiveVehiclesMovements', '🅱️ نوبة B')">
+                <span>🅱️ نوبة B</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="C" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'C', 'filterActiveVehiclesMovements', '🅲 نوبة C')">
+                <span>🅲 نوبة C</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="D" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'D', 'filterActiveVehiclesMovements', '🅳 نوبة D')">
+                <span>🅳 نوبة D</span>
+              </div>
+              <div class="luxury-dropdown-item" data-value="نهار" onclick="window.app.selectLuxuryDropdownOption('vehShiftFilterContainer', 'vehShiftFilter', 'نهار', 'filterActiveVehiclesMovements', '☀️ نهاري')">
+                <span>☀️ نهاري</span>
+              </div>
+            </div>
+            <select id="vehShiftFilter" style="display:none;" onchange="window.app.filterActiveVehiclesMovements()">
+              <option value="ALL">كافة النوبات</option>
+              <option value="A">نوبة A</option>
+              <option value="B">نوبة B</option>
+              <option value="C">نوبة C</option>
+              <option value="D">نوبة D</option>
+              <option value="نهار">نهاري</option>
+            </select>
+          </div>
         </div>
       </div>
 

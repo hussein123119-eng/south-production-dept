@@ -4063,27 +4063,91 @@ select::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.12) !important;
 }
 
-/* Stylized Refined RTL Select Dropdowns */
+/* ==============================================================================
+   🌟 Universal Luxury Select Dropdowns System (تعميم التصميم الفاخر لكافة القوائم المنسدلة) 🌟
+   Supports Daytime (Light) and Neon (Dark) Themes seamlessly
+   Matching the reference high-end petroleum UI (Image 2)
+   ============================================================================== */
+select,
+.form-select,
+.filter-select,
+.select-glass,
 select.form-control,
-select {
+.dept-doc-select,
+.sec-notif-select,
+.unit-notif-select,
+.endorsement-input:is(select),
+select.de-dynamic-input {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  min-height: 38px !important;
+  padding: 0.38rem 0.85rem 0.38rem 2.2rem !important;
+  border-radius: 10px !important;
+  font-family: inherit !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
   background-repeat: no-repeat !important;
-  background-position: left 0.75rem center !important;
-  background-size: 14px 14px !important;
-  padding-left: 2.1rem !important;
-  padding-right: 0.85rem !important;
-  cursor: pointer;
-  line-height: 1.4;
+  background-position: left 0.85rem center !important;
+  background-size: 13px 13px !important;
+  line-height: 1.4 !important;
+  user-select: none !important;
+  text-align: right !important;
+  
+  /* Daytime (Light) Theme Defaults */
+  background-color: var(--md-sys-color-surface, #ffffff) !important;
+  color: var(--md-sys-color-on-surface, #0f172a) !important;
+  border: 1.5px solid var(--md-sys-color-outline-variant, rgba(11, 87, 208, 0.25)) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230b57d0' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
 
-select.form-control option {
-  background: #ffffff !important;
-  color: #1e293b !important;
-  font-weight: 600 !important;
-  padding: 0.5rem 0.85rem !important;
+select:hover,
+.form-select:hover,
+.filter-select:hover,
+.select-glass:hover,
+select.form-control:hover,
+.dept-doc-select:hover,
+.sec-notif-select:hover,
+.unit-notif-select:hover,
+.endorsement-input:is(select):hover,
+select.de-dynamic-input:hover {
+  border-color: var(--md-sys-color-primary, #0b57d0) !important;
+  box-shadow: 0 3px 10px rgba(11, 87, 208, 0.12) !important;
+  background-color: #f8faff !important;
+}
+
+select:focus,
+.form-select:focus,
+.filter-select:focus,
+.select-glass:focus,
+select.form-control:focus,
+.dept-doc-select:focus,
+.sec-notif-select:focus,
+.unit-notif-select:focus,
+.endorsement-input:is(select):focus,
+select.de-dynamic-input:focus {
+  outline: none !important;
+  border-color: var(--md-sys-color-primary, #0b57d0) !important;
+  box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.18), 0 4px 12px rgba(11, 87, 208, 0.12) !important;
+  background-color: #ffffff !important;
+}
+
+select option,
+select optgroup {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  padding: 8px 12px !important;
+}
+
+select optgroup {
+  color: #0b57d0 !important;
+  font-weight: 800 !important;
+  background-color: #f1f5f9 !important;
 }
 
 /* Dark Mode Overrides for Refined Form Controls */
@@ -4094,34 +4158,81 @@ select.form-control option {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Neon / Dark Mode Overrides for Universal Select Dropdowns */
+[data-theme="dark"] select,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .filter-select,
+[data-theme="dark"] .select-glass,
 [data-theme="dark"] select.form-control,
-[data-theme="dark"] select {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  background-color: rgba(7, 13, 29, 0.85) !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300dfd8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: left 0.75rem center !important;
-  background-size: 14px 14px !important;
-  border: 1.2px solid rgba(0, 223, 216, 0.3) !important;
-  color: #ffffff !important;
-  padding-left: 2.1rem !important;
-  padding-right: 0.85rem !important;
+[data-theme="dark"] .dept-doc-select,
+[data-theme="dark"] .sec-notif-select,
+[data-theme="dark"] .unit-notif-select,
+[data-theme="dark"] .endorsement-input:is(select),
+[data-theme="dark"] select.de-dynamic-input,
+body.theme-dark select,
+.theme-dark select {
+  background-color: var(--md-sys-color-surface-variant, rgba(11, 20, 42, 0.92)) !important;
+  color: var(--md-sys-color-on-surface, #ffffff) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.38) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.08) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
 
-[data-theme="dark"] .form-control::placeholder {
-  color: #64748b !important;
+[data-theme="dark"] select:hover,
+[data-theme="dark"] .form-select:hover,
+[data-theme="dark"] .filter-select:hover,
+[data-theme="dark"] .select-glass:hover,
+[data-theme="dark"] select.form-control:hover,
+[data-theme="dark"] .dept-doc-select:hover,
+[data-theme="dark"] .sec-notif-select:hover,
+[data-theme="dark"] .unit-notif-select:hover,
+[data-theme="dark"] .endorsement-input:is(select):hover,
+[data-theme="dark"] select.de-dynamic-input:hover,
+body.theme-dark select:hover,
+.theme-dark select:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.28) !important;
+  background-color: rgba(14, 25, 52, 0.98) !important;
 }
 
-[data-theme="dark"] .form-control:hover {
-  border-color: rgba(56, 189, 248, 0.45) !important;
+[data-theme="dark"] select:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] .filter-select:focus,
+[data-theme="dark"] .select-glass:focus,
+[data-theme="dark"] select.form-control:focus,
+[data-theme="dark"] .dept-doc-select:focus,
+[data-theme="dark"] .sec-notif-select:focus,
+[data-theme="dark"] .unit-notif-select:focus,
+[data-theme="dark"] .endorsement-input:is(select):focus,
+[data-theme="dark"] select.de-dynamic-input:focus,
+body.theme-dark select:focus,
+.theme-dark select:focus {
+  outline: none !important;
+  border-color: #00dfd8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), 0 0 20px rgba(0, 223, 216, 0.35) !important;
+  background-color: #0c162d !important;
 }
 
-[data-theme="dark"] select.form-control option {
-  background: #070d1d !important;
-  color: #ffffff !important;
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup,
+body.theme-dark select option,
+body.theme-dark select optgroup,
+.theme-dark select option,
+.theme-dark select optgroup {
+  background-color: #0c162d !important;
+  color: #e2e8f0 !important;
+  font-weight: 700 !important;
+  padding: 8px 12px !important;
 }
+
+[data-theme="dark"] select optgroup,
+body.theme-dark select optgroup,
+.theme-dark select optgroup {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  background-color: rgba(56, 189, 248, 0.12) !important;
+}
+
 
 /* Futuristic Technological Segmented Tabs System */
 .tabs-header {
@@ -10621,6 +10732,25 @@ body[data-theme="dark"],
 
 [data-theme="dark"] .luxury-dropdown-menu::-webkit-scrollbar-thumb:hover {
   background: rgba(56, 189, 248, 0.6);
+}
+
+/* ==============================================================================
+   🌟 Enforce ALL Dropdown Menus to Open Downwards (إلزام نزول جميع القوائم للأسفل حصراً) 🌟
+   ============================================================================== */
+.luxury-dropdown-menu,
+.custom-role-dropdown-menu,
+.dropdown-menu,
+.select-menu,
+.picker-dropdown,
+.luxury-filter-menu,
+.global-search-dropdown {
+  top: calc(100% + 5px) !important;
+  bottom: auto !important;
+}
+
+/* Safeguard: Native selects wrapped inside luxury dropdown containers must stay hidden */
+.luxury-dropdown-container select {
+  display: none !important;
 }
 
 

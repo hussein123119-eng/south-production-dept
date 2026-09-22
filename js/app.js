@@ -8203,6 +8203,181 @@ class AppController {
     }
   }
 
+  buildLuxuryDropdownHtml(config) {
+    const {
+      selectId,
+      containerId = `${selectId}Container`,
+      triggerId = `${selectId}Trigger`,
+      labelId = `${selectId}Label`,
+      menuId = `${selectId}Menu`,
+      selectedValue = 'ALL',
+      options = [], // [{ value, label, group, icon }] or plain strings/objects
+      onChangeCallback = '',
+      width = 'auto',
+      minWidth = '140px',
+      extraClasses = '',
+      title = ''
+    } = config;
+
+    let currentLabel = '';
+    options.forEach(opt => {
+      const val = typeof opt === 'object' ? opt.value : opt;
+      const lbl = typeof opt === 'object' ? opt.label : opt;
+      if (String(val) === String(selectedValue)) {
+        currentLabel = lbl;
+      }
+    });
+    if (!currentLabel && options.length > 0) {
+      currentLabel = typeof options[0] === 'object' ? options[0].label : options[0];
+    }
+
+    const groups = {};
+    const ungrouped = [];
+    options.forEach(opt => {
+      const item = typeof opt === 'object' ? opt : { value: opt, label: opt };
+      if (item.group) {
+        if (!groups[item.group]) groups[item.group] = [];
+        groups[item.group].push(item);
+      } else {
+        ungrouped.push(item);
+      }
+    });
+
+    let menuItemsHtml = '';
+    ungrouped.forEach(opt => {
+      const isAct = String(opt.value) === String(selectedValue);
+      const safeLabel = String(opt.label).replace(/'/g, "\\'");
+      menuItemsHtml += `
+        <div class="luxury-dropdown-item ${isAct ? 'active-item' : ''}" 
+             data-value="${opt.value}" 
+             onclick="window.app.selectLuxuryDropdownOption('${containerId}', '${selectId}', '${opt.value}', '${onChangeCallback}', '${safeLabel}')">
+          <span>${opt.label}</span>
+          ${isAct ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+        </div>
+      `;
+    });
+
+    Object.keys(groups).forEach(grpName => {
+      menuItemsHtml += `<div class="luxury-dropdown-header">${grpName}</div>`;
+      groups[grpName].forEach(opt => {
+        const isAct = String(opt.value) === String(selectedValue);
+        const safeLabel = String(opt.label).replace(/'/g, "\\'");
+        menuItemsHtml += `
+          <div class="luxury-dropdown-item ${isAct ? 'active-item' : ''}" 
+               data-value="${opt.value}" 
+               onclick="window.app.selectLuxuryDropdownOption('${containerId}', '${selectId}', '${opt.value}', '${onChangeCallback}', '${safeLabel}')">
+            <span>${opt.label}</span>
+            ${isAct ? '<span class="luxury-dropdown-check">✓</span>' : ''}
+          </div>
+        `;
+      });
+    });
+
+    let nativeOptionsHtml = '';
+    ungrouped.forEach(opt => {
+      nativeOptionsHtml += `<option value="${opt.value}" ${String(opt.value) === String(selectedValue) ? 'selected' : ''}>${opt.label}</option>`;
+    });
+    Object.keys(groups).forEach(grpName => {
+      nativeOptionsHtml += `<optgroup label="${grpName}">`;
+      groups[grpName].forEach(opt => {
+        nativeOptionsHtml += `<option value="${opt.value}" ${String(opt.value) === String(selectedValue) ? 'selected' : ''}>${opt.label}</option>`;
+      });
+      nativeOptionsHtml += `</optgroup>`;
+    });
+
+    const onchangeAttr = onChangeCallback ? `onchange="${onChangeCallback.includes('(') ? onChangeCallback : `window.app.${onChangeCallback}()`}"` : '';
+
+    return `
+      <div class="luxury-dropdown-container ${extraClasses}" id="${containerId}" style="width: ${width}; min-width: ${minWidth};" title="${title || ''}">
+        <div class="luxury-dropdown-trigger" id="${triggerId}" onclick="window.app.toggleLuxuryDropdown('${containerId}', event)">
+          <span class="luxury-dropdown-selected-label" id="${labelId}">
+            <span>${currentLabel}</span>
+          </span>
+          <span class="luxury-dropdown-arrow">▼</span>
+        </div>
+        <div class="luxury-dropdown-menu" id="${menuId}">
+          ${menuItemsHtml}
+        </div>
+        <select id="${selectId}" style="display:none;" ${onchangeAttr}>
+          ${nativeOptionsHtml}
+        </select>
+      </div>
+    `;
+  }
+
+  enhanceSelectToLuxury(selectEl) {
+    if (!selectEl || selectEl.dataset?.luxuryEnhanced === 'true') return;
+    if (selectEl.closest?.('.luxury-dropdown-container')) return;
+    if (selectEl.style?.display === 'none' || selectEl.classList?.contains('hidden')) return;
+
+    const selectId = selectEl.id || `luxSel_${Math.random().toString(36).substr(2, 9)}`;
+    selectEl.id = selectId;
+    const containerId = `${selectId}Container`;
+    const triggerId = `${selectId}Trigger`;
+    const labelId = `${selectId}Label`;
+    const menuId = `${selectId}Menu`;
+
+    const options = [];
+    Array.from(selectEl.children || []).forEach(child => {
+      if (child.tagName === 'OPTGROUP') {
+        const grp = child.label || '';
+        Array.from(child.children || []).forEach(opt => {
+          options.push({ value: opt.value, label: opt.textContent.trim(), group: grp });
+        });
+      } else if (child.tagName === 'OPTION') {
+        options.push({ value: child.value, label: child.textContent.trim() });
+      }
+    });
+
+    const selectedValue = selectEl.value;
+    const computedWidth = selectEl.style?.width || 'auto';
+
+    const container = document.createElement('div');
+    container.className = 'luxury-dropdown-container';
+    container.id = containerId;
+    if (computedWidth && computedWidth !== 'auto') {
+      container.style.width = computedWidth;
+    }
+
+    const html = this.buildLuxuryDropdownHtml({
+      selectId,
+      containerId,
+      triggerId,
+      labelId,
+      menuId,
+      selectedValue,
+      options,
+      onChangeCallback: '',
+      width: computedWidth
+    });
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const newContainer = tempDiv.firstElementChild;
+    const innerSelect = newContainer.querySelector('select');
+
+    if (selectEl.parentNode) {
+      selectEl.parentNode.insertBefore(newContainer, selectEl);
+      if (innerSelect) {
+        innerSelect.remove();
+      }
+      selectEl.style.display = 'none';
+      selectEl.dataset.luxuryEnhanced = 'true';
+      newContainer.appendChild(selectEl);
+    }
+  }
+
+  enhanceAllSelects(rootElement) {
+    const root = rootElement || (typeof document !== 'undefined' ? document : null);
+    if (!root || !root.querySelectorAll) return;
+    const selects = root.querySelectorAll('select:not([data-no-luxury])');
+    selects.forEach(sel => {
+      try {
+        this.enhanceSelectToLuxury(sel);
+      } catch (e) {}
+    });
+  }
+
   setModalSelectedRole(roleKey) {
     const sel = document.getElementById('editUserRoleSelect');
     if (sel) {
