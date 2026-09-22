@@ -14135,6 +14135,54 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
     });
   }
 
+  filterActiveVehiclesMovements() {
+    const q = (document.getElementById('vehMovementSearchInput')?.value || '').toLowerCase().trim();
+    const affFilter = document.getElementById('vehAffiliationFilter')?.value || 'ALL';
+    const shiftFilter = document.getElementById('vehShiftFilter')?.value || 'ALL';
+
+    const rows = document.querySelectorAll('#activeVehMovementsTable .veh-movement-row');
+    let visibleCount = 0;
+    rows.forEach(r => {
+      const searchData = (r.getAttribute('data-search') || '').toLowerCase();
+      const aff = r.getAttribute('data-affiliation') || '';
+      const shift = r.getAttribute('data-shift') || '';
+      const section = r.getAttribute('data-section') || '';
+
+      const matchesSearch = !q || searchData.includes(q);
+      const matchesAff = affFilter === 'ALL' || aff === affFilter || (affFilter === 'DEPT_MGMT' && section === 'DEPT');
+      const matchesShift = shiftFilter === 'ALL' || shift === shiftFilter;
+
+      if (matchesSearch && matchesAff && matchesShift) {
+        r.style.display = '';
+        visibleCount++;
+      } else {
+        r.style.display = 'none';
+      }
+    });
+
+    const emptyRow = document.getElementById('vehMovementsEmptyFilterRow');
+    const tableBody = document.querySelector('#activeVehMovementsTable tbody');
+    if (tableBody) {
+      if (visibleCount === 0 && rows.length > 0) {
+        if (!emptyRow) {
+          const tr = document.createElement('tr');
+          tr.id = 'vehMovementsEmptyFilterRow';
+          tr.innerHTML = `
+            <td colspan="12" style="text-align: center; padding: 2rem; color: var(--md-sys-color-outline);">
+              <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🔍</div>
+              <strong>لا توجد حركات تطابق معايير التصفية الحالية.</strong>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+        } else {
+          emptyRow.style.display = '';
+        }
+      } else if (emptyRow) {
+        emptyRow.style.display = 'none';
+      }
+    }
+  }
+
   forwardTechStatusToSection(statusId, stationId = null) {
     const actorUser = window.auth.getCurrentUser();
     const res = window.store.forwardTechnicalStatusToSection(statusId, actorUser);

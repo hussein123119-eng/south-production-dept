@@ -161,6 +161,61 @@ assert(vehHtml.includes('vehShiftFilterTrigger'), 'توفر زر تفعيل قا
 assert(vehHtml.includes('vehShiftFilterMenu'), 'توفر القائمة المنسدلة لأسفل للنوبات');
 assert(vehHtml.includes('id="vehShiftFilter"'), 'الحفاظ على select الأصلي vehShiftFilter');
 
+// التحقق من اتساع الحاويات لمنع قطع النص
+assert(vehHtml.includes('width: 170px'), 'اتساع حاوية الارتباطات لمنع اقتطاع النص (170px)');
+assert(vehHtml.includes('width: 155px'), 'اتساع حاوية النوبات لمنع اقتطاع النص (155px)');
+
+// التحقق من توفر دالة تصفية حركات الآليات ومحاكاة عملها
+assert(typeof window.app.filterActiveVehiclesMovements === 'function', 'توفر دالة filterActiveVehiclesMovements في app.js');
+
+const mockMovementRow1 = {
+  style: { display: '' },
+  attrs: { 'data-search': 'سعد كريم 12345 صهريج', 'data-affiliation': 'STATION', 'data-shift': 'A', 'data-section': 'SEC_STATIONS' },
+  getAttribute(name) { return this.attrs[name] || ''; }
+};
+const mockMovementRow2 = {
+  style: { display: '' },
+  attrs: { 'data-search': 'حسين علي 98765 قلاب', 'data-affiliation': 'DEPT_MGMT', 'data-shift': 'B', 'data-section': 'DEPT' },
+  getAttribute(name) { return this.attrs[name] || ''; }
+};
+
+const origQSA = global.document.querySelectorAll;
+const origQS = global.document.querySelector;
+const mockTableBody = { appendChild: () => {} };
+
+global.document.querySelectorAll = (sel) => {
+  if (sel === '#activeVehMovementsTable .veh-movement-row') {
+    return [mockMovementRow1, mockMovementRow2];
+  }
+  return [];
+};
+global.document.querySelector = (sel) => {
+  if (sel === '#activeVehMovementsTable tbody') return mockTableBody;
+  return null;
+};
+
+// تصفية بالنوبة A
+global.document.getElementById('vehMovementSearchInput').value = '';
+global.document.getElementById('vehAffiliationFilter').value = 'ALL';
+global.document.getElementById('vehShiftFilter').value = 'A';
+window.app.filterActiveVehiclesMovements();
+
+assert(mockMovementRow1.style.display === '', 'ظهور حركة النوبة A المطابقة');
+assert(mockMovementRow2.style.display === 'none', 'إخفاء حركة النوبة B غير المطابقة');
+
+// تصفية بإدارة القسم DEPT_MGMT
+global.document.getElementById('vehShiftFilter').value = 'ALL';
+global.document.getElementById('vehAffiliationFilter').value = 'DEPT_MGMT';
+window.app.filterActiveVehiclesMovements();
+
+assert(mockMovementRow1.style.display === 'none', 'إخفاء حركة المحطة عند تصفية إدارة القسم');
+assert(mockMovementRow2.style.display === '', 'ظهور حركة إدارة القسم المطابقة');
+
+// استعادة الدوال
+global.document.querySelectorAll = origQSA;
+global.document.querySelector = origQS;
+
+
 // --- 6. التحقق من قوائم الموقف الفني (technical_status.js) ---
 console.log('\n--- 6. التحقق من قوائم الموقف الفني (technical_status.js) ---');
 const mockStations = [

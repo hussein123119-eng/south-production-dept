@@ -158,7 +158,7 @@ function renderActiveMovementsTab(activeMovements, canManage) {
                  oninput="window.app.filterActiveVehiclesMovements()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 220px;">
           
           <!-- Luxury Affiliation Dropdown Filter -->
-          <div class="luxury-dropdown-container" id="vehAffiliationFilterContainer" style="width: 145px; min-width: 140px;">
+          <div class="luxury-dropdown-container" id="vehAffiliationFilterContainer" style="width: 170px; min-width: 160px;">
             <div class="luxury-dropdown-trigger" id="vehAffiliationFilterTrigger" onclick="window.app.toggleLuxuryDropdown('vehAffiliationFilterContainer', event)">
               <span class="luxury-dropdown-selected-label" id="vehAffiliationFilterLabel">
                 <span>🏢 كافة الارتباطات</span>
@@ -189,7 +189,7 @@ function renderActiveMovementsTab(activeMovements, canManage) {
           </div>
 
           <!-- Luxury Shift Dropdown Filter -->
-          <div class="luxury-dropdown-container" id="vehShiftFilterContainer" style="width: 125px; min-width: 110px;">
+          <div class="luxury-dropdown-container" id="vehShiftFilterContainer" style="width: 155px; min-width: 145px;">
             <div class="luxury-dropdown-trigger" id="vehShiftFilterTrigger" onclick="window.app.toggleLuxuryDropdown('vehShiftFilterContainer', event)">
               <span class="luxury-dropdown-selected-label" id="vehShiftFilterLabel">
                 <span>⏱️ كافة النوبات</span>
