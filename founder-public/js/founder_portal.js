@@ -129,13 +129,13 @@ const FounderPortal = {
   },
 
   // --- مصادقة وتسجيل دخول المؤسس ---
-  // --- مصادقة وتسجيل دخول المؤسس ---
   checkAuthSession: function() {
     const sessionStr = localStorage.getItem('SPD_FOUNDER_AUTH_SESSION_V99');
     const overlay = document.getElementById('founderLoginOverlay');
     const mainWrapper = document.getElementById('founderMainWrapper');
     const emailDisplay = document.getElementById('activeUserEmailDisplay');
 
+    // 1. التحقق من وجود جلسة المؤسس المخزنة مسبقاً
     if (sessionStr) {
       try {
         const session = JSON.parse(sessionStr);
@@ -154,14 +154,44 @@ const FounderPortal = {
       } catch (e) {}
     }
 
-    // غير مسجل الدخول: إظهار شاشة الدخول وإخفاء غرفة العمليات
+    // 2. التحقق من وجود جلسة في المنظومة العامة للمؤسس (Single Sign-On عبر الجهاز)
+    try {
+      const mainSessionStr = sessionStorage.getItem('SPD_CURRENT_USER_SESSION');
+      if (mainSessionStr) {
+        const mainSession = JSON.parse(mainSessionStr);
+        const emailLower = (mainSession?.email || '').toLowerCase().trim();
+        const isFounder = emailLower === 'hussein123119@gmail.com' || emailLower === 'southprod.rumaila@gmail.com' || mainSession?.role === 'SUPER_ADMIN' || mainSession?.role === 'FOUNDER_SUPER_ADMIN';
+        if (isFounder && emailLower) {
+          const sessionData = { email: emailLower, loggedInAt: Date.now(), role: 'FOUNDER_SUPER_ADMIN' };
+          localStorage.setItem('SPD_FOUNDER_AUTH_SESSION_V99', JSON.stringify(sessionData));
+          if (overlay) {
+            overlay.classList.add('is-hidden');
+            overlay.style.setProperty('display', 'none', 'important');
+          }
+          if (mainWrapper) {
+            mainWrapper.classList.remove('is-hidden');
+            mainWrapper.style.setProperty('display', 'block', 'important');
+          }
+          if (emailDisplay) emailDisplay.textContent = emailLower;
+          return true;
+        }
+      }
+    } catch (e) {}
+
+    // 3. غير مسجل الدخول: إظهار شاشة الدخول الفاخرة وإخفاء غرفة العمليات فقط إذا كانت الشاشة متوفرة
     if (overlay) {
       overlay.classList.remove('is-hidden');
       overlay.style.removeProperty('display');
       overlay.style.setProperty('display', 'flex', 'important');
-    }
-    if (mainWrapper) {
-      mainWrapper.style.setProperty('display', 'none', 'important');
+      if (mainWrapper) {
+        mainWrapper.style.setProperty('display', 'none', 'important');
+      }
+    } else {
+      // صمام أمان حاسم: في حال عدم وجود شاشة الدخول لسبب ما، لا يتم حجب واجهة النظام نهائياً
+      if (mainWrapper) {
+        mainWrapper.classList.remove('is-hidden');
+        mainWrapper.style.setProperty('display', 'block', 'important');
+      }
     }
     return false;
   },
@@ -2089,16 +2119,20 @@ const FounderPortal = {
 
   initAuthProviderCard: async function() {
     try {
-      const resp = await fetch('/api/system/auth-provider');
-      const data = await resp.json();
-      if (data.success) {
-        this.authProviderState.activeProvider = data.activeProvider;
-        this.authProviderState.providers = data.providers;
-        this.renderAuthProviderUI();
+      if (typeof fetch === 'function') {
+        const resp = await fetch('/api/system/auth-provider');
+        if (resp && resp.ok) {
+          const data = await resp.json();
+          if (data && data.success) {
+            this.authProviderState.activeProvider = data.activeProvider;
+            this.authProviderState.providers = data.providers;
+            this.renderAuthProviderUI();
+            return;
+          }
+        }
       }
-    } catch (err) {
-      console.log('Error loading auth provider state:', err);
-    }
+    } catch (err) {}
+    this.renderAuthProviderUI();
   },
 
   renderAuthProviderUI: function() {
