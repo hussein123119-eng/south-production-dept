@@ -738,9 +738,9 @@ const FounderPortal = {
     this.auditLogs.slice(0, 10).forEach(log => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-family: monospace; font-size: 0.85rem; color: #cbd5e1; direction: ltr; text-align: right;">${log.time}</td>
-        <td style="font-weight: 700; color: #f8fafc;">${log.actor}</td>
-        <td style="color: #e2e8f0;">${log.action}</td>
+        <td style="font-family: monospace; font-size: 0.85rem; color: var(--text-soft); direction: ltr; text-align: right;">${log.time}</td>
+        <td style="font-weight: 700; color: var(--text-pure);">${log.actor}</td>
+        <td style="color: var(--text-bright); font-weight: 600;">${log.action}</td>
         <td><span class="badge-role badge-role-founder" style="font-size: 0.75rem;">${log.status}</span></td>
       `;
       tbody.appendChild(tr);
@@ -887,9 +887,9 @@ const FounderPortal = {
       const badgeClass = roleBadges[role] || 'badge-role-supervisor';
 
       tr.innerHTML = `
-        <td style="font-weight: 700; color: #ffffff;">${emp.fullName || emp.name}</td>
-        <td style="font-family: monospace; font-weight: 700; color: #f59e0b;">${emp.empId || emp.code || 'EMP-0000'}</td>
-        <td style="color: #cbd5e1;">${emp.department || emp.section || 'شعبة الإنتاج'}</td>
+        <td style="font-weight: 700; color: var(--text-pure);">${emp.fullName || emp.name}</td>
+        <td style="font-family: monospace; font-weight: 700; color: var(--gold-primary);">${emp.empId || emp.code || 'EMP-0000'}</td>
+        <td style="color: var(--text-soft); font-weight: 600;">${emp.department || emp.section || 'شعبة الإنتاج'}</td>
         <td>
           <span class="badge-role ${badgeClass}">${role}</span>
         </td>
@@ -905,7 +905,7 @@ const FounderPortal = {
           </select>
         </td>
         <td>
-          <span style="color: var(--emerald-light); font-weight: 700; font-size: 0.82rem;">● نشط وموثق</span>
+          <span style="color: var(--emerald-primary); font-weight: 700; font-size: 0.82rem;">● نشط وموثق</span>
         </td>
         <td>
           <button class="btn-glass btn-glass-cyan" style="height: 30px; padding: 0 0.75rem; font-size: 0.78rem;" onclick="FounderPortal.openDossierModal('${emp.empId || emp.id}')">
@@ -938,18 +938,18 @@ const FounderPortal = {
       container.innerHTML = '';
       if (this.pendingUsers.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; padding: 1.8rem; background: rgba(9,20,38,0.5); border-radius: 14px; border: var(--border-subtle); color: var(--text-muted);">
-            <div style="font-size: 1.5rem; margin-bottom: 0.4rem; color: var(--emerald-light);">✓</div>
+          <div style="text-align: center; padding: 1.8rem; background: var(--glass-inner); border-radius: 14px; border: var(--border-subtle); color: var(--text-muted);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.4rem; color: var(--emerald-primary);">✓</div>
             <div style="font-weight: 700;">لا توجد أي طلبات تسجيل معلقة حالياً - كافة الحسابات معتمدة وموثقة.</div>
           </div>
         `;
       } else {
         this.pendingUsers.forEach(u => {
           const card = document.createElement('div');
-          card.style.cssText = 'background: rgba(9,20,38,0.7); border: var(--border-subtle); border-radius: 14px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;';
+          card.style.cssText = 'background: var(--glass-inner); border: var(--border-subtle); border-radius: 14px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;';
           card.innerHTML = `
             <div>
-              <div style="font-weight: 800; color: #ffffff; font-size: 0.95rem;">${u.fullName}</div>
+              <div style="font-weight: 800; color: var(--text-pure); font-size: 0.95rem;">${u.fullName}</div>
               <div style="font-size: 0.8rem; color: var(--text-soft);">${u.email} | ${u.jobTitle || 'موظف'} - ${u.department || 'القسم'}</div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -970,10 +970,10 @@ const FounderPortal = {
         this.pendingUsers.forEach(user => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td style="font-weight: 700; color: #ffffff;">${user.fullName}</td>
-            <td style="direction: ltr; text-align: right; color: #94a3b8; font-family: monospace;">${user.email}</td>
-            <td style="color: #cbd5e1;">${user.jobTitle} - ${user.department}</td>
-            <td style="color: #f59e0b; font-weight: 700;">${user.requestedRole}</td>
+            <td style="font-weight: 700; color: var(--text-pure);">${user.fullName}</td>
+            <td style="direction: ltr; text-align: right; color: var(--text-muted); font-family: monospace;">${user.email}</td>
+            <td style="color: var(--text-soft); font-weight: 600;">${user.jobTitle} - ${user.department}</td>
+            <td style="color: var(--gold-primary); font-weight: 700;">${user.requestedRole}</td>
             <td>
               <div style="display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: nowrap; white-space: nowrap;">
                 <button class="btn-glass btn-glass-emerald" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="FounderPortal.approvePendingUser('${user.id}')">
@@ -1061,11 +1061,11 @@ const FounderPortal = {
     this.whitelist.forEach((email, idx) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-weight: 700; color: #f59e0b;">${idx + 1}</td>
-        <td style="direction: ltr; text-align: right; font-family: monospace; font-size: 0.92rem; color: #f8fafc;">${email}</td>
+        <td style="font-weight: 700; color: var(--gold-primary);">${idx + 1}</td>
+        <td style="direction: ltr; text-align: right; font-family: monospace; font-size: 0.92rem; font-weight: 700; color: var(--text-pure);">${email}</td>
         <td><span class="badge-role badge-role-founder">مخول رئيسي</span></td>
         <td>
-          ${email.includes('founder') ? '<span style="font-size: 0.78rem; color: #94a3b8;">حساب رئيسي غير قابل للحذف</span>' : `
+          ${email.includes('founder') ? '<span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">حساب رئيسي غير قابل للحذف</span>' : `
             <button class="btn-glass btn-glass-danger" style="padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="FounderPortal.removeWhitelistEmail('${email}')">
               حذف التصريح
             </button>
@@ -1161,15 +1161,15 @@ const FounderPortal = {
     filtered.forEach(emp => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-family: monospace; font-weight: 700; color: #f59e0b;">${emp.empId}</td>
-        <td style="font-weight: 700; color: #ffffff;">${emp.fullName}</td>
-        <td style="color: #cbd5e1;">${emp.jobTitle}</td>
+        <td style="font-family: monospace; font-weight: 700; color: var(--gold-primary);">${emp.empId}</td>
+        <td style="font-weight: 700; color: var(--text-pure);">${emp.fullName}</td>
+        <td style="color: var(--text-soft);">${emp.jobTitle}</td>
         <td>
-          <span style="font-weight: 700; color: #10b981;">الدرجة ${emp.grade}</span>
-          <span style="color: #94a3b8; font-size: 0.8rem; margin-right: 0.3rem;">المرحلة ${emp.step}</span>
+          <span style="font-weight: 700; color: var(--emerald-primary);">الدرجة ${emp.grade}</span>
+          <span style="color: var(--text-muted); font-size: 0.8rem; margin-right: 0.3rem;">المرحلة ${emp.step}</span>
         </td>
-        <td style="color: #cbd5e1; font-size: 0.85rem;">${emp.department}</td>
-        <td style="font-weight: 700; color: #f8fafc;">${emp.yearsOfService} سنة</td>
+        <td style="color: var(--text-soft); font-size: 0.85rem;">${emp.department}</td>
+        <td style="font-weight: 700; color: var(--text-pure);">${emp.yearsOfService} سنة</td>
         <td><span class="badge-role badge-role-operator" style="font-size: 0.75rem;">${emp.shift}</span></td>
         <td>
           <div style="display: inline-flex; align-items: center; gap: 0.35rem; flex-wrap: nowrap; white-space: nowrap;">
@@ -1350,9 +1350,9 @@ const FounderPortal = {
           </div>
           <span class="badge-role badge-role-supervisor" style="font-size: 0.75rem;">استمارة معتمدة جديدة</span>
         </div>
-        <h4 style="font-size: 1.05rem; font-weight: 800; color: #ffffff; margin-bottom: 0.35rem;">${form.title}</h4>
+        <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--text-pure); margin-bottom: 0.35rem;">${form.title}</h4>
         <p style="font-size: 0.85rem; color: var(--text-soft); line-height: 1.4; margin-bottom: 0.5rem;">${form.description}</p>
-        <div style="font-size: 0.78rem; color: #10b981; margin-bottom: 0.8rem; font-weight: 700;">
+        <div style="font-size: 0.78rem; color: var(--emerald-primary); margin-bottom: 0.8rem; font-weight: 700;">
           الحقول المشمولة: ${form.fields.join(' • ')}
         </div>
         <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.4rem; margin-top: auto;">
@@ -2143,19 +2143,19 @@ const FounderPortal = {
     const badge = document.getElementById('activeProviderBadge');
     if (badge) {
       if (isGmail) {
-        badge.style.background = 'rgba(16, 185, 129, 0.2)';
-        badge.style.color = '#34d399';
-        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        badge.style.background = 'rgba(5, 150, 105, 0.12)';
+        badge.style.color = 'var(--emerald-light)';
+        badge.style.borderColor = 'rgba(5, 150, 105, 0.4)';
         badge.innerHTML = `
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-primary); box-shadow: 0 0 8px var(--emerald-primary);"></span>
           <span>المزود النشط: خادم جيميل المباشر المعتمد</span>
         `;
       } else {
-        badge.style.background = 'rgba(56, 189, 248, 0.2)';
-        badge.style.color = '#38bdf8';
-        badge.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        badge.style.background = 'rgba(2, 132, 199, 0.12)';
+        badge.style.color = 'var(--cyan-primary)';
+        badge.style.borderColor = 'rgba(2, 132, 199, 0.4)';
         badge.innerHTML = `
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--cyan-primary); box-shadow: 0 0 8px var(--cyan-primary);"></span>
           <span>المزود النشط: خدمة فايربيز السحابية من غوغل</span>
         `;
       }
@@ -2167,25 +2167,25 @@ const FounderPortal = {
     const badgeFb = document.getElementById('badgeFirebaseStatus');
 
     if (cardGmail) {
-      cardGmail.style.border = isGmail ? '2px solid rgba(16, 185, 129, 0.8)' : '1px solid rgba(255, 255, 255, 0.1)';
-      cardGmail.style.boxShadow = isGmail ? '0 0 20px rgba(16, 185, 129, 0.25)' : 'none';
-      cardGmail.style.background = isGmail ? 'rgba(16, 185, 129, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+      cardGmail.style.border = isGmail ? '2px solid rgba(5, 150, 105, 0.8)' : '1px solid var(--border-glass)';
+      cardGmail.style.boxShadow = isGmail ? '0 0 20px rgba(5, 150, 105, 0.2)' : 'none';
+      cardGmail.style.background = isGmail ? 'rgba(5, 150, 105, 0.08)' : 'var(--glass-inner)';
     }
     if (cardFb) {
-      cardFb.style.border = !isGmail ? '2px solid rgba(56, 189, 248, 0.8)' : '1px solid rgba(255, 255, 255, 0.1)';
-      cardFb.style.boxShadow = !isGmail ? '0 0 20px rgba(56, 189, 248, 0.25)' : 'none';
-      cardFb.style.background = !isGmail ? 'rgba(56, 189, 248, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+      cardFb.style.border = !isGmail ? '2px solid rgba(2, 132, 199, 0.8)' : '1px solid var(--border-glass)';
+      cardFb.style.boxShadow = !isGmail ? '0 0 20px rgba(2, 132, 199, 0.2)' : 'none';
+      cardFb.style.background = !isGmail ? 'rgba(2, 132, 199, 0.08)' : 'var(--glass-inner)';
     }
 
     if (badgeGmail) {
       badgeGmail.textContent = isGmail ? 'نشط ومعتمد حالياً' : 'جاهز للتبديل';
-      badgeGmail.style.background = isGmail ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.1)';
-      badgeGmail.style.color = isGmail ? '#34d399' : '#94a3b8';
+      badgeGmail.style.background = isGmail ? 'rgba(5, 150, 105, 0.18)' : 'rgba(100, 116, 139, 0.12)';
+      badgeGmail.style.color = isGmail ? 'var(--emerald-light)' : 'var(--text-muted)';
     }
     if (badgeFb) {
       badgeFb.textContent = !isGmail ? 'نشط ومعتمد حالياً' : 'جاهز كاحتياط سحابي';
-      badgeFb.style.background = !isGmail ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255, 255, 255, 0.1)';
-      badgeFb.style.color = !isGmail ? '#38bdf8' : '#94a3b8';
+      badgeFb.style.background = !isGmail ? 'rgba(2, 132, 199, 0.18)' : 'rgba(100, 116, 139, 0.12)';
+      badgeFb.style.color = !isGmail ? 'var(--cyan-primary)' : 'var(--text-muted)';
     }
 
     const btnGmail = document.getElementById('btnSwitchGmail');
@@ -2253,10 +2253,10 @@ const FounderPortal = {
     if (container && window.store && typeof window.store.getFeatureFlags === 'function') {
       const flags = window.store.getFeatureFlags();
       container.innerHTML = Object.entries(flags).map(([flag, val]) => `
-        <div style="padding: 1rem; background: rgba(0,0,0,0.25); border: 1px solid ${val ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255,255,255,0.08)'}; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+        <div style="padding: 1rem; background: var(--glass-inner); border: 1px solid ${val ? 'rgba(5, 150, 105, 0.45)' : 'var(--border-subtle)'}; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
           <div>
-            <strong style="color: #ffffff; font-size: 0.9rem; display: block;">${flag}</strong>
-            <div style="font-size: 0.75rem; color: ${val ? '#34d399' : '#94a3b8'}; margin-top: 0.2rem;">${val ? 'مفعلة وتعمل بنجاح' : 'معطلة حالياً'}</div>
+            <strong style="color: var(--text-pure); font-size: 0.9rem; display: block;">${flag}</strong>
+            <div style="font-size: 0.75rem; color: ${val ? 'var(--emerald-primary)' : 'var(--text-muted)'}; margin-top: 0.2rem; font-weight: 600;">${val ? 'مفعلة وتعمل بنجاح' : 'معطلة حالياً'}</div>
           </div>
           <button class="btn-glass ${val ? 'btn-glass-emerald' : 'btn-glass-rose'}" onclick="FounderPortal.toggleFeatureFlag('${flag}', ${!val})" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; white-space: nowrap;">
             ${val ? '✅ مفعل' : '⏸️ إيقاف'}
@@ -2274,14 +2274,14 @@ const FounderPortal = {
       } else {
         deptTbody.innerHTML = depts.map(d => {
           const mgr = d.managerId ? (window.store.getUserById ? window.store.getUserById(d.managerId) : null) : null;
-          const mgrName = mgr ? mgr.fullName : (d.managerName || '<span style="color: #f59e0b;">شاغر</span>');
+          const mgrName = mgr ? mgr.fullName : (d.managerName || '<span style="color: var(--gold-primary);">شاغر</span>');
           const createdDate = d.createdAt ? new Date(d.createdAt).toISOString().slice(0, 10) : '2026-01-01';
           return `
             <tr>
-              <td><code style="color: #00dfd8; font-weight: 700;">${d.id}</code></td>
-              <td><strong style="color: #ffffff;">${d.name}</strong></td>
+              <td><code style="color: var(--cyan-primary); font-weight: 700;">${d.id}</code></td>
+              <td><strong style="color: var(--text-pure);">${d.name}</strong></td>
               <td><span class="badge-role badge-role-supervisor">${d.code}</span></td>
-              <td><span style="font-weight: 900; background: rgba(0, 223, 216, 0.2); color: #00dfd8; padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(0,223,216,0.4);">${d.logoText || 'ق'}</span></td>
+              <td><span style="font-weight: 900; background: rgba(2, 132, 199, 0.12); color: var(--cyan-primary); padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(2, 132, 199, 0.35);">${d.logoText || 'ق'}</span></td>
               <td>${mgrName}</td>
               <td><span class="badge-role ${d.status === 'ACTIVE' ? 'badge-role-founder' : 'badge-role-director'}">${d.status === 'ACTIVE' ? 'نشط وفعال' : 'معطل'}</span></td>
               <td style="direction: ltr; text-align: right; font-family: monospace;">${createdDate}</td>
@@ -2310,12 +2310,12 @@ const FounderPortal = {
       } else {
         apprTbody.innerHTML = filtered.map(e => `
           <tr>
-            <td><strong style="font-family: monospace; color: #f59e0b; font-size: 0.95rem;">${e.id}</strong></td>
-            <td><strong style="color: #ffffff;">${e.name}</strong></td>
-            <td style="color: #cbd5e1;">${e.departmentId || 'south-production-dept'}</td>
-            <td style="color: #94a3b8;">${e.motherName || '-'}</td>
-            <td style="direction: ltr; text-align: right; font-family: monospace; color: #38bdf8;">${e.unifiedCardNumber || '-'}</td>
-            <td style="color: #e2e8f0;">${e.jobGrade || '-'} / ${e.jobStage || '-'}</td>
+            <td><strong style="font-family: monospace; color: var(--gold-primary); font-size: 0.95rem;">${e.id}</strong></td>
+            <td><strong style="color: var(--text-pure);">${e.name}</strong></td>
+            <td style="color: var(--text-soft);">${e.departmentId || 'south-production-dept'}</td>
+            <td style="color: var(--text-muted);">${e.motherName || '-'}</td>
+            <td style="direction: ltr; text-align: right; font-family: monospace; color: var(--cyan-primary); font-weight: 600;">${e.unifiedCardNumber || '-'}</td>
+            <td style="color: var(--text-soft);">${e.jobGrade || '-'} / ${e.jobStage || '-'}</td>
             <td>
               <button class="btn-glass btn-glass-rose" onclick="FounderPortal.deleteApprovedEmployee('${e.id}')" style="padding: 0.25rem 0.6rem; font-size: 0.78rem; white-space: nowrap;">✕ حذف</button>
             </td>
@@ -2337,10 +2337,10 @@ const FounderPortal = {
           const deptName = window.store && window.store.getDepartmentById ? (window.store.getDepartmentById(u.departmentId)?.name || u.departmentId) : (u.departmentId || 'south-production-dept');
           return `
             <tr>
-              <td><strong style="font-family: monospace; color: #f59e0b;">${u.employeeId || '-'}</strong></td>
-              <td><strong style="color: #ffffff;">${u.fullName || '-'}</strong></td>
-              <td style="direction: ltr; text-align: right; font-family: monospace; color: #94a3b8;">${u.email || '-'}</td>
-              <td style="color: #cbd5e1;">${deptName}</td>
+              <td><strong style="font-family: monospace; color: var(--gold-primary);">${u.employeeId || '-'}</strong></td>
+              <td><strong style="color: var(--text-pure);">${u.fullName || '-'}</strong></td>
+              <td style="direction: ltr; text-align: right; font-family: monospace; color: var(--text-muted);">${u.email || '-'}</td>
+              <td style="color: var(--text-soft);">${deptName}</td>
               <td><span class="badge-role badge-role-supervisor">${u.role || 'STAFF'}</span></td>
               <td><span class="badge-role ${u.status === 'APPROVED' ? 'badge-role-founder' : 'badge-role-director'}">${u.status || 'PENDING'}</span></td>
               <td>
