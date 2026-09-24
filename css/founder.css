@@ -295,27 +295,10 @@ body {
   letter-spacing: 0.2px;
 }
 
-/* شارة النمط الكريمي المعتمد في الترويسة */
+/* إلغاء وإخفاء زر تبديل النمط تماماً لاعتماد النمط الملكي الكريمي كوضع دائم ووحيد */
+#themeToggleBtn,
 .founder-cream-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  height: 34px;
-  padding: 0 0.95rem;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.95) 100%);
-  border: 1.2px solid rgba(217, 119, 6, 0.45);
-  color: #92400e;
-  font-size: 0.82rem;
-  font-weight: 800;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12);
-  cursor: default;
-}
-
-.founder-cream-badge svg {
-  width: 16px;
-  height: 16px;
-  color: #b45309;
+  display: none !important;
 }
 
 /* ==============================================================================
