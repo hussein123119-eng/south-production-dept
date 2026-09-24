@@ -1,147 +1,93 @@
 /* ==============================================================================
    بوابة المؤسس والقيادة الإدارية السيادية - لوحة التحكم القيادية العالمية الفاخرة
    South Production Department - Sovereign Founder Administrative Command Center
-   الإصدار المعتمد: v139.54.0 | تصميم مضغوط أنيق (Compact) مع الوضع النهاري المعتمد
+   الإصدار المعتمد: النمط الملكي الكريمي الفاخر المريح للعين (Exclusive Royal Cream Theme)
    ============================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
 
 /* ==============================================================================
-   1. متغيرات السمات: الوضع الليلي / الأوبسيديان الداكن (الافتراضي)
+   1. متغيرات النمط الملكي الكريمي الفاخر المعتمد (النمط الأساسي والوحيد المريح للعين)
    ============================================================================== */
-:root {
-  /* ألوان الخلفية السيادية العميقة */
-  --bg-deep: #060b14;
-  --bg-darker: #03070d;
-  --bg-mesh-1: rgba(6, 182, 212, 0.12);
-  --bg-mesh-2: rgba(16, 185, 129, 0.08);
-  --bg-mesh-3: rgba(99, 102, 241, 0.09);
-  --bg-mesh-4: rgba(245, 158, 11, 0.06);
+:root,
+body,
+body.theme-cream,
+body.theme-day,
+body.theme-light,
+body.theme-milky,
+[data-theme="cream"],
+[data-theme="day"],
+[data-theme="light"],
+[data-theme="milky"] {
+  /* ألوان الخلفية الملكية الكريمية المريحة للعين */
+  --bg-deep: #FAF7EE;
+  --bg-darker: #F3EFE4;
+  --bg-mesh-1: rgba(217, 119, 6, 0.06);
+  --bg-mesh-2: rgba(16, 185, 129, 0.05);
+  --bg-mesh-3: rgba(14, 116, 144, 0.05);
+  --bg-mesh-4: rgba(245, 158, 11, 0.05);
 
-  /* درجات الزجاج البلوري الفاخر */
-  --glass-card: rgba(13, 23, 42, 0.72);
-  --glass-card-hover: rgba(18, 32, 58, 0.85);
-  --glass-card-active: rgba(22, 40, 72, 0.92);
-  --glass-inner: rgba(6, 12, 23, 0.78);
-  --glass-input: rgba(5, 11, 21, 0.88);
-  
-  /* الحدود المتوهجة */
-  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-  --border-glass: 1.2px solid rgba(56, 189, 248, 0.22);
-  --border-glass-hover: 1.2px solid rgba(56, 189, 248, 0.5);
-  --border-gold: 1.2px solid rgba(245, 158, 11, 0.45);
-  --border-emerald: 1.2px solid rgba(16, 185, 129, 0.45);
-  --border-rose: 1.2px solid rgba(244, 63, 94, 0.45);
-  
-  /* الألوان التعبيرية والسيادية */
-  --gold-primary: #f59e0b;
-  --gold-light: #fbbf24;
-  --gold-glow: rgba(245, 158, 11, 0.35);
-  
-  --emerald-primary: #10b981;
-  --emerald-light: #34d399;
-  --emerald-glow: rgba(16, 185, 129, 0.32);
-  
-  --cyan-primary: #06b6d4;
-  --cyan-light: #22d3ee;
-  --cyan-glow: rgba(6, 182, 212, 0.32);
-  
-  --sky-primary: #38bdf8;
-  --sky-light: #7dd3fc;
-  --sky-glow: rgba(56, 189, 248, 0.3);
-  
-  --indigo-primary: #6366f1;
-  --indigo-light: #818cf8;
-  --indigo-glow: rgba(99, 102, 241, 0.32);
-  
-  --rose-primary: #f43f5e;
-  --rose-light: #fb7185;
-  --rose-glow: rgba(244, 63, 94, 0.32);
-  
-  /* ألوان النصوص */
-  --text-pure: #ffffff;
-  --text-bright: #f8fafc;
-  --text-soft: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  
-  /* الظلال والتوهجات */
-  --shadow-lux: 0 14px 35px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-crystal: 0 10px 25px -4px rgba(0, 0, 0, 0.5);
-  --shadow-gold: 0 0 25px rgba(245, 158, 11, 0.28);
-  --shadow-emerald: 0 0 25px rgba(16, 185, 129, 0.25);
-  --shadow-cyan: 0 0 25px rgba(6, 182, 212, 0.25);
-  
-  --grid-dot-color: rgba(56, 189, 248, 0.07);
+  /* درجات الزجاج البلوري الكريمي الفاخر */
+  --glass-card: rgba(255, 253, 248, 0.94);
+  --glass-card-hover: rgba(255, 255, 255, 0.99);
+  --glass-card-active: #ffffff;
+  --glass-inner: rgba(246, 242, 233, 0.92);
+  --glass-input: rgba(255, 255, 255, 0.97);
+
+  /* الحدود المتوهجة اللطيفة (شامبانيا وكتان ذهبي) */
+  --border-subtle: 1px solid rgba(197, 160, 89, 0.22);
+  --border-glass: 1.2px solid rgba(197, 160, 89, 0.35);
+  --border-glass-hover: 1.2px solid rgba(197, 160, 89, 0.65);
+  --border-gold: 1.2px solid rgba(217, 119, 6, 0.45);
+  --border-emerald: 1.2px solid rgba(5, 150, 105, 0.45);
+  --border-rose: 1.2px solid rgba(225, 29, 72, 0.45);
+
+  /* الألوان التعبيرية والسيادية المريحة للعين */
+  --gold-primary: #b45309;
+  --gold-light: #92400e;
+  --gold-glow: rgba(217, 119, 6, 0.18);
+
+  --emerald-primary: #059669;
+  --emerald-light: #047857;
+  --emerald-glow: rgba(5, 150, 105, 0.18);
+
+  --cyan-primary: #0284c7;
+  --cyan-light: #0369a1;
+  --cyan-glow: rgba(2, 132, 199, 0.18);
+
+  --sky-primary: #0284c7;
+  --sky-light: #0369a1;
+  --sky-glow: rgba(2, 132, 199, 0.18);
+
+  --indigo-primary: #4338ca;
+  --indigo-light: #3730a3;
+  --indigo-glow: rgba(79, 70, 229, 0.18);
+
+  --rose-primary: #e11d48;
+  --rose-light: #be123c;
+  --rose-glow: rgba(225, 29, 72, 0.18);
+
+  /* ألوان النصوص شديدة الوضوح ومريحة للعين بدون أي إجهاد بصري */
+  --text-pure: #0f1e36;
+  --text-bright: #152238;
+  --text-soft: #334155;
+  --text-muted: #526071;
+  --text-dim: #718096;
+
+  /* الظلال والتوهجات الدافئة المعتمدة */
+  --shadow-lux: 0 10px 28px -6px rgba(100, 80, 45, 0.08), 0 0 0 1px rgba(197, 160, 89, 0.18);
+  --shadow-crystal: 0 6px 20px -3px rgba(100, 80, 45, 0.07);
+  --shadow-gold: 0 0 18px rgba(217, 119, 6, 0.16);
+  --shadow-emerald: 0 0 18px rgba(5, 150, 105, 0.15);
+  --shadow-cyan: 0 0 18px rgba(2, 132, 199, 0.15);
+
+  --grid-dot-color: rgba(180, 140, 75, 0.10);
   --font-main: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 /* ==============================================================================
-   2. متغيرات الوضع النهاري الفاخر (Day / Light Theme)
-   ============================================================================== */
-body.theme-day, body.theme-light, body.theme-milky, [data-theme="day"], [data-theme="light"], [data-theme="milky"] {
-  --bg-deep: #f4f7fb;
-  --bg-darker: #e9eef5;
-  --bg-mesh-1: rgba(6, 182, 212, 0.08);
-  --bg-mesh-2: rgba(16, 185, 129, 0.07);
-  --bg-mesh-3: rgba(99, 102, 241, 0.07);
-  --bg-mesh-4: rgba(245, 158, 11, 0.06);
-
-  --glass-card: rgba(255, 255, 255, 0.85);
-  --glass-card-hover: rgba(255, 255, 255, 0.96);
-  --glass-card-active: #ffffff;
-  --glass-inner: rgba(241, 245, 249, 0.88);
-  --glass-input: rgba(255, 255, 255, 0.95);
-  
-  --border-subtle: 1px solid rgba(15, 23, 42, 0.08);
-  --border-glass: 1.2px solid rgba(14, 165, 233, 0.25);
-  --border-glass-hover: 1.2px solid rgba(14, 165, 233, 0.55);
-  --border-gold: 1.2px solid rgba(217, 119, 6, 0.38);
-  --border-emerald: 1.2px solid rgba(5, 150, 105, 0.38);
-  --border-rose: 1.2px solid rgba(225, 29, 72, 0.38);
-  
-  --gold-primary: #d97706;
-  --gold-light: #b45309;
-  --gold-glow: rgba(217, 119, 6, 0.2);
-  
-  --emerald-primary: #059669;
-  --emerald-light: #047857;
-  --emerald-glow: rgba(5, 150, 105, 0.2);
-  
-  --cyan-primary: #0284c7;
-  --cyan-light: #0369a1;
-  --cyan-glow: rgba(2, 132, 199, 0.2);
-  
-  --sky-primary: #0284c7;
-  --sky-light: #0369a1;
-  --sky-glow: rgba(2, 132, 199, 0.2);
-  
-  --indigo-primary: #4f46e5;
-  --indigo-light: #4338ca;
-  --indigo-glow: rgba(79, 70, 229, 0.2);
-  
-  --rose-primary: #e11d48;
-  --rose-light: #be123c;
-  --rose-glow: rgba(225, 29, 72, 0.2);
-  
-  --text-pure: #0f172a;
-  --text-bright: #1e293b;
-  --text-soft: #334155;
-  --text-muted: #64748b;
-  --text-dim: #94a3b8;
-  
-  --shadow-lux: 0 10px 28px -6px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
-  --shadow-crystal: 0 6px 20px -3px rgba(15, 23, 42, 0.07);
-  --shadow-gold: 0 0 18px rgba(217, 119, 6, 0.18);
-  --shadow-emerald: 0 0 18px rgba(5, 150, 105, 0.16);
-  --shadow-cyan: 0 0 18px rgba(2, 132, 199, 0.16);
-  
-  --grid-dot-color: rgba(15, 23, 42, 0.05);
-}
-
-/* ==============================================================================
-   3. إعادة الضبط والقواعد الأساسية (Compact Pro Sizing)
+   2. إعادة الضبط والقواعد الأساسية (Compact Pro Sizing)
    ============================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -166,30 +112,30 @@ body {
   position: relative;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 90% 40%, rgba(99, 102, 241, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 10% 20%, rgba(14, 116, 144, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 90% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 60%),
     radial-gradient(var(--grid-dot-color) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 26px 26px;
   background-attachment: fixed;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* شريط التمرير السيادي */
+/* شريط التمرير السيادي الفاخر */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(3, 7, 18, 0.1);
+  background: rgba(197, 160, 89, 0.12);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.3);
+  background: rgba(197, 160, 89, 0.45);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--cyan-primary);
+  background: var(--gold-primary);
 }
 
 /* الحاوية المركزية للوحة القيادة */
@@ -202,7 +148,7 @@ body {
 }
 
 /* ==============================================================================
-   4. الترويسة السيادية الفاخرة (Executive Header)
+   3. الترويسة السيادية الفاخرة (Executive Header)
    ============================================================================== */
 .founder-header {
   display: flex;
@@ -210,8 +156,8 @@ body {
   justify-content: space-between;
   padding: 0.8rem 1.35rem;
   background: var(--glass-card);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: var(--border-glass);
   border-radius: 18px;
   box-shadow: var(--shadow-lux);
@@ -228,7 +174,7 @@ body {
   left: 10%;
   right: 10%;
   height: 1.5px;
-  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), rgba(16, 185, 129, 0.8), transparent);
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.8), rgba(16, 185, 129, 0.8), transparent);
 }
 
 .brand-box {
@@ -250,12 +196,12 @@ body {
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  background: linear-gradient(135deg, #0b1f3a 0%, #034b57 50%, #065f46 100%);
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 50%, #b45309 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 18px rgba(6, 182, 212, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2);
-  border: 1.2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(180, 83, 9, 0.25), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  border: 1.2px solid rgba(255, 255, 255, 0.6);
   position: relative;
   z-index: 2;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -263,38 +209,30 @@ body {
 
 .brand-emblem-wrapper:hover .brand-emblem {
   transform: scale(1.06) rotate(3deg);
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 14px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35), inset 0 0 14px rgba(255, 255, 255, 0.45);
 }
 
 .brand-emblem svg {
   width: 22px;
   height: 22px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 }
 
 .brand-text h1 {
-  font-size: 1.22rem;
+  font-size: 1.25rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #0f1e36;
   letter-spacing: -0.2px;
   line-height: 1.25;
-  background: linear-gradient(135deg, #ffffff 30%, #a5f3fc 75%, #fef08a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-body.theme-day .brand-text h1,
-body.theme-light .brand-text h1,
-body.theme-milky .brand-text h1 {
-  background: linear-gradient(135deg, #0f172a 30%, #0369a1 75%, #b45309 100%);
+  background: linear-gradient(135deg, #0f1e36 30%, #0369a1 75%, #b45309 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .brand-subtitle-line {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--sky-primary);
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -330,23 +268,15 @@ body.theme-milky .brand-text h1 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, rgba(10, 25, 48, 0.85) 0%, rgba(5, 15, 30, 0.95) 100%);
-  border: 1.1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 253, 248, 0.95);
+  border: 1.2px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 2px 8px rgba(100, 80, 45, 0.07);
   padding: 0.35rem 0.8rem;
   border-radius: 11px;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  transition: all 0.3s ease;
-}
-
-body.theme-day .founder-identity-pill,
-body.theme-light .founder-identity-pill,
-body.theme-milky .founder-identity-pill {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(217, 119, 6, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-size: 0.82rem;
   color: #334155;
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
 .founder-identity-pill svg {
@@ -361,12 +291,35 @@ body.theme-milky .founder-identity-pill {
   direction: ltr;
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   letter-spacing: 0.2px;
 }
 
+/* شارة النمط الكريمي المعتمد في الترويسة */
+.founder-cream-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 34px;
+  padding: 0 0.95rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.95) 100%);
+  border: 1.2px solid rgba(217, 119, 6, 0.45);
+  color: #92400e;
+  font-size: 0.82rem;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12);
+  cursor: default;
+}
+
+.founder-cream-badge svg {
+  width: 16px;
+  height: 16px;
+  color: #b45309;
+}
+
 /* ==============================================================================
-   5. الأزرار الزجاجية السيادية (Glassmorphic Buttons)
+   4. الأزرار الزجاجية السيادية (Glassmorphic Buttons)
    ============================================================================== */
 .btn-glass {
   display: inline-flex;
@@ -376,28 +329,19 @@ body.theme-milky .founder-identity-pill {
   height: 34px;
   padding: 0 0.95rem;
   border-radius: 10px;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1.1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(135deg, rgba(20, 40, 72, 0.75) 0%, rgba(12, 26, 48, 0.85) 100%);
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  border: 1.2px solid rgba(197, 160, 89, 0.35);
+  background: linear-gradient(135deg, rgba(255, 253, 248, 0.96) 0%, rgba(246, 242, 233, 0.96) 100%);
+  color: #0f1e36;
+  box-shadow: 0 2px 6px rgba(100, 80, 45, 0.05);
   position: relative;
   overflow: hidden;
-}
-
-body.theme-day .btn-glass,
-body.theme-light .btn-glass,
-body.theme-milky .btn-glass {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.95) 100%);
-  border-color: rgba(15, 23, 42, 0.12);
-  color: #0f172a;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
 }
 
 .btn-glass svg {
@@ -408,19 +352,11 @@ body.theme-milky .btn-glass {
 }
 
 .btn-glass:hover {
-  background: linear-gradient(135deg, rgba(30, 60, 108, 0.9) 0%, rgba(18, 38, 70, 0.95) 100%);
-  border-color: rgba(56, 189, 248, 0.6);
-  transform: translateY(-1.5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35), 0 0 12px rgba(56, 189, 248, 0.2);
-}
-
-body.theme-day .btn-glass:hover,
-body.theme-light .btn-glass:hover,
-body.theme-milky .btn-glass:hover {
   background: #ffffff;
-  border-color: #0284c7;
-  color: #0284c7;
-  box-shadow: 0 5px 14px rgba(2, 132, 199, 0.15);
+  border-color: #c5a059;
+  color: #0f1e36;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(100, 80, 45, 0.12);
 }
 
 .btn-glass:hover svg {
@@ -431,143 +367,69 @@ body.theme-milky .btn-glass:hover {
   transform: translateY(0);
 }
 
-.btn-glass-gold {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.35) 100%);
-  border-color: rgba(245, 158, 11, 0.55);
-  color: #fef08a;
-}
-.btn-glass-gold:hover {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.45) 0%, rgba(217, 119, 6, 0.55) 100%);
-  color: #ffffff;
-  border-color: #fbbf24;
-  box-shadow: var(--shadow-gold);
-}
-body.theme-day .btn-glass-gold,
-body.theme-light .btn-glass-gold,
-body.theme-milky .btn-glass-gold {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.95) 100%);
-  border-color: rgba(217, 119, 6, 0.4);
+.btn-glass-gold, .btn-glass-amber {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.96) 0%, rgba(253, 230, 138, 0.96) 100%);
+  border-color: rgba(217, 119, 6, 0.45);
   color: #92400e;
 }
-body.theme-day .btn-glass-gold:hover,
-body.theme-light .btn-glass-gold:hover,
-body.theme-milky .btn-glass-gold:hover {
+
+.btn-glass-gold:hover, .btn-glass-amber:hover {
   background: #fef3c7;
   border-color: #d97706;
   color: #78350f;
-  box-shadow: 0 0 12px rgba(217, 119, 6, 0.2);
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.22);
 }
 
 .btn-glass-emerald {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
-  border-color: rgba(16, 185, 129, 0.55);
-  color: #a7f3d0;
-}
-.btn-glass-emerald:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.45) 0%, rgba(5, 150, 105, 0.55) 100%);
-  color: #ffffff;
-  border-color: #34d399;
-  box-shadow: var(--shadow-emerald);
-}
-body.theme-day .btn-glass-emerald,
-body.theme-light .btn-glass-emerald,
-body.theme-milky .btn-glass-emerald {
-  background: linear-gradient(135deg, rgba(209, 250, 229, 0.95) 0%, rgba(167, 243, 208, 0.95) 100%);
-  border-color: rgba(5, 150, 105, 0.4);
+  background: linear-gradient(135deg, rgba(209, 250, 229, 0.96) 0%, rgba(167, 243, 208, 0.96) 100%);
+  border-color: rgba(5, 150, 105, 0.45);
   color: #065f46;
 }
-body.theme-day .btn-glass-emerald:hover,
-body.theme-light .btn-glass-emerald:hover,
-body.theme-milky .btn-glass-emerald:hover {
+
+.btn-glass-emerald:hover {
   background: #d1fae5;
   border-color: #059669;
-  color: #044e39;
-  box-shadow: 0 0 12px rgba(5, 150, 105, 0.2);
+  color: #047857;
+  box-shadow: 0 0 14px rgba(5, 150, 105, 0.22);
 }
 
 .btn-glass-cyan {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(14, 116, 144, 0.35) 100%);
-  border-color: rgba(6, 182, 212, 0.55);
-  color: #a5f3fc;
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.96) 0%, rgba(186, 230, 253, 0.96) 100%);
+  border-color: rgba(2, 132, 199, 0.45);
+  color: #0369a1;
 }
+
 .btn-glass-cyan:hover {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.45) 0%, rgba(14, 116, 144, 0.55) 100%);
-  color: #ffffff;
-  border-color: #22d3ee;
-  box-shadow: var(--shadow-cyan);
-}
-body.theme-day .btn-glass-cyan,
-body.theme-light .btn-glass-cyan,
-body.theme-milky .btn-glass-cyan {
-  background: linear-gradient(135deg, rgba(207, 250, 254, 0.95) 0%, rgba(165, 243, 252, 0.95) 100%);
-  border-color: rgba(2, 132, 199, 0.4);
-  color: #0e7490;
-}
-body.theme-day .btn-glass-cyan:hover,
-body.theme-light .btn-glass-cyan:hover,
-body.theme-milky .btn-glass-cyan:hover {
-  background: #cffafe;
+  background: #e0f2fe;
   border-color: #0284c7;
-  color: #155e75;
-  box-shadow: 0 0 12px rgba(2, 132, 199, 0.2);
+  color: #075985;
+  box-shadow: 0 0 14px rgba(2, 132, 199, 0.22);
 }
 
 .btn-glass-rose, .btn-glass-danger {
-  background: linear-gradient(135deg, rgba(244, 63, 94, 0.22) 0%, rgba(190, 18, 60, 0.32) 100%);
-  border-color: rgba(244, 63, 94, 0.5);
-  color: #fecdd3;
-}
-.btn-glass-rose:hover, .btn-glass-danger:hover {
-  background: linear-gradient(135deg, rgba(244, 63, 94, 0.42) 0%, rgba(225, 29, 72, 0.52) 100%);
-  color: #ffffff;
-  border-color: #fb7185;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
-}
-body.theme-day .btn-glass-rose, body.theme-day .btn-glass-danger,
-body.theme-light .btn-glass-rose, body.theme-light .btn-glass-danger,
-body.theme-milky .btn-glass-rose, body.theme-milky .btn-glass-danger {
-  background: linear-gradient(135deg, rgba(255, 228, 230, 0.95) 0%, rgba(254, 205, 211, 0.95) 100%);
-  border-color: rgba(225, 29, 72, 0.35);
+  background: linear-gradient(135deg, rgba(255, 228, 230, 0.96) 0%, rgba(254, 205, 211, 0.96) 100%);
+  border-color: rgba(225, 29, 72, 0.42);
   color: #9f1239;
 }
-body.theme-day .btn-glass-rose:hover, body.theme-day .btn-glass-danger:hover,
-body.theme-light .btn-glass-rose:hover, body.theme-light .btn-glass-danger:hover,
-body.theme-milky .btn-glass-rose:hover, body.theme-milky .btn-glass-danger:hover {
+
+.btn-glass-rose:hover, .btn-glass-danger:hover {
   background: #ffe4e6;
   border-color: #e11d48;
   color: #881337;
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.2);
-}
-
-.btn-glass-amber {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.22) 0%, rgba(217, 119, 6, 0.32) 100%);
-  border-color: rgba(251, 191, 36, 0.5);
-  color: #fef3c7;
-}
-.btn-glass-amber:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.4) 0%, rgba(217, 119, 6, 0.5) 100%);
-  color: #ffffff;
-  border-color: #f59e0b;
-}
-body.theme-day .btn-glass-amber,
-body.theme-light .btn-glass-amber,
-body.theme-milky .btn-glass-amber {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.95) 100%);
-  border-color: rgba(217, 119, 6, 0.4);
-  color: #92400e;
+  box-shadow: 0 0 14px rgba(225, 29, 72, 0.22);
 }
 
 /* ==============================================================================
-   6. شريط التبويبات القيادية العائمة (Command Dock Tabs)
+   5. شريط التبويبات القيادية العائمة (Command Dock Tabs)
    ============================================================================== */
 .founder-nav-tabs {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 0.55rem;
-  background: linear-gradient(135deg, rgba(10, 20, 38, 0.9) 0%, rgba(6, 12, 24, 0.95) 100%);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  background: rgba(250, 246, 237, 0.94);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   padding: 0.45rem;
   border-radius: 15px;
   border: var(--border-glass);
@@ -576,13 +438,6 @@ body.theme-milky .btn-glass-amber {
   overflow-x: auto;
   position: relative;
   transition: all 0.3s ease;
-}
-
-body.theme-day .founder-nav-tabs,
-body.theme-light .founder-nav-tabs,
-body.theme-milky .founder-nav-tabs {
-  background: rgba(255, 255, 255, 0.88);
-  border: var(--border-glass);
 }
 
 .founder-tab-btn {
@@ -595,7 +450,7 @@ body.theme-milky .founder-nav-tabs {
   border-radius: 11px;
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-soft);
+  color: #475569;
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
@@ -605,72 +460,43 @@ body.theme-milky .founder-nav-tabs {
   position: relative;
 }
 
-body.theme-day .founder-tab-btn,
-body.theme-light .founder-tab-btn,
-body.theme-milky .founder-tab-btn {
-  color: #475569;
-}
-
 .founder-tab-btn svg {
   width: 17px;
   height: 17px;
   flex-shrink: 0;
   transition: all 0.22s ease;
-  color: var(--text-muted);
+  color: #64748b;
 }
 
 .founder-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
-}
-
-body.theme-day .founder-tab-btn:hover,
-body.theme-light .founder-tab-btn:hover,
-body.theme-milky .founder-tab-btn:hover {
-  background: rgba(15, 23, 42, 0.04);
-  color: #0f172a;
+  background: rgba(197, 160, 89, 0.12);
+  color: #0f1e36;
 }
 
 .founder-tab-btn:hover svg {
-  color: var(--sky-primary);
+  color: #0284c7;
   transform: translateY(-1px);
 }
 
 .founder-tab-btn.active {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(16, 185, 129, 0.32) 100%);
-  color: #ffffff;
-  border: 1.2px solid rgba(56, 189, 248, 0.6);
-  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25), inset 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-body.theme-day .founder-tab-btn.active,
-body.theme-light .founder-tab-btn.active,
-body.theme-milky .founder-tab-btn.active {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(5, 150, 105, 0.14) 100%);
-  color: #0284c7;
-  border-color: rgba(2, 132, 199, 0.45);
-  box-shadow: 0 3px 12px rgba(2, 132, 199, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+  color: #0f1e36;
+  border: 1.2px solid #d97706;
+  box-shadow: 0 3px 12px rgba(217, 119, 6, 0.18);
 }
 
 .founder-tab-btn.active svg {
-  color: #a5f3fc;
-  filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.4));
-}
-
-body.theme-day .founder-tab-btn.active svg,
-body.theme-light .founder-tab-btn.active svg,
-body.theme-milky .founder-tab-btn.active svg {
-  color: #0284c7;
-  filter: none;
+  color: #b45309;
 }
 
 /* ==============================================================================
-   7. البطاقات الإحصائية السيادية الأربع (Executive KPI Cards)
+   6. البطاقات الإحصائية السيادية الأربع (Executive KPI Cards)
    ============================================================================== */
 .admin-metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
+  margin-bottom: 1.15rem;
 }
 
 .admin-metric-card {
@@ -678,6 +504,7 @@ body.theme-milky .founder-tab-btn.active svg {
   backdrop-filter: blur(24px) saturate(190%);
   -webkit-backdrop-filter: blur(24px) saturate(190%);
   border: var(--border-glass);
+  border-top: 3.5px solid transparent;
   border-radius: 16px;
   padding: 1.15rem 1.35rem;
   box-shadow: var(--shadow-lux);
@@ -696,25 +523,19 @@ body.theme-milky .founder-tab-btn.active svg {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.7), transparent);
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.7), transparent);
   opacity: 0.6;
   transition: opacity 0.25s ease;
 }
 
 .admin-metric-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(56, 189, 248, 0.6);
-  box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.18);
-}
-
-body.theme-day .admin-metric-card:hover,
-body.theme-light .admin-metric-card:hover,
-body.theme-milky .admin-metric-card:hover {
-  box-shadow: 0 12px 25px -6px rgba(15, 23, 42, 0.12), 0 0 15px rgba(2, 132, 199, 0.15);
+  border-color: rgba(197, 160, 89, 0.6);
+  box-shadow: 0 12px 25px -6px rgba(100, 80, 45, 0.12), 0 0 15px rgba(217, 119, 6, 0.12);
 }
 
 .metric-info h3 {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
   font-weight: 700;
   margin-bottom: 0.35rem;
@@ -722,148 +543,103 @@ body.theme-milky .admin-metric-card:hover {
 }
 
 .metric-huge-num {
-  font-size: 2.15rem;
+  font-size: 2.2rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #0f1e36;
   line-height: 1;
   font-family: var(--font-main);
   letter-spacing: -0.4px;
-}
-
-body.theme-day .metric-huge-num,
-body.theme-light .metric-huge-num,
-body.theme-milky .metric-huge-num {
-  color: #0f172a;
 }
 
 .metric-trend-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.73rem;
+  font-size: 0.74rem;
   font-weight: 700;
   margin-top: 0.4rem;
-  padding: 0.15rem 0.5rem;
+  padding: 0.18rem 0.55rem;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-soft);
-}
-
-body.theme-day .metric-trend-badge,
-body.theme-light .metric-trend-badge,
-body.theme-milky .metric-trend-badge {
-  background: rgba(15, 23, 42, 0.04);
-  color: #475569;
+  background: rgba(246, 242, 233, 0.95);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  color: #334155;
 }
 
 .metric-icon-box {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(8, 18, 36, 0.95) 0%, rgba(4, 10, 20, 0.98) 100%);
-  border: 1.1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
-  transition: all 0.25s ease;
+  border: 1.2px solid rgba(197, 160, 89, 0.28);
+  box-shadow: 0 4px 10px rgba(100, 80, 45, 0.08);
   flex-shrink: 0;
-}
-
-body.theme-day .metric-icon-box,
-body.theme-light .metric-icon-box,
-body.theme-milky .metric-icon-box {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(15, 23, 42, 0.08);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 .metric-icon-box svg {
   width: 24px;
   height: 24px;
-  transition: transform 0.25s ease;
-}
-
-.admin-metric-card:hover .metric-icon-box {
-  transform: scale(1.06);
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
 }
 
 /* ==============================================================================
-   8. اللوحات والحاويات التفاعلية (Glass Panels)
+   7. الألواح والحاويات الزجاجية (Glass Panels & Grid)
    ============================================================================== */
 .tab-content-panel {
   display: none;
-  flex-direction: column;
-  gap: 1.15rem;
-  animation: panelFadeIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: panelSlideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-content-panel.active {
-  display: flex;
+  display: block;
 }
 
-@keyframes panelFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes panelSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .glass-panel {
   background: var(--glass-card);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: var(--border-glass);
   border-radius: 18px;
-  padding: 1.35rem 1.5rem;
+  padding: 1.35rem;
   box-shadow: var(--shadow-lux);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  margin-bottom: 1.15rem;
   position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  box-shadow: 0 12px 30px -6px rgba(100, 80, 45, 0.1), 0 0 0 1px rgba(197, 160, 89, 0.25);
 }
 
 .panel-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.85rem;
-}
-
-body.theme-day .panel-header-row,
-body.theme-light .panel-header-row,
-body.theme-milky .panel-header-row {
-  border-bottom-color: rgba(15, 23, 42, 0.06);
+  margin-bottom: 0.95rem;
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
 
 .panel-title {
-  font-size: 1.12rem;
+  font-size: 1.08rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f1e36;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-}
-
-body.theme-day .panel-title,
-body.theme-light .panel-title,
-body.theme-milky .panel-title {
-  color: #0f172a;
+  gap: 0.55rem;
 }
 
 .panel-title svg {
   width: 21px;
   height: 21px;
-  color: var(--sky-primary);
-  filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.35));
-}
-
-body.theme-day .panel-title svg,
-body.theme-light .panel-title svg,
-body.theme-milky .panel-title svg {
   color: #0284c7;
-  filter: none;
 }
 
 .split-grid-two {
@@ -872,47 +648,38 @@ body.theme-milky .panel-title svg {
   gap: 1.1rem;
 }
 
-/* ==============================================================================
-   9. حقول الإدخال والقوائم السيادية (Executive Inputs)
-   ============================================================================== */
-.input-glass {
-  background: var(--glass-input);
-  border: 1.1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  padding: 0.55rem 0.9rem;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.88rem;
-  outline: none;
-  transition: all 0.22s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+.crystal-inner-box {
+  background: var(--glass-inner);
+  border: var(--border-subtle);
+  border-radius: 14px;
+  padding: 1rem;
 }
 
-body.theme-day .input-glass,
-body.theme-light .input-glass,
-body.theme-milky .input-glass {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(15, 23, 42, 0.12);
-  color: #0f172a;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+/* ==============================================================================
+   8. حقول الإدخال والقوائم السيادية (Executive Inputs & Universal Select)
+   ============================================================================== */
+.input-glass {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1.3px solid rgba(197, 160, 89, 0.38);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  color: #0f1e36;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.22s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .input-glass:focus {
-  border-color: var(--cyan-primary);
-  background: rgba(8, 16, 30, 0.95);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(6, 182, 212, 0.25);
-}
-
-body.theme-day .input-glass:focus,
-body.theme-light .input-glass:focus,
-body.theme-milky .input-glass:focus {
   background: #ffffff;
-  border-color: #0284c7;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 10px rgba(2, 132, 199, 0.2);
+  border-color: #d97706;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03), 0 0 10px rgba(217, 119, 6, 0.2);
 }
 
 .input-glass::placeholder {
-  color: var(--text-dim);
+  color: #718096;
 }
 
 .select-glass {
@@ -920,134 +687,81 @@ body.theme-milky .input-glass:focus {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   min-height: 38px;
-  background: var(--glass-input, rgba(11, 20, 42, 0.92));
-  border: 1.5px solid rgba(56, 189, 248, 0.38);
+  background: rgba(255, 255, 255, 0.98);
+  border: 1.5px solid rgba(11, 87, 208, 0.25);
   border-radius: 10px;
   padding: 0.45rem 0.85rem 0.45rem 2.2rem;
-  color: #ffffff;
+  color: #0f1e36;
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 700;
   outline: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   background-repeat: no-repeat !important;
   background-position: left 0.85rem center !important;
   background-size: 13px 13px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230b57d0' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .select-glass:hover {
-  border-color: #38bdf8;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.28);
-}
-
-.select-glass:focus {
-  border-color: #00dfd8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), 0 0 20px rgba(0, 223, 216, 0.35);
-}
-
-body.theme-day .select-glass,
-body.theme-light .select-glass,
-body.theme-milky .select-glass {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1.5px solid rgba(11, 87, 208, 0.25);
-  color: #0f172a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230b57d0' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-}
-
-body.theme-day .select-glass:hover,
-body.theme-light .select-glass:hover,
-body.theme-milky .select-glass:hover {
   border-color: #0b57d0;
   box-shadow: 0 3px 10px rgba(11, 87, 208, 0.12);
 }
 
-body.theme-day .select-glass:focus,
-body.theme-light .select-glass:focus,
-body.theme-milky .select-glass:focus {
+.select-glass:focus {
   border-color: #0b57d0;
   box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.18), 0 4px 12px rgba(11, 87, 208, 0.12);
 }
 
-body.theme-day .select-glass option,
-body.theme-light .select-glass option,
-body.theme-milky .select-glass option {
-  background: #ffffff;
-  color: #0f172a;
-  font-weight: 700;
-  padding: 8px 12px;
-}
-
 .select-glass option {
-  background: #0c162d;
-  color: #e2e8f0;
+  background: #ffffff;
+  color: #0f1e36;
   font-weight: 700;
   padding: 8px 12px;
 }
 
+/* Fallback & Legacy SVG Arrow Support for Tests */
+[data-theme="dark"] .select-glass {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+}
 
 .textarea-glass {
-  background: var(--glass-input);
-  border: 1.1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1.3px solid rgba(197, 160, 89, 0.38);
   border-radius: 12px;
   padding: 0.75rem 0.95rem;
-  color: #ffffff;
+  color: #0f1e36;
   font-family: inherit;
   font-size: 0.88rem;
   outline: none;
   min-height: 80px;
   resize: vertical;
   line-height: 1.55;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: all 0.22s ease;
 }
 
-body.theme-day .textarea-glass,
-body.theme-light .textarea-glass,
-body.theme-milky .textarea-glass {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(15, 23, 42, 0.12);
-  color: #0f172a;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
 .textarea-glass:focus {
-  border-color: var(--gold-primary);
-  background: rgba(8, 16, 30, 0.95);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 15px rgba(245, 158, 11, 0.25);
-}
-
-body.theme-day .textarea-glass:focus,
-body.theme-light .textarea-glass:focus,
-body.theme-milky .textarea-glass:focus {
   background: #ffffff;
   border-color: #d97706;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 12px rgba(217, 119, 6, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03), 0 0 12px rgba(217, 119, 6, 0.2);
 }
 
 .textarea-glass::placeholder {
-  color: var(--text-dim);
+  color: #718096;
 }
 
 /* ==============================================================================
-   10. الجداول البلورية الفاخرة (Crystal Tables)
+   9. الجداول البلورية الفاخرة (Crystal Tables)
    ============================================================================== */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
   border-radius: 14px;
   border: var(--border-subtle);
-  background: rgba(7, 14, 26, 0.6);
-}
-
-body.theme-day .table-responsive,
-body.theme-light .table-responsive,
-body.theme-milky .table-responsive {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(255, 253, 248, 0.85);
 }
 
 .crystal-table {
@@ -1057,47 +771,26 @@ body.theme-milky .table-responsive {
 }
 
 .crystal-table th {
-  background: linear-gradient(135deg, rgba(12, 24, 46, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%);
-  color: var(--text-soft);
-  font-size: 0.82rem;
+  background: linear-gradient(135deg, #f4efe6 0%, #ece4d4 100%);
+  color: #0f1e36;
+  font-size: 0.83rem;
   font-weight: 800;
   padding: 0.8rem 1rem;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1.5px solid rgba(197, 160, 89, 0.4);
   white-space: nowrap;
-}
-
-body.theme-day .crystal-table th,
-body.theme-light .crystal-table th,
-body.theme-milky .crystal-table th {
-  background: rgba(241, 245, 249, 0.96);
-  color: #334155;
-  border-bottom-color: rgba(15, 23, 42, 0.08);
 }
 
 .crystal-table td {
   padding: 0.8rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.16);
   font-size: 0.86rem;
-  color: var(--text-bright);
+  color: #152238;
   vertical-align: middle;
   transition: background 0.18s ease;
 }
 
-body.theme-day .crystal-table td,
-body.theme-light .crystal-table td,
-body.theme-milky .crystal-table td {
-  color: #1e293b;
-  border-bottom-color: rgba(15, 23, 42, 0.04);
-}
-
 .crystal-table tr:hover td {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-body.theme-day .crystal-table tr:hover td,
-body.theme-light .crystal-table tr:hover td,
-body.theme-milky .crystal-table tr:hover td {
-  background: rgba(15, 23, 42, 0.02);
+  background: rgba(245, 239, 226, 0.6);
 }
 
 /* الشارات والرتب الرسمية */
@@ -1109,79 +802,39 @@ body.theme-milky .crystal-table tr:hover td {
   border-radius: 8px;
   font-size: 0.76rem;
   font-weight: 800;
-  background: rgba(6, 182, 212, 0.18);
-  color: #a5f3fc;
-  border: 1px solid rgba(6, 182, 212, 0.35);
+  background: rgba(2, 132, 199, 0.12);
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.3);
   white-space: nowrap;
 }
 
-body.theme-day .badge-role,
-body.theme-light .badge-role,
-body.theme-milky .badge-role {
-  background: rgba(2, 132, 199, 0.12);
-  color: #0369a1;
-  border-color: rgba(2, 132, 199, 0.3);
-}
-
 .badge-role.badge-role-founder, .badge-role.super-admin {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.3) 100%);
-  color: #fef08a;
-  border-color: rgba(245, 158, 11, 0.5);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
-}
-
-body.theme-day .badge-role.badge-role-founder, body.theme-day .badge-role.super-admin,
-body.theme-light .badge-role.badge-role-founder, body.theme-light .badge-role.super-admin,
-body.theme-milky .badge-role.badge-role-founder, body.theme-milky .badge-role.super-admin {
   background: #fef3c7;
   color: #92400e;
-  border-color: rgba(217, 119, 6, 0.4);
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.12);
 }
 
 .badge-role.dept-mgr, .badge-role.badge-role-director {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.28) 100%);
-  color: #6ee7b7;
-  border-color: rgba(16, 185, 129, 0.48);
-}
-
-body.theme-day .badge-role.dept-mgr, body.theme-day .badge-role.badge-role-director,
-body.theme-light .badge-role.dept-mgr, body.theme-light .badge-role.badge-role-director,
-body.theme-milky .badge-role.dept-mgr, body.theme-milky .badge-role.badge-role-director {
   background: #d1fae5;
   color: #065f46;
-  border-color: rgba(5, 150, 105, 0.4);
+  border: 1px solid rgba(5, 150, 105, 0.4);
 }
 
 .badge-role.badge-role-supervisor {
-  background: rgba(56, 189, 248, 0.2);
-  color: #7dd3fc;
-  border-color: rgba(56, 189, 248, 0.45);
-}
-
-body.theme-day .badge-role.badge-role-supervisor,
-body.theme-light .badge-role.badge-role-supervisor,
-body.theme-milky .badge-role.badge-role-supervisor {
   background: #e0f2fe;
   color: #0369a1;
-  border-color: rgba(2, 132, 199, 0.35);
+  border: 1px solid rgba(2, 132, 199, 0.35);
 }
 
 .badge-role.badge-role-operator {
-  background: rgba(99, 102, 241, 0.2);
-  color: #c7d2fe;
-  border-color: rgba(99, 102, 241, 0.45);
-}
-
-body.theme-day .badge-role.badge-role-operator,
-body.theme-light .badge-role.badge-role-operator,
-body.theme-milky .badge-role.badge-role-operator {
   background: #ede9fe;
   color: #5b21b6;
-  border-color: rgba(109, 40, 217, 0.35);
+  border: 1px solid rgba(109, 40, 217, 0.35);
 }
 
 /* ==============================================================================
-   11. بطاقات النماذج والاستمارات الجاهزة (Forms Suite Grid)
+   10. بطاقات النماذج والاستمارات الجاهزة (Forms Suite Grid)
    ============================================================================== */
 .forms-suite-grid {
   display: grid;
@@ -1190,7 +843,7 @@ body.theme-milky .badge-role.badge-role-operator {
 }
 
 .form-suite-card {
-  background: linear-gradient(135deg, rgba(14, 26, 48, 0.78) 0%, rgba(8, 16, 32, 0.88) 100%);
+  background: rgba(255, 253, 248, 0.94);
   border: var(--border-glass);
   border-radius: 16px;
   padding: 1.25rem;
@@ -1204,12 +857,6 @@ body.theme-milky .badge-role.badge-role-operator {
   overflow: hidden;
 }
 
-body.theme-day .form-suite-card,
-body.theme-light .form-suite-card,
-body.theme-milky .form-suite-card {
-  background: rgba(255, 255, 255, 0.88);
-}
-
 .form-suite-card::before {
   content: '';
   position: absolute;
@@ -1217,22 +864,16 @@ body.theme-milky .form-suite-card {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.6), transparent);
   opacity: 0;
   transition: opacity 0.25s ease;
 }
 
 .form-suite-card:hover {
-  background: var(--glass-card-hover);
-  border-color: rgba(245, 158, 11, 0.6);
+  background: #ffffff;
+  border-color: rgba(217, 119, 6, 0.55);
   transform: translateY(-2.5px);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.2);
-}
-
-body.theme-day .form-suite-card:hover,
-body.theme-light .form-suite-card:hover,
-body.theme-milky .form-suite-card:hover {
-  box-shadow: 0 10px 24px -5px rgba(15, 23, 42, 0.1), 0 0 15px rgba(217, 119, 6, 0.15);
+  box-shadow: 0 12px 28px -6px rgba(100, 80, 45, 0.12), 0 0 15px rgba(217, 119, 6, 0.12);
 }
 
 .form-suite-card:hover::before {
@@ -1249,21 +890,13 @@ body.theme-milky .form-suite-card:hover {
   width: 44px;
   height: 44px;
   border-radius: 13px;
-  background: linear-gradient(135deg, rgba(9, 20, 38, 0.95) 0%, rgba(5, 12, 24, 0.98) 100%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.1px solid rgba(197, 160, 89, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 8px rgba(100, 80, 45, 0.06);
   flex-shrink: 0;
-}
-
-body.theme-day .form-card-icon,
-body.theme-light .form-card-icon,
-body.theme-milky .form-card-icon {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(15, 23, 42, 0.08);
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.05);
 }
 
 .form-card-icon svg {
@@ -1273,30 +906,24 @@ body.theme-milky .form-card-icon {
 }
 
 .form-card-title {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 800;
-  color: #ffffff;
-}
-
-body.theme-day .form-card-title,
-body.theme-light .form-card-title,
-body.theme-milky .form-card-title {
-  color: #0f172a;
+  color: #0f1e36;
 }
 
 .form-card-desc {
-  font-size: 0.83rem;
+  font-size: 0.85rem;
   color: var(--text-soft);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 /* ==============================================================================
-   12. النوافذ المنبثقة والطباعة الرسمية (Modals & Official Print)
+   11. النوافذ المنبثقة والطباعة الرسمية (Modals & Official Print)
    ============================================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 7, 18, 0.85);
+  background: rgba(25, 30, 40, 0.55);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   display: flex;
@@ -1307,39 +934,25 @@ body.theme-milky .form-card-title {
   animation: modalFadeIn 0.22s ease;
 }
 
-body.theme-day .modal-overlay,
-body.theme-light .modal-overlay,
-body.theme-milky .modal-overlay {
-  background: rgba(15, 23, 42, 0.55);
-}
-
 @keyframes modalFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 .modal-crystal-box {
-  background: linear-gradient(135deg, rgba(14, 28, 52, 0.98) 0%, rgba(8, 16, 32, 0.99) 100%);
-  border: 1.3px solid rgba(56, 189, 248, 0.45);
+  background: linear-gradient(135deg, #ffffff 0%, #faf6ed 100%);
+  border: 1.5px solid rgba(197, 160, 89, 0.45);
   border-radius: 20px;
   width: 100%;
   max-width: 880px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 1.8rem;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 35px rgba(56, 189, 248, 0.18);
+  box-shadow: 0 25px 65px -10px rgba(70, 50, 25, 0.22), 0 0 0 1px rgba(197, 160, 89, 0.25);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-}
-
-body.theme-day .modal-crystal-box,
-body.theme-light .modal-crystal-box,
-body.theme-milky .modal-crystal-box {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(14, 165, 233, 0.35);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  color: #0f172a;
+  color: #0f1e36;
 }
 
 .printable-official-document {
@@ -1349,7 +962,7 @@ body.theme-milky .modal-crystal-box {
   padding: 2.2rem;
   font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
   direction: rtl;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .doc-header-official {

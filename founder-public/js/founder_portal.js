@@ -8,7 +8,7 @@
 const FounderPortal = {
   // الحالة المركزية للبوابة
   currentTab: 'control',
-  currentTheme: 'dark',
+  currentTheme: 'day',
   dossiers: [],
   roles: [],
   pendingUsers: [],
@@ -17,9 +17,9 @@ const FounderPortal = {
   auditLogs: [],
   broadcastMessage: '',
 
-  // تهيئة سمة الواجهة (الوضع النهاري أو الليلي)
+  // تهيئة سمة الواجهة (النمط الملكي الكريمي المريح للعين)
   initTheme: function() {
-    const savedTheme = localStorage.getItem('spd_founder_theme_mode') || 'dark';
+    const savedTheme = localStorage.getItem('spd_founder_theme_mode') || 'day';
     this.applyTheme(savedTheme);
   },
 
@@ -38,18 +38,19 @@ const FounderPortal = {
     const iconMilky = document.getElementById('themeIconMilky');
     const textLabel = document.getElementById('themeToggleText');
 
+    body.classList.add('theme-cream');
     if (theme === 'day' || theme === 'milky' || theme === 'light') {
       body.classList.add('theme-day', 'theme-milky');
       body.setAttribute('data-theme', 'day');
-      if (iconDark) iconDark.style.display = 'inline-block';
-      if (iconMilky) iconMilky.style.display = 'none';
-      if (textLabel) textLabel.textContent = 'الوضع الليلي';
+      if (iconDark) iconDark.style.display = 'none';
+      if (iconMilky) iconMilky.style.display = 'inline-block';
+      if (textLabel) textLabel.textContent = 'النمط الملكي الكريمي';
     } else {
       body.classList.remove('theme-day', 'theme-milky', 'theme-light');
       body.removeAttribute('data-theme');
-      if (iconDark) iconDark.style.display = 'none';
-      if (iconMilky) iconMilky.style.display = 'inline-block';
-      if (textLabel) textLabel.textContent = 'الوضع النهاري';
+      if (iconDark) iconDark.style.display = 'inline-block';
+      if (iconMilky) iconMilky.style.display = 'none';
+      if (textLabel) textLabel.textContent = 'الوضع الليلي';
     }
   },
 
