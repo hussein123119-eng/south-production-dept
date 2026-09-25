@@ -14,7 +14,7 @@
     employeeId: '',
     employeeName: 'مهندس تشغيل موقعي (نموذج افتراضي)',
     jobTitle: 'مهندس تشغيل موقعي',
-    section: 'شعبة التشغيل والإنتاج',
+    section: 'الشعبة الأولى',
     degree: 'bachelor_high_diploma',
     evaluation: 'excellent',
     serviceYears: 10,
@@ -427,7 +427,7 @@
     if (preset === 'prod_engineer') {
       window.incentiveState.employeeName = 'مهندس تشغيل موقعي (مناوب)';
       window.incentiveState.jobTitle = 'مهندس تشغيل';
-      window.incentiveState.section = 'شعبة التشغيل والإنتاج';
+      window.incentiveState.section = 'الشعبة الأولى';
       window.incentiveState.degree = 'bachelor_high_diploma';
       window.incentiveState.evaluation = 'excellent';
       window.incentiveState.serviceYears = 12;
@@ -440,7 +440,7 @@
     } else if (preset === 'section_manager') {
       window.incentiveState.employeeName = 'مسؤول شعبة إنتاجية رأسية';
       window.incentiveState.jobTitle = 'مسؤول شعبة';
-      window.incentiveState.section = 'شعبة الإنتاج والعمليات';
+      window.incentiveState.section = 'الشعبة الثانية';
       window.incentiveState.degree = 'bachelor_high_diploma';
       window.incentiveState.evaluation = 'very_good';
       window.incentiveState.serviceYears = 18;
@@ -453,7 +453,7 @@
     } else if (preset === 'leave_deduction') {
       window.incentiveState.employeeName = 'حالة موظف مجاز (6 أيام إجازة)';
       window.incentiveState.jobTitle = 'فني تشغيل';
-      window.incentiveState.section = 'شعبة المحطات والضخ';
+      window.incentiveState.section = 'شعبة المختبرات';
       window.incentiveState.degree = 'diploma';
       window.incentiveState.evaluation = 'good';
       window.incentiveState.serviceYears = 8;
@@ -466,7 +466,7 @@
     } else if (preset === 'absence_deduction') {
       window.incentiveState.employeeName = 'حالة موظف لديه غياب (يومان غياب)';
       window.incentiveState.jobTitle = 'كاتب حسابات';
-      window.incentiveState.section = 'الشعبة الإدارية والمالية';
+      window.incentiveState.section = 'إدارة القسم';
       window.incentiveState.degree = 'preparatory';
       window.incentiveState.evaluation = 'medium';
       window.incentiveState.serviceYears = 5;
@@ -479,7 +479,7 @@
     } else if (preset === 'penalty_attention') {
       window.incentiveState.employeeName = 'حالة موظف صادر بحقه لفت نظر';
       window.incentiveState.jobTitle = 'فني صيانة';
-      window.incentiveState.section = 'شعبة الصيانة الميكانيكية';
+      window.incentiveState.section = 'شعبة العدادات';
       window.incentiveState.degree = 'bachelor_high_diploma';
       window.incentiveState.evaluation = 'good';
       window.incentiveState.serviceYears = 9;
@@ -492,7 +492,7 @@
     } else if (preset === 'total_withholding') {
       window.incentiveState.employeeName = 'حالة حجب كامل (إجازة دراسية)';
       window.incentiveState.jobTitle = 'مهندس أقدم';
-      window.incentiveState.section = 'شعبة التطوير الفني';
+      window.incentiveState.section = 'الوحدة الفنية';
       window.incentiveState.degree = 'bachelor_high_diploma';
       window.incentiveState.evaluation = 'very_good';
       window.incentiveState.serviceYears = 14;

@@ -198,7 +198,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
     selectedSectionLabel = `📁 ${secMap[state.section].name}`;
   } else if (unitMap[state.section]) {
     const u = unitMap[state.section];
-    selectedSectionLabel = `⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}`;
+    selectedSectionLabel = `⚙️ ${(u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : ('وحدة ' + u.name)}`;
   } else if (staMap[state.section]) {
     selectedSectionLabel = `⛽ ${staMap[state.section].name}`;
   }
@@ -321,7 +321,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
 
               ${discoveredUnits.length > 0 ? `
                 <optgroup label="⚙️ الوحدات الإدارية والفنية">
-                  ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
+                  ${discoveredUnits.map(u => `<option value="${u.id}" ${state.section === u.id ? 'selected' : ''}>⚙️ ${(u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : ('وحدة ' + u.name)}</option>`).join('')}
                 </optgroup>
               ` : ''}
 
@@ -377,7 +377,7 @@ function renderUserRegistryTab(roster, actorUser, sections, units, stations) {
               ${discoveredUnits.length > 0 ? `
                 <div class="luxury-dropdown-header">⚙️ الوحدات الإدارية والفنية</div>
                 ${discoveredUnits.map(u => {
-                  const uLabel = u.name.startsWith('وحدة') ? u.name : ('وحدة ' + u.name);
+                  const uLabel = (u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : ('وحدة ' + u.name);
                   return `
                     <div class="luxury-dropdown-item ${state.section === u.id ? 'active-item' : ''}" 
                          data-value="${u.id}" 

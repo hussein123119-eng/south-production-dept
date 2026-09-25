@@ -168,6 +168,100 @@ function renderSuperAdminView() {
         </div>
       </div>
 
+      <!-- الهيكل التنظيمي والتشكيلات المعتمدة (القسم، الإدارة، الوحدات، الشعب، والمحطات) -->
+      <div class="card" style="border-top: 4px solid #00dfd8;">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h3 class="card-title">🏛️ الهيكل التنظيمي والتشكيلات المعتمدة (القسم، الإدارة، الوحدات، الشعب، والمحطات)</h3>
+            <p style="font-size: 0.82rem; color: var(--md-sys-color-outline); margin: 0.2rem 0 0 0;">
+              التشكيلات الإدارية والميدانية الخمسة المعتمدة في كافة أرجاء المنظومة وبوابة المؤسس.
+            </p>
+          </div>
+          <span class="badge badge-info" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+            المرجع الهيكلي الموحد (SPD-01)
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 0.5rem 0;">
+          <!-- 1. القسم وإدارة القسم -->
+          <div style="padding: 1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-sm); background: rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="font-size: 0.95rem;">🏢 القسم وإدارة القسم</strong>
+              <span class="badge badge-primary">SPD-01</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant); line-height: 1.6;">
+              <div><strong>القسم:</strong> قسم الإنتاج الجنوبي (شركة نفط البصرة)</div>
+              <div><strong>مقر الإدارة:</strong> مكتب مدير القسم والسكرتارية التنفيذية (<code style="font-weight: 700;">SPD-MGMT</code>)</div>
+            </div>
+          </div>
+
+          <!-- 2. الوحدات الإدارية والفنية -->
+          <div style="padding: 1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-sm); background: rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="font-size: 0.95rem;">⚙️ الوحدات التابعة للإدارة (3)</strong>
+              <span class="badge badge-info">مباشرة بالإدارة</span>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant); list-style: none; padding: 0; margin: 0; line-height: 1.7;">
+              <li>🔹 <strong>الوحدة الفنية</strong> (<code>UNIT-TECH</code>)</li>
+              <li>🔹 <strong>وحدة التدريب والتطوير</strong> (<code>UNIT-TRN</code>)</li>
+              <li>🔹 <strong>وحدة الضمان الصحي</strong> (<code>UNIT-HLTH</code>)</li>
+            </ul>
+          </div>
+
+          <!-- 3. الشعب الإنتاجية والرأسية -->
+          <div style="padding: 1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-sm); background: rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="font-size: 0.95rem;">📁 الشعب الإنتاجية والرأسية (4)</strong>
+              <span class="badge badge-warning">الشعب الرئيسية</span>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant); list-style: none; padding: 0; margin: 0; line-height: 1.7;">
+              <li>📁 <strong>الشعبة الأولى</strong> (<code>SEC-01</code>)</li>
+              <li>📁 <strong>الشعبة الثانية</strong> (<code>SEC-02</code>)</li>
+              <li>📁 <strong>شعبة المختبرات</strong> (<code>SEC-03</code>)</li>
+              <li>📁 <strong>شعبة العدادات</strong> (<code>SEC-04</code>)</li>
+            </ul>
+          </div>
+
+          <!-- 4. المحطات الميدانية الـ 7 المعتمدة -->
+          <div style="padding: 1rem; border: 1px solid var(--md-sys-color-surface-variant); border-radius: var(--radius-sm); background: rgba(0,0,0,0.02); grid-column: 1 / -1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+              <strong style="font-size: 0.95rem;">⛽ المحطات الإنتاجية الميدانية المعتمدة (7 محطات حقلية)</strong>
+              <span class="badge badge-success">محطات الحقول DS</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; font-size: 0.82rem;">
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #0284c7;">
+                <strong>المحطة المركزية</strong> <span style="font-family: monospace; color: #0284c7;">(ST-CTR / DS-1)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #0284c7;">
+                <strong>المحطة الجنوبية</strong> <span style="font-family: monospace; color: #0284c7;">(ST-STH / DS-2)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #0284c7;">
+                <strong>محطة الرطكة</strong> <span style="font-family: monospace; color: #0284c7;">(ST-RTK / DS-3)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #10b981;">
+                <strong>محطة الشامية</strong> <span style="font-family: monospace; color: #10b981;">(ST-SHM / DS-4)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #10b981;">
+                <strong>محطة القرينات</strong> <span style="font-family: monospace; color: #10b981;">(ST-QRN / DS-5)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #10b981;">
+                <strong>محطة مشرف شامية</strong> <span style="font-family: monospace; color: #10b981;">(ST-MSH-SHM / DS-6)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; border-right: 3px solid #10b981;">
+                <strong>محطة مشرف قرينات</strong> <span style="font-family: monospace; color: #10b981;">(ST-MSH-QRN / DS-7)</span>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-outline);">الشعبة الثانية</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Master Approved Employee IDs Management -->
       <div class="card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">

@@ -317,6 +317,7 @@ const INITIAL_DB = {
       id: 'sec-1',
       departmentId: 'dept-south-prod',
       name: 'الشعبة الأولى',
+      code: 'SEC-01',
       managerId: null,
       description: 'تضم محطات الإنتاج الرئيسية (المركزية، الجنوبية، الرطكة) ومعالجة الخام والغاز المصاحب.',
       status: 'ACTIVE',
@@ -327,6 +328,7 @@ const INITIAL_DB = {
       id: 'sec-2',
       departmentId: 'dept-south-prod',
       name: 'الشعبة الثانية',
+      code: 'SEC-02',
       managerId: null,
       description: 'تضم محطات ومشرفي الشامية والقرينات وضخ النفط الخام المستمر.',
       status: 'ACTIVE',
@@ -337,6 +339,7 @@ const INITIAL_DB = {
       id: 'sec-3',
       departmentId: 'dept-south-prod',
       name: 'شعبة المختبرات',
+      code: 'SEC-03',
       managerId: null,
       description: 'إدارة الفحوصات الكيميائية وجودة النفط والغاز ونسب الماء والأملاح والمعادن.',
       status: 'ACTIVE',
@@ -347,6 +350,7 @@ const INITIAL_DB = {
       id: 'sec-4',
       departmentId: 'dept-south-prod',
       name: 'شعبة العدادات',
+      code: 'SEC-04',
       managerId: null,
       description: 'معايرة وفحص عدادات القياس الحجمي والكتلي ومنظومات العزل التلقائي.',
       status: 'ACTIVE',
@@ -392,7 +396,8 @@ const INITIAL_DB = {
     {
       id: 'unit-1',
       departmentId: 'dept-south-prod',
-      name: 'الفنية',
+      name: 'الوحدة الفنية',
+      code: 'UNIT-TECH',
       managerId: null,
       description: 'الدعم الفني، الصيانة الوقائية والطارئة، والدراسات الهندسية المباشرة بإدارة القسم.',
       status: 'ACTIVE',
@@ -402,7 +407,8 @@ const INITIAL_DB = {
     {
       id: 'unit-2',
       departmentId: 'dept-south-prod',
-      name: 'التدريب والتطوير',
+      name: 'وحدة التدريب والتطوير',
+      code: 'UNIT-TRN',
       managerId: null,
       description: 'إعداد الورش التدريبية، برامج التأهيل الفني، ومتابعة كفاءة التشغيل والسلامة للكوادر.',
       status: 'ACTIVE',
@@ -412,7 +418,8 @@ const INITIAL_DB = {
     {
       id: 'unit-3',
       departmentId: 'dept-south-prod',
-      name: 'الضمان الصحي',
+      name: 'وحدة الضمان الصحي',
+      code: 'UNIT-HLTH',
       managerId: null,
       description: 'متابعة المعاملات الصحية، تصاريح السلامة المهنية، والامتثال للوائح حماية البيئة.',
       status: 'ACTIVE',
@@ -4075,6 +4082,52 @@ class StoreManager {
     return (this.getDb().stations || []).find(s => s.id === stId);
   }
 
+  // --- Canonical Enterprise Hierarchy (الأقسام، الإدارة، الوحدات، الشعب، والمحطات) ---
+  getHierarchy(deptId = 'dept-south-prod') {
+    const db = this.getDb();
+    const dept = (db.departments || []).find(d => d.id === deptId) || {
+      id: 'dept-south-prod',
+      name: 'إدارة قسم الإنتاج الجنوبي',
+      shortName: 'قسم الإنتاج الجنوبي',
+      code: 'SPD-01',
+      description: 'المنصة الرسمية لإدارة الموارد البشرية والوثائق والتبليغات والمحطات التابعة لقسم الإنتاج الجنوبي.'
+    };
+
+    const management = {
+      id: 'dept-mgmt',
+      name: 'إدارة القسم',
+      fullName: 'مقر إدارة قسم الإنتاج الجنوبي ومكتب مدير القسم',
+      code: 'SPD-MGMT',
+      departmentId: dept.id,
+      description: 'مقر إدارة قسم الإنتاج الجنوبي ومكتب مدير القسم والسكرتارية والكوادر التنفيذية'
+    };
+
+    const units = (db.units || []).filter(u => !u.departmentId || u.departmentId === deptId).map(u => ({
+      ...u,
+      code: u.code || (u.id === 'unit-1' ? 'UNIT-TECH' : u.id === 'unit-2' ? 'UNIT-TRN' : 'UNIT-HLTH'),
+      fullName: (u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : `وحدة ${u.name}`
+    }));
+
+    const sections = (db.sections || []).filter(s => !s.departmentId || s.departmentId === deptId).map(s => ({
+      ...s,
+      code: s.code || (s.id === 'sec-1' ? 'SEC-01' : s.id === 'sec-2' ? 'SEC-02' : s.id === 'sec-3' ? 'SEC-03' : 'SEC-04')
+    }));
+
+    const stations = (db.stations || []).filter(s => !s.departmentId || s.departmentId === deptId);
+
+    // 7 Canonical field production stations
+    const fieldStations = stations.filter(s => s.sectionId === 'sec-1' || s.sectionId === 'sec-2');
+
+    return {
+      department: dept,
+      management,
+      units,
+      sections,
+      stations,
+      fieldStations
+    };
+  }
+
   getStationCode(stId, stName = '') {
     const name = String(stName || stId || '').trim();
     if (!name) return 'DS-1';
@@ -4095,15 +4148,15 @@ class StoreManager {
     }
     if (st && st.code) return st.code;
 
-    // قاموس رموز محطات ومواقع حقول الإنتاج الجنوبي المعتمدة
+    // قاموس رموز محطات ومواقع حقول الإنتاج الجنوبي المعتمدة (مع مراعاة أولوية الأسماء المركبة)
     if (name.includes('الرميلة الشمالية') || name.includes('شمالية') || name.includes('الشمالية')) return 'DS-1';
     if (name.includes('الرميلة الجنوبية') || name.includes('جنوبية') || name.includes('الجنوبية')) return 'DS-2';
     if (name.includes('المركزية')) return 'ST-CTR';
     if (name.includes('الرطكة')) return 'ST-RTK';
-    if (name.includes('الشامية')) return 'ST-SHM';
-    if (name.includes('القرينات')) return 'ST-QRN';
     if (name.includes('مشرف شامية')) return 'ST-MSH-SHM';
     if (name.includes('مشرف قرينات')) return 'ST-MSH-QRN';
+    if (name.includes('الشامية')) return 'ST-SHM';
+    if (name.includes('القرينات')) return 'ST-QRN';
 
     return 'DS-1';
   }

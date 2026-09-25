@@ -889,7 +889,7 @@ const FounderPortal = {
       tr.innerHTML = `
         <td style="font-weight: 700; color: var(--text-pure);">${emp.fullName || emp.name}</td>
         <td style="font-family: monospace; font-weight: 700; color: var(--gold-primary);">${emp.empId || emp.code || 'EMP-0000'}</td>
-        <td style="color: var(--text-soft); font-weight: 600;">${emp.department || emp.section || 'شعبة الإنتاج'}</td>
+        <td style="color: var(--text-soft); font-weight: 600;">${emp.department || emp.section || 'إدارة القسم المركزية'}</td>
         <td>
           <span class="badge-role ${badgeClass}">${role}</span>
         </td>
@@ -1137,20 +1137,73 @@ const FounderPortal = {
     tbody.innerHTML = '';
 
     const searchInput = document.getElementById('dossierSearchInput');
-    const stationFilter = document.getElementById('dossierStationFilter');
+    const sectionFilter = document.getElementById('dossierSectionFilter') || document.getElementById('dossierStationFilter');
 
     const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-    const station = stationFilter ? stationFilter.value : '';
+    const filterVal = sectionFilter ? sectionFilter.value : 'ALL';
 
     const filtered = this.dossiers.filter(emp => {
       const matchQuery = !query || 
-        emp.fullName.toLowerCase().includes(query) ||
-        emp.empId.toLowerCase().includes(query) ||
-        emp.jobTitle.toLowerCase().includes(query);
+        (emp.fullName && emp.fullName.toLowerCase().includes(query)) ||
+        (emp.empId && emp.empId.toLowerCase().includes(query)) ||
+        (emp.jobTitle && emp.jobTitle.toLowerCase().includes(query)) ||
+        (emp.department && emp.department.toLowerCase().includes(query));
 
-      const matchStation = !station || emp.department.includes(station);
+      if (!matchQuery) return false;
+      if (!filterVal || filterVal === 'ALL') return true;
 
-      return matchQuery && matchStation;
+      const deptStr = (emp.department || '').toLowerCase();
+      const secId = emp.sectionId || '';
+      const unitId = emp.unitId || '';
+      const staId = emp.stationId || '';
+
+      if (filterVal === 'DEPT') {
+        return deptStr.includes('إدارة القسم') || deptStr.includes('مقر') || (!secId && !unitId && !staId && !deptStr.includes('شعبة') && !deptStr.includes('وحدة') && !deptStr.includes('محطة'));
+      }
+      if (filterVal === 'sec-1') {
+        return secId === 'sec-1' || deptStr.includes('الأولى') || deptStr.includes('الاولى') || deptStr.includes('المركزية') || deptStr.includes('الجنوبية') || deptStr.includes('الرطكة') || deptStr.includes('st-ctr') || deptStr.includes('st-sth') || deptStr.includes('st-rtk') || deptStr.includes('ds-1') || deptStr.includes('ds-2') || deptStr.includes('ds-3');
+      }
+      if (filterVal === 'sec-2') {
+        return secId === 'sec-2' || deptStr.includes('الثانية') || deptStr.includes('الشامية') || deptStr.includes('القرينات') || deptStr.includes('مشرف') || deptStr.includes('st-shm') || deptStr.includes('st-qrn') || deptStr.includes('st-msh') || deptStr.includes('ds-4') || deptStr.includes('ds-5') || deptStr.includes('ds-6') || deptStr.includes('ds-7');
+      }
+      if (filterVal === 'sec-3') {
+        return secId === 'sec-3' || deptStr.includes('مختبر') || deptStr.includes('lab');
+      }
+      if (filterVal === 'sec-4') {
+        return secId === 'sec-4' || deptStr.includes('عداد') || deptStr.includes('mtr');
+      }
+      if (filterVal === 'unit-1') {
+        return unitId === 'unit-1' || deptStr.includes('فنية') || deptStr.includes('unit-tech');
+      }
+      if (filterVal === 'unit-2') {
+        return unitId === 'unit-2' || deptStr.includes('تدريب') || deptStr.includes('تطوير') || deptStr.includes('unit-trn');
+      }
+      if (filterVal === 'unit-3') {
+        return unitId === 'unit-3' || deptStr.includes('ضمان') || deptStr.includes('صحي') || deptStr.includes('unit-hlth');
+      }
+      if (filterVal === 'ST-CTR') {
+        return staId === 'st-101' || deptStr.includes('المركزية') || deptStr.includes('st-ctr') || deptStr.includes('ds-1');
+      }
+      if (filterVal === 'ST-STH') {
+        return staId === 'st-102' || deptStr.includes('الجنوبية') || deptStr.includes('st-sth') || deptStr.includes('ds-2');
+      }
+      if (filterVal === 'ST-RTK') {
+        return staId === 'st-103' || deptStr.includes('الرطكة') || deptStr.includes('st-rtk') || deptStr.includes('ds-3');
+      }
+      if (filterVal === 'ST-SHM') {
+        return staId === 'st-201' || deptStr.includes('الشامية') || deptStr.includes('st-shm') || deptStr.includes('ds-4');
+      }
+      if (filterVal === 'ST-QRN') {
+        return staId === 'st-202' || deptStr.includes('القرينات') || deptStr.includes('st-qrn') || deptStr.includes('ds-5');
+      }
+      if (filterVal === 'ST-MSH-SHM') {
+        return staId === 'st-203' || deptStr.includes('مشرف شامية') || deptStr.includes('st-msh-shm') || deptStr.includes('ds-6');
+      }
+      if (filterVal === 'ST-MSH-QRN') {
+        return staId === 'st-204' || deptStr.includes('مشرف قرينات') || deptStr.includes('st-msh-qrn') || deptStr.includes('ds-7');
+      }
+
+      return deptStr.includes(filterVal.toLowerCase());
     });
 
     if (filtered.length === 0) {
@@ -1168,7 +1221,7 @@ const FounderPortal = {
           <span style="font-weight: 700; color: var(--emerald-primary);">الدرجة ${emp.grade}</span>
           <span style="color: var(--text-muted); font-size: 0.8rem; margin-right: 0.3rem;">المرحلة ${emp.step}</span>
         </td>
-        <td style="color: var(--text-soft); font-size: 0.85rem;">${emp.department}</td>
+        <td style="color: var(--text-soft); font-size: 0.85rem;">${emp.department || 'إدارة القسم المركزية'}</td>
         <td style="font-weight: 700; color: var(--text-pure);">${emp.yearsOfService} سنة</td>
         <td><span class="badge-role badge-role-operator" style="font-size: 0.75rem;">${emp.shift}</span></td>
         <td>
@@ -1196,20 +1249,97 @@ const FounderPortal = {
 
   // فتح نافذة تعديل الإضبارة
   openDossierModal: function(empId) {
-    const emp = this.dossiers.find(e => e.empId === empId);
+    const emp = this.dossiers.find(e => e.empId === empId) || (window.deptEmployees && window.deptEmployees.find(e => (e.empId === empId || e.id === empId)));
     if (!emp) return;
 
-    document.getElementById('editEmpId').value = emp.empId;
-    document.getElementById('editEmpName').value = emp.fullName;
-    document.getElementById('editEmpJobTitle').value = emp.jobTitle;
-    document.getElementById('editEmpDept').value = emp.department;
-    document.getElementById('editEmpGrade').value = emp.grade;
-    document.getElementById('editEmpStep').value = emp.step;
-    document.getElementById('editEmpYears').value = emp.yearsOfService;
-    document.getElementById('editEmpShift').value = emp.shift;
+    const elId = document.getElementById('editEmpId');
+    if (elId) elId.value = emp.empId || emp.id || '';
+
+    const elName = document.getElementById('editEmpName');
+    if (elName) elName.value = emp.fullName || emp.name || '';
+
+    const elCode = document.getElementById('editEmpCode');
+    if (elCode) elCode.value = emp.empId || emp.code || '';
+
+    const elShift = document.getElementById('editEmpShift');
+    if (elShift) elShift.value = emp.shift || 'صباحي';
+
+    const elService = document.getElementById('editEmpService') || document.getElementById('editEmpYears');
+    if (elService) elService.value = emp.yearsOfService || 5;
+
+    const elGrade = document.getElementById('editEmpGrade');
+    if (elGrade) elGrade.value = emp.grade || 'الخامسة';
+
+    const elStep = document.getElementById('editEmpStep');
+    if (elStep) elStep.value = emp.step || 'الثانية';
+
+    const elJob = document.getElementById('editEmpJobTitle');
+    if (elJob) elJob.value = emp.jobTitle || '';
+
+    const elDept = document.getElementById('editEmpDept');
+    if (elDept) elDept.value = emp.department || '';
+
+    // تحديد الشعبة/الوحدة والمحطة المعتمدة في القوائم المنسدلة
+    const elSection = document.getElementById('editEmpSection');
+    const elStation = document.getElementById('editEmpStation');
+    const deptStr = (emp.department || '').toLowerCase();
+
+    if (elSection) {
+      if (emp.unitId) {
+        elSection.value = emp.unitId;
+      } else if (emp.sectionId) {
+        elSection.value = emp.sectionId;
+      } else if (deptStr.includes('فنية')) {
+        elSection.value = 'unit-1';
+      } else if (deptStr.includes('تدريب')) {
+        elSection.value = 'unit-2';
+      } else if (deptStr.includes('ضمان') || deptStr.includes('صحي')) {
+        elSection.value = 'unit-3';
+      } else if (deptStr.includes('مختبر')) {
+        elSection.value = 'sec-3';
+      } else if (deptStr.includes('عداد')) {
+        elSection.value = 'sec-4';
+      } else if (deptStr.includes('ثانية') || deptStr.includes('شامية') || deptStr.includes('قرينات')) {
+        elSection.value = 'sec-2';
+      } else if (deptStr.includes('أولى') || deptStr.includes('اولى') || deptStr.includes('مركزية') || deptStr.includes('جنوبية') || deptStr.includes('رطكة')) {
+        elSection.value = 'sec-1';
+      } else {
+        elSection.value = 'DEPT';
+      }
+    }
+
+    if (elStation) {
+      if (emp.stationId) {
+        elStation.value = emp.stationId;
+      } else if (deptStr.includes('مركزية')) {
+        elStation.value = 'st-101';
+      } else if (deptStr.includes('جنوبية')) {
+        elStation.value = 'st-102';
+      } else if (deptStr.includes('رطكة')) {
+        elStation.value = 'st-103';
+      } else if (deptStr.includes('مشرف شامية')) {
+        elStation.value = 'st-203';
+      } else if (deptStr.includes('مشرف قرينات')) {
+        elStation.value = 'st-204';
+      } else if (deptStr.includes('شامية')) {
+        elStation.value = 'st-201';
+      } else if (deptStr.includes('قرينات')) {
+        elStation.value = 'st-202';
+      } else {
+        elStation.value = '';
+      }
+    }
 
     const modal = document.getElementById('dossierModal');
     if (modal) modal.style.display = 'flex';
+  },
+
+  onDossierSectionChange: function(sectionVal) {
+    const elStation = document.getElementById('editEmpStation');
+    if (!elStation) return;
+    if (sectionVal === 'DEPT' || sectionVal.startsWith('unit-')) {
+      elStation.value = '';
+    }
   },
 
   // إغلاق نافذة تعديل الإضبارة
@@ -1220,19 +1350,91 @@ const FounderPortal = {
 
   // حفظ التعديلات على إضبارة المنتسب
   saveDossier: function(e) {
-    if (e) e.preventDefault();
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
 
-    const empId = document.getElementById('editEmpId').value;
-    const emp = this.dossiers.find(e => e.empId === empId);
+    const empId = document.getElementById('editEmpId')?.value;
+    const emp = this.dossiers.find(e => e.empId === empId) || (window.deptEmployees && window.deptEmployees.find(e => (e.empId === empId || e.id === empId)));
     if (!emp) return;
 
-    emp.fullName = document.getElementById('editEmpName').value.trim();
-    emp.jobTitle = document.getElementById('editEmpJobTitle').value.trim();
-    emp.department = document.getElementById('editEmpDept').value.trim();
-    emp.grade = document.getElementById('editEmpGrade').value.trim();
-    emp.step = document.getElementById('editEmpStep').value.trim();
-    emp.yearsOfService = document.getElementById('editEmpYears').value.trim();
-    emp.shift = document.getElementById('editEmpShift').value;
+    const elName = document.getElementById('editEmpName');
+    if (elName) emp.fullName = elName.value.trim();
+
+    const elCode = document.getElementById('editEmpCode');
+    if (elCode && elCode.value.trim()) {
+      emp.empId = elCode.value.trim();
+    }
+
+    const elJob = document.getElementById('editEmpJobTitle');
+    if (elJob && elJob.value.trim()) {
+      emp.jobTitle = elJob.value.trim();
+    }
+
+    const elShift = document.getElementById('editEmpShift');
+    if (elShift) emp.shift = elShift.value;
+
+    const elService = document.getElementById('editEmpService') || document.getElementById('editEmpYears');
+    if (elService) emp.yearsOfService = elService.value.trim();
+
+    const elGrade = document.getElementById('editEmpGrade');
+    if (elGrade) emp.grade = elGrade.value.trim();
+
+    const elStep = document.getElementById('editEmpStep');
+    if (elStep) emp.step = elStep.value.trim();
+
+    const elSection = document.getElementById('editEmpSection');
+    const elStation = document.getElementById('editEmpStation');
+
+    const sectionNames = {
+      'DEPT': 'إدارة القسم المركزية',
+      'sec-1': 'الشعبة الأولى',
+      'sec-2': 'الشعبة الثانية',
+      'sec-3': 'شعبة المختبرات',
+      'sec-4': 'شعبة العدادات',
+      'unit-1': 'الوحدة الفنية',
+      'unit-2': 'وحدة التدريب والتطوير',
+      'unit-3': 'وحدة الضمان الصحي'
+    };
+
+    const stationNames = {
+      'st-101': 'المحطة المركزية (ST-CTR)',
+      'st-102': 'المحطة الجنوبية (ST-STH)',
+      'st-103': 'محطة الرطكة (ST-RTK)',
+      'st-201': 'محطة الشامية (ST-SHM)',
+      'st-202': 'محطة القرينات (ST-QRN)',
+      'st-203': 'محطة مشرف شامية (ST-MSH-SHM)',
+      'st-204': 'محطة مشرف قرينات (ST-MSH-QRN)'
+    };
+
+    if (elSection) {
+      const sVal = elSection.value;
+      if (sVal === 'DEPT') {
+        emp.department = 'إدارة القسم المركزية';
+        emp.sectionId = null;
+        emp.unitId = null;
+        emp.stationId = null;
+      } else if (sVal.startsWith('unit-')) {
+        emp.department = sectionNames[sVal] || 'الوحدة التابعة للإدارة';
+        emp.unitId = sVal;
+        emp.sectionId = null;
+        emp.stationId = null;
+      } else {
+        emp.sectionId = sVal;
+        emp.unitId = null;
+        const staVal = elStation ? elStation.value : '';
+        if (staVal && stationNames[staVal]) {
+          emp.stationId = staVal;
+          emp.department = `${stationNames[staVal]} - ${sectionNames[sVal]}`;
+        } else {
+          emp.stationId = null;
+          emp.department = sectionNames[sVal] || 'الشعبة الأولى';
+        }
+      }
+    }
+
+    const elDept = document.getElementById('editEmpDept');
+    if (elDept && elDept.value.trim() && !elSection) {
+      emp.department = elDept.value.trim();
+    }
 
     this.saveDossiers();
     this.renderDossiersTable();
@@ -1842,16 +2044,16 @@ const FounderPortal = {
             <td style="text-align: center; font-weight: 700;">1</td>
             <td style="font-weight: 800;">...................................................</td>
             <td>....................................</td>
-            <td>محطة إنتاج الرميلة 1 (SP-1)</td>
-            <td style="font-weight: 800; color: #004d40;">محطة إنتاج الرميلة 3 (SP-3)</td>
+            <td>المحطة المركزية (ST-CTR)</td>
+            <td style="font-weight: 800; color: #004d40;">محطة الشامية (ST-SHM)</td>
             <td style="text-align: center;">A</td>
           </tr>
           <tr>
             <td style="text-align: center; font-weight: 700;">2</td>
             <td style="font-weight: 800;">...................................................</td>
             <td>....................................</td>
-            <td>شعبة الصيانة الميكانيكية</td>
-            <td style="font-weight: 800; color: #004d40;">محطة حاقن الماء (WIP)</td>
+            <td>الشعبة الأولى (SEC-01)</td>
+            <td style="font-weight: 800; color: #004d40;">الوحدة الفنية (UNIT-TECH)</td>
             <td style="text-align: center;">صباحي</td>
           </tr>
         </tbody>

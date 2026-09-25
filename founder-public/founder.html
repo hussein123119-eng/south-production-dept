@@ -452,6 +452,106 @@
           </table>
         </div>
       </div>
+
+      <!-- لوحة الهيكل التنظيمي والتشكيلات المعتمدة (القسم، الإدارة، الوحدات، الشعب، والمحطات) -->
+      <div class="glass-panel" id="canonicalHierarchyPanel">
+        <div class="panel-header-row">
+          <h2 class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>الهيكل التنظيمي والتشكيلات الإدارية والميدانية المعتمدة</span>
+          </h2>
+          <span style="font-size: 0.8rem; color: var(--gold-light); font-weight: 800; background: rgba(245,158,11,0.12); padding: 0.25rem 0.6rem; border-radius: 8px; border: 1px solid rgba(245,158,11,0.3);">
+            التشكيلات الخمسة الموحدة (SPD)
+          </span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 1rem;">
+          المخطط الهيكلي الرسمي الموحد المعتمد عبر كافة بوابات المنظومة: القسم، مقر إدارة القسم، الوحدات المركزية الثلاث، الشعب الأربع، والمحطات الحقلية السبع.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <!-- 1. القسم وإدارة القسم -->
+          <div style="background: var(--glass-inner); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+              <strong style="color: var(--text-pure); font-size: 0.95rem;">🏢 القسم وإدارة القسم</strong>
+              <span class="badge-role badge-role-founder">SPD-01</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-soft); line-height: 1.5;">
+              <div style="margin-bottom: 0.4rem;"><strong style="color: var(--gold-primary);">القسم:</strong> قسم الإنتاج الجنوبي (شركة نفط البصرة - الرميلة)</div>
+              <div><strong style="color: var(--gold-primary);">إدارة القسم:</strong> مقر إدارة قسم الإنتاج الجنوبي ومكتب مدير القسم (<code style="font-family: monospace;">SPD-MGMT</code>)</div>
+            </div>
+          </div>
+
+          <!-- 2. الوحدات الإدارية والفنية -->
+          <div style="background: var(--glass-inner); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+              <strong style="color: var(--text-pure); font-size: 0.95rem;">⚙️ الوحدات التابعة للإدارة (3)</strong>
+              <span class="badge-role badge-role-director">مرتبطة بالإدارة</span>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--text-soft); list-style: none; padding: 0; margin: 0; line-height: 1.7;">
+              <li>🔹 <strong>الوحدة الفنية</strong> (<code style="color: var(--cyan-primary);">UNIT-TECH</code>)</li>
+              <li>🔹 <strong>وحدة التدريب والتطوير</strong> (<code style="color: var(--cyan-primary);">UNIT-TRN</code>)</li>
+              <li>🔹 <strong>وحدة الضمان الصحي</strong> (<code style="color: var(--cyan-primary);">UNIT-HLTH</code>)</li>
+            </ul>
+          </div>
+
+          <!-- 3. الشعب الإنتاجية والرأسية -->
+          <div style="background: var(--glass-inner); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+              <strong style="color: var(--text-pure); font-size: 0.95rem;">📁 الشعب الإنتاجية والرأسية (4)</strong>
+              <span class="badge-role badge-role-supervisor">تشكيلات رئيسية</span>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--text-soft); list-style: none; padding: 0; margin: 0; line-height: 1.7;">
+              <li>📁 <strong>الشعبة الأولى</strong> (<code style="color: var(--gold-primary);">SEC-01</code>)</li>
+              <li>📁 <strong>الشعبة الثانية</strong> (<code style="color: var(--gold-primary);">SEC-02</code>)</li>
+              <li>📁 <strong>شعبة المختبرات</strong> (<code style="color: var(--gold-primary);">SEC-03</code>)</li>
+              <li>📁 <strong>شعبة العدادات</strong> (<code style="color: var(--gold-primary);">SEC-04</code>)</li>
+            </ul>
+          </div>
+
+          <!-- 4. المحطات الميدانية الـ 7 المعتمدة -->
+          <div style="background: var(--glass-inner); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem; grid-column: 1 / -1;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+              <strong style="color: var(--text-pure); font-size: 0.95rem;">⛽ المحطات الإنتاجية الميدانية المعتمدة (7 محطات رئيسية)</strong>
+              <span class="badge-role badge-role-operator">محطات الحقول DS</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; font-size: 0.82rem;">
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--cyan-primary);">
+                <strong>المحطة المركزية</strong> <span style="font-family: monospace; color: var(--cyan-primary);">(ST-CTR / DS-1)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--cyan-primary);">
+                <strong>المحطة الجنوبية</strong> <span style="font-family: monospace; color: var(--cyan-primary);">(ST-STH / DS-2)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--cyan-primary);">
+                <strong>محطة الرطكة</strong> <span style="font-family: monospace; color: var(--cyan-primary);">(ST-RTK / DS-3)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الأولى</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--emerald-primary);">
+                <strong>محطة الشامية</strong> <span style="font-family: monospace; color: var(--emerald-primary);">(ST-SHM / DS-4)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--emerald-primary);">
+                <strong>محطة القرينات</strong> <span style="font-family: monospace; color: var(--emerald-primary);">(ST-QRN / DS-5)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--emerald-primary);">
+                <strong>محطة مشرف شامية</strong> <span style="font-family: monospace; color: var(--emerald-primary);">(ST-MSH-SHM / DS-6)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الثانية</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border-right: 3px solid var(--emerald-primary);">
+                <strong>محطة مشرف قرينات</strong> <span style="font-family: monospace; color: var(--emerald-primary);">(ST-MSH-QRN / DS-7)</span>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">تابعة للشعبة الثانية</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ======================================================================= -->
@@ -471,11 +571,28 @@
           <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 0.75rem;">
             <input type="text" id="dossierSearchInput" class="input-glass" placeholder="بحث بالاسم أو الرقم الوظيفي..." oninput="FounderPortal.filterDossiers()" style="width: 280px;">
             <select id="dossierSectionFilter" class="select-glass" onchange="FounderPortal.filterDossiers()">
-              <option value="ALL">كافة الشعب</option>
-              <option value="الإنتاج">شعبة الإنتاج</option>
-              <option value="المعالجة والعمليات">شعبة المعالجة والعمليات</option>
-              <option value="الصيانة">شعبة الصيانة</option>
-              <option value="المتابعة الفنية">شعبة المتابعة الفنية</option>
+              <option value="ALL">كافة التشكيلات الإدارية والميدانية</option>
+              <option value="DEPT">🏢 إدارة القسم المركزية</option>
+              <optgroup label="📁 الشعب الإنتاجية والرأسية">
+                <option value="sec-1">📁 الشعبة الأولى</option>
+                <option value="sec-2">📁 الشعبة الثانية</option>
+                <option value="sec-3">📁 شعبة المختبرات</option>
+                <option value="sec-4">📁 شعبة العدادات</option>
+              </optgroup>
+              <optgroup label="⚙️ الوحدات التابعة لإدارة القسم">
+                <option value="unit-1">⚙️ الوحدة الفنية</option>
+                <option value="unit-2">⚙️ وحدة التدريب والتطوير</option>
+                <option value="unit-3">⚙️ وحدة الضمان الصحي</option>
+              </optgroup>
+              <optgroup label="⛽ محطات الإنتاج الميدانية (DS)">
+                <option value="ST-CTR">⛽ المحطة المركزية (DS-1)</option>
+                <option value="ST-STH">⛽ المحطة الجنوبية (DS-2)</option>
+                <option value="ST-RTK">⛽ محطة الرطكة (DS-3)</option>
+                <option value="ST-SHM">⛽ محطة الشامية (DS-4)</option>
+                <option value="ST-QRN">⛽ محطة القرينات (DS-5)</option>
+                <option value="ST-MSH-SHM">⛽ محطة مشرف شامية (DS-6)</option>
+                <option value="ST-MSH-QRN">⛽ محطة مشرف قرينات (DS-7)</option>
+              </optgroup>
             </select>
           </div>
         </div>
@@ -970,20 +1087,45 @@
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
           <div>
-            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الشعبة:</label>
-            <select id="editEmpSection" class="select-glass" style="width: 100%;">
-              <option value="الإنتاج">شعبة الإنتاج</option>
-              <option value="المعالجة والعمليات">شعبة المعالجة والعمليات</option>
-              <option value="الصيانة">شعبة الصيانة</option>
-              <option value="المتابعة الفنية">شعبة المتابعة الفنية</option>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الشعبة / جهة الارتباط:</label>
+            <select id="editEmpSection" class="select-glass" style="width: 100%;" onchange="FounderPortal.onDossierSectionChange(this.value)">
+              <option value="DEPT">🏢 إدارة القسم المركزية</option>
+              <optgroup label="📁 الشُعب الإنتاجية">
+                <option value="sec-1">الشعبة الأولى</option>
+                <option value="sec-2">الشعبة الثانية</option>
+                <option value="sec-3">شعبة المختبرات</option>
+                <option value="sec-4">شعبة العدادات</option>
+              </optgroup>
+              <optgroup label="⚙️ الوحدات الإدارية والفنية">
+                <option value="unit-1">الوحدة الفنية</option>
+                <option value="unit-2">وحدة التدريب والتطوير</option>
+                <option value="unit-3">وحدة الضمان الصحي</option>
+              </optgroup>
             </select>
           </div>
+          <div>
+            <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">المحطة التابعة (للملاكات الميدانية):</label>
+            <select id="editEmpStation" class="select-glass" style="width: 100%;">
+              <option value="">-- بدون محطة / ملاك مكتبي --</option>
+              <optgroup label="محطات الشعبة الأولى">
+                <option value="st-101">المحطة المركزية (ST-CTR / DS-1)</option>
+                <option value="st-102">المحطة الجنوبية (ST-STH / DS-2)</option>
+                <option value="st-103">محطة الرطكة (ST-RTK / DS-3)</option>
+              </optgroup>
+              <optgroup label="محطات الشعبة الثانية">
+                <option value="st-201">محطة الشامية (ST-SHM / DS-4)</option>
+                <option value="st-202">محطة القرينات (ST-QRN / DS-5)</option>
+                <option value="st-203">محطة مشرف شامية (ST-MSH-SHM / DS-6)</option>
+                <option value="st-204">محطة مشرف قرينات (ST-MSH-QRN / DS-7)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem;">
           <div>
             <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">سنوات الخدمة الوظيفية:</label>
             <input type="number" id="editEmpService" class="input-glass" style="width: 100%;" min="0" max="45" value="5">
           </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
           <div>
             <label style="font-size: 0.84rem; color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 0.35rem;">الدرجة الوظيفية:</label>
             <input type="text" id="editEmpGrade" class="input-glass" style="width: 100%;" placeholder="مثال: الخامسة">
