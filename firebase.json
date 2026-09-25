@@ -15,7 +15,10 @@
         "server.js",
         "package.json",
         "package-lock.json",
-        "founder-public/**"
+        "founder-public/**",
+        "js/test_*.js",
+        "run_all_tests.ps1",
+        "*.md"
       ],
       "headers": [
         {
