@@ -45,6 +45,7 @@ eval(fs.readFileSync(path.join(__dirname, 'store.js'), 'utf8'));
 eval(fs.readFileSync(path.join(__dirname, 'utils/exporter.js'), 'utf8'));
 eval(fs.readFileSync(path.join(__dirname, 'components/correspondence.js'), 'utf8'));
 eval(fs.readFileSync(path.join(__dirname, 'components/sidebar.js'), 'utf8'));
+eval(fs.readFileSync(path.join(__dirname, 'components/mail_system.js'), 'utf8'));
 
 let passCount = 0;
 function pass(msg) {
@@ -68,7 +69,7 @@ try {
 
   console.log('\n--- 2. التحقق من الثلاثي القانوني المعتمد (العدد + التاريخ + الباركود) ---');
   outwardList.forEach(item => {
-    assert(item.docNumber && item.docNumber.includes('ق.ج/ص/'), `العدد الصريح المقروء غير صالح: ${item.docNumber}`);
+    assert(item.docNumber && item.docNumber.startsWith('ق.ج/') && item.docNumber.includes('/ص/'), `العدد الصريح المقروء غير صالح: ${item.docNumber}`);
     assert(item.docDate && item.docDate.match(/^\d{4}-\d{2}-\d{2}$/), `التاريخ الرسمي غير صالح: ${item.docDate}`);
     assert(item.barcodeValue && item.barcodeValue.startsWith('SPD-OUT-'), `رمز الباركود غير صالح: ${item.barcodeValue}`);
     assert(item.verificationHash && item.verificationHash.startsWith('VFY-'), `رمز التحقق غير صالح: ${item.verificationHash}`);
@@ -179,8 +180,81 @@ try {
   assert(!viewHtml.includes('عليا'), 'واجهة المراسلات خالية من كلمة عليا');
   pass('واجهة المراسلات تتضمن كافة السجلات والأدوات الفورية ومتوافقة بالكامل');
 
+  console.log('\n--- 8. التحقق من الربط التلقائي للمحاور الخمسة مع الصادر والوارد (Cross-Module Integration) ---');
+  
+  // أ. تبليغات وأوامر إدارة القسم
+  const deptNotif = store.addOfficialNotification({
+    title: 'أمر إداري: تشكيل لجنة جرد أصول محطة الرميلة',
+    content: 'تقرر تشكيل لجنة برئاسة رئيس مهندسين أقدم لجرد موجودات المحطة.',
+    priority: 'HIGH',
+    importance: 'HIGH',
+    targetSectionName: 'كافة الشعب'
+  }, user);
+  assert(deptNotif.docNumber && deptNotif.docNumber.startsWith('ق.ج/'), 'يجب أن يحصل تبليغ إدارة القسم على عدد رسمي');
+  assert(deptNotif.barcodeValue && deptNotif.barcodeValue.startsWith('SPD-OUT-'), 'يجب توليد باركود لتبليغ إدارة القسم');
+  const verifyDeptNotif = store.verifyCorrespondence(deptNotif.docNumber);
+  assert(verifyDeptNotif.verified === true && verifyDeptNotif.item.sourceModule === 'DEPT_NOTIFICATION', 'يجب توثيق تبليغ إدارة القسم في سجل الصادر');
+  pass(`تم ربط إدارة القسم بسجل الصادر بنجاح (${deptNotif.docNumber})`);
+
+  // ب. تبليغات ومذكرات الشُعب
+  const secNotif = store.addSectionNotification({
+    sectionId: 'sec-1',
+    title: 'مذكرة داخلية: فحص دوري لمضخات التعزيز',
+    content: 'يرجى تزويدنا بجدول الصيانة للأسبوع القادم.',
+    priority: 'NORMAL'
+  }, user);
+  assert(secNotif.docNumber && secNotif.docNumber.includes('/ص/'), 'يجب أن تحصل مذكرة الشعبة على عدد صادر خاص بالشعبة');
+  const verifySecNotif = store.verifyCorrespondence(secNotif.docNumber);
+  assert(verifySecNotif.verified === true && verifySecNotif.item.sourceModule === 'SECTION_NOTIFICATION', 'يجب توثيق مذكرة الشعبة في سجل الصادر');
+  pass(`تم ربط مذكرات الشُعب بسجل الصادر بنجاح (${secNotif.docNumber})`);
+
+  // ج. تبليغات ومذكرات المحطات
+  const stNotif = store.addStationNotification({
+    stationId: 'st-101',
+    stationName: 'محطة DS-1',
+    title: 'مذكرة محطة: إشعار استبدال صمام العزل الرئيسي',
+    content: 'تم إنجاز أعمال الصيانة الميكانيكية بنجاح.',
+    priority: 'NORMAL'
+  }, user);
+  assert(stNotif.docNumber && stNotif.docNumber.includes('/ص/'), 'يجب أن تحصل مذكرة المحطة على عدد صادر خاص بالمحطة');
+  const verifyStNotif = store.verifyCorrespondence(stNotif.docNumber);
+  assert(verifyStNotif.verified === true && verifyStNotif.item.sourceModule === 'STATION_NOTIFICATION', 'يجب توثيق مذكرة المحطة في سجل الصادر');
+  pass(`تم ربط مذكرات المحطات بسجل الصادر بنجاح (${stNotif.docNumber})`);
+
+  // د. استمارات وطلبات المنتسبين الإدارية (قيد الوارد)
+  const newReq = store.addRequest({
+    id: 'req-' + Date.now(),
+    typeId: 'vacation-regular',
+    typeTitle: 'طلب إجازة اعتيادية',
+    userId: user.id,
+    userName: user.fullName,
+    userEmployeeId: 'EMP-2024-001',
+    description: 'طلب إجازة اعتيادية لمدة يومين لأسباب عائلية',
+    priority: 'NORMAL'
+  });
+  assert(newReq.inwardNumber && newReq.inwardNumber.includes('ق.ج/و/'), 'يجب أن يحصل طلب المنتسب على رقم قيد وارد رسمي');
+  assert(newReq.barcodeValue && newReq.barcodeValue.startsWith('SPD-IN-'), 'يجب توليد باركود وارد لطلب المنتسب');
+  const verifyReq = store.verifyCorrespondence(newReq.inwardNumber);
+  assert(verifyReq.verified === true && verifyReq.item.sourceModule === 'ADMINISTRATIVE_REQUEST', 'يجب توثيق طلب المنتسب في سجل الوارد');
+  pass(`تم ربط الاستمارات والطلبات الإدارية بسجل الوارد بنجاح (${newReq.inwardNumber})`);
+
+  // هـ. البريد الداخلي الرسمي
+  const mailResult = sendMail({
+    mailType: 'public',
+    fromLevel: 'department',
+    subject: 'كتاب وزاري دوري: ترشيد الطاقة والالتزام بمعايير السلامة المهنية',
+    body: 'نرفق طياً التعليمات الوزارية الجديدة الواجب تطبيقها فوراً.',
+    letterType: 'OFFICIAL_LETTER',
+    priority: 'IMMEDIATE',
+    classification: 'OFFICIAL'
+  }, user);
+  assert(mailResult && mailResult.mail && mailResult.mail.refNumber, 'يجب أن يتضمن البريد الصادر رقماً مرجعياً رسمياً');
+  const verifyMail = store.verifyCorrespondence(mailResult.mail.refNumber);
+  assert(verifyMail.verified === true && verifyMail.item.sourceModule === 'MAIL_SYSTEM', 'يجب توثيق البريد الصادر في سجل الصادر والوارد');
+  pass(`تم ربط البريد الداخلي بسجل الصادر والوارد بنجاح (${mailResult.mail.refNumber})`);
+
   console.log('----------------------------------------------------------------------');
-  console.log(`🎉 نجحت جميع اختبارات نظام الصادر والوارد المعتمد بنسبة 100%! (${passCount} اختبار)`);
+  console.log(`🎉 نجحت جميع اختبارات نظام الصادر والوارد المعتمد والربط الشامل بنسبة 100%! (${passCount} اختبار)`);
   console.log('----------------------------------------------------------------------');
   process.exit(0);
 } catch (err) {

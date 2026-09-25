@@ -130,6 +130,54 @@ function sendMail(mailData, user) {
     status: 'sent'
   };
 
+  // ربط تلقائي فوري بنظام الصادر والوارد بالثلاثي المعتمد
+  try {
+    if (window.store && typeof window.store.registerSystemCorrespondence === 'function') {
+      const corrOut = window.store.registerSystemCorrespondence({
+        type: 'OUTWARD',
+        sourceModule: 'MAIL_SYSTEM',
+        sourceId: newMail.id,
+        date: newMail.letterDate,
+        docNumber: newMail.refNumber || null,
+        subject: newMail.subject,
+        content: newMail.body,
+        senderDept: newMail.fromUserName ? `${newMail.fromUserName} (${newMail.fromUserTitle || 'مسؤول'})` : 'قسم الإنتاج الجنوبي',
+        recipientDept: newMail.toTargetName || 'الجميع',
+        senderSigner: newMail.fromUserName ? `${newMail.fromUserName} - ${newMail.fromUserTitle || ''}` : 'إدارة قسم الإنتاج الجنوبي',
+        priority: newMail.priority === 'IMMEDIATE' ? 'URGENT' : (newMail.priority || 'NORMAL'),
+        category: newMail.letterType === 'OFFICIAL_LETTER' ? 'OFFICIAL_LETTER' : (newMail.letterType === 'FIELD_MEMO' ? 'MEMORANDUM' : 'CIRCULAR'),
+        securityClassification: newMail.classification === 'CONFIDENTIAL' ? 'CONFIDENTIAL' : 'OFFICIAL',
+        attachmentsCount: (newMail.attachments || []).length,
+        fromLevel: newMail.fromLevel
+      }, user);
+
+      newMail.corrDocNumber = corrOut.docNumber;
+      newMail.refNumber = corrOut.docNumber; // توحيد العدد الصريح المقروء
+      newMail.barcodeValue = corrOut.barcodeValue;
+      newMail.verificationHash = corrOut.verificationHash;
+
+      // إذا كان الكتاب موجهاً لجهة محددة (شعبة أو وحدة أو محطة أو منتسب)، يُقيد فوراً كوارد إليها
+      if (newMail.toLevel !== 'all') {
+        window.store.registerSystemCorrespondence({
+          type: 'INWARD',
+          sourceModule: 'MAIL_SYSTEM_INWARD',
+          sourceId: 'IN-' + newMail.id,
+          date: newMail.letterDate,
+          externalDocNumber: corrOut.docNumber,
+          externalDocDate: newMail.letterDate,
+          subject: newMail.subject,
+          content: newMail.body,
+          senderDept: newMail.fromUserName,
+          recipientDept: newMail.toTargetName,
+          priority: corrOut.priority,
+          category: corrOut.category,
+          executiveRouting: 'برسم الاطلاع وإجراء اللازم',
+          attachmentsCount: (newMail.attachments || []).length
+        }, user);
+      }
+    }
+  } catch (e) {}
+
   db.mailSystem.mails.unshift(newMail); // أحدث أولاً
   window.store.saveDb(db);
 
@@ -1858,13 +1906,18 @@ function buildMailViewerContent(mailId) {
             ${mail.refNumber ? `
               <div style="background:var(--md-sys-color-surface); border:1.5px solid #d97706; padding:0.35rem 0.8rem; border-radius:var(--radius-sm); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
                 <div style="font-size:0.68rem; color:#b45309; font-weight:800;">العدد الصادر</div>
-                <div style="font-weight:900; font-size:0.92rem; color:var(--md-sys-color-on-surface);">${esc(mail.refNumber)}</div>
+                <div style="font-weight:900; font-size:0.92rem; color:var(--md-sys-color-on-surface); font-family:monospace;">${esc(mail.refNumber)}</div>
               </div>
             ` : ''}
             <div style="background:var(--md-sys-color-surface); border:1.5px solid rgba(0,0,0,0.12); padding:0.35rem 0.8rem; border-radius:var(--radius-sm); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
               <div style="font-size:0.68rem; color:var(--md-sys-color-outline); font-weight:800;">التاريخ الرسمي</div>
               <div style="font-weight:900; font-size:0.92rem; color:var(--md-sys-color-on-surface);">${esc(mail.letterDate || (mail.timestamp ? mail.timestamp.slice(0, 10) : '—'))}</div>
             </div>
+            ${mail.refNumber ? `
+              <button type="button" class="btn btn-sm btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${esc(mail.refNumber)}')" title="فحص صحة الصدور والباركود في سجل الصادر والوارد" style="border-color:#0284c7; color:#0284c7; font-size:0.78rem; padding:0.4rem 0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:0.3rem;">
+                <span>🔍</span> <span>صحة الصدور</span>
+              </button>
+            ` : ''}
             ${mail.priority === 'URGENT' ? '<span style="background:#dc2626; color:white; font-size:0.75rem; font-weight:900; padding:0.35rem 0.7rem; border-radius:999px;">عاجل ⚠️</span>' : ''}
             ${mail.priority === 'IMMEDIATE' ? '<span style="background:#7f1d1d; color:white; font-size:0.75rem; font-weight:900; padding:0.35rem 0.7rem; border-radius:999px; box-shadow:0 0 10px rgba(220,38,38,0.5);">🔴 فوري وسري جداً</span>' : ''}
             ${mail.classification === 'CONFIDENTIAL' ? '<span style="background:#1e293b; color:#f8fafc; font-size:0.75rem; font-weight:900; padding:0.35rem 0.7rem; border-radius:999px; border:1px solid #475569;">🔒 سري ومكتوم</span>' : ''}

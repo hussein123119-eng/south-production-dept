@@ -315,12 +315,22 @@ function renderDeptNotifsTab(notifs, actorUser, sections) {
                       ${n.status === 'PUBLISHED' ? 'منشور' : 'مسودة / مؤرشف'}
                     </span>
                   </div>
-                  <div style="font-size: 0.78rem; color: var(--md-sys-color-outline);">
-                    📅 الصادر: ${dateStr} | بواسطة: <strong>${n.createdByName || 'إدارة القسم'}</strong>
+                  <div style="font-size: 0.78rem; color: var(--md-sys-color-outline); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                    <span>📅 الصادر: ${dateStr} | بواسطة: <strong>${n.createdByName || 'إدارة القسم'}</strong></span>
+                    ${n.docNumber ? `
+                      <span style="font-family: monospace; font-size: 0.76rem; font-weight: 800; color: #003366; background: rgba(0,51,102,0.08); border: 1px solid rgba(0,51,102,0.2); padding: 1px 6px; border-radius: 4px;">
+                        📋 العدد: ${n.docNumber}
+                      </span>
+                    ` : ''}
                   </div>
                 </div>
 
-                <div style="display: flex; gap: 0.35rem; align-items: center;">
+                <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                  ${n.docNumber ? `
+                    <button class="btn btn-sm btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${n.docNumber}')" title="فحص صحة الصدور والباركود في سجل الصادر والوارد" style="font-size: 0.78rem; padding: 2px 8px; border-color: #0284c7; color: #0284c7;">
+                      🔍 صحة الصدور
+                    </button>
+                  ` : ''}
                   ${canPublish ? `
                     <button class="${n.status === 'PUBLISHED' ? 'btn-action-broadcast' : 'btn-action-export'}" onclick="window.app.togglePublishDeptNotification('${n.id}')" title="${n.status === 'PUBLISHED' ? 'إلغاء تعميم التبليغ' : 'نشر وتعميم التبليغ'}">
                       ${n.status === 'PUBLISHED' ? 'إلغاء النشر' : 'نشر التبليغ'}

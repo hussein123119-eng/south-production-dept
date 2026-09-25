@@ -455,6 +455,11 @@ function renderStationNotificationsTab(station, section, relevantSectionNotifs =
                         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.35rem;">
                           ${priorityBadge}
                           <span class="badge badge-secondary" style="font-size: 0.78rem;">🎯 النطاق: ${scopeText}</span>
+                          ${n.docNumber ? `
+                            <span style="font-family: monospace; font-size: 0.76rem; font-weight: 800; color: #003366; background: rgba(0,51,102,0.08); border: 1px solid rgba(0,51,102,0.2); padding: 1px 6px; border-radius: 4px;">
+                              📋 العدد: ${n.docNumber}
+                            </span>
+                          ` : ''}
                           <span style="font-size: 0.78rem; color: var(--md-sys-color-outline); font-family: monospace;">📅 ${formattedDate}</span>
                         </div>
                         <h4 style="margin: 0; font-weight: 800; font-size: 1.15rem; color: var(--md-sys-color-on-surface);">
@@ -462,7 +467,12 @@ function renderStationNotificationsTab(station, section, relevantSectionNotifs =
                         </h4>
                       </div>
                       
-                      <div style="display: flex; gap: 0.35rem; align-items: center;">
+                      <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                        ${n.docNumber ? `
+                          <button class="btn btn-sm btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${n.docNumber}')" title="فحص صحة الصدور والباركود" style="font-size: 0.78rem; padding: 2px 7px; border-color: #0284c7; color: #0284c7;">
+                            🔍 صحة الصدور
+                          </button>
+                        ` : ''}
                         <button class="btn-action-view" onclick="window.app.viewStationNotificationDetails('${n.id}')" title="معاينة التبليغ">معاينة</button>
                         <button class="btn-action-print" onclick="window.app.printStationNotification('${n.id}')" title="طباعة التبليغ">طباعة</button>
                         ${canPublishStation ? `

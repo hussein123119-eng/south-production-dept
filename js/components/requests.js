@@ -60,7 +60,17 @@ function renderRequestsListBody(requests, isHRorMgr) {
     </tr>
     ${requests.map(r => `
       <tr>
-        <td><strong>${r.id}</strong><br/><small style="color: var(--md-sys-color-outline);">${new Date(r.createdAt).toLocaleDateString('ar-IQ')}</small></td>
+        <td>
+          <strong>${r.id}</strong>
+          ${(r.inwardNumber || r.corrDocNumber) ? `
+            <div style="margin-top: 3px;">
+              <span style="font-family: monospace; font-size: 0.76rem; font-weight: 800; color: #047857; background: rgba(4,120,87,0.1); border: 1px solid rgba(4,120,87,0.25); padding: 1px 6px; border-radius: 4px; display: inline-block;">
+                📥 وارد: ${r.inwardNumber || r.corrDocNumber}
+              </span>
+            </div>
+          ` : ''}
+          <small style="color: var(--md-sys-color-outline); display: block; margin-top: 2px;">${new Date(r.createdAt).toLocaleDateString('ar-IQ')}</small>
+        </td>
         <td><strong>${r.typeTitle}</strong></td>
         <td>${r.userName}<br/><small style="color: var(--md-sys-color-outline);">${r.userEmployeeId}</small></td>
         <td style="max-width: 250px; font-size: 0.85rem;">
@@ -72,7 +82,10 @@ function renderRequestsListBody(requests, isHRorMgr) {
           </span>
         </td>
         <td>
-          <div style="display: flex; gap: 0.3rem;">
+          <div style="display: flex; gap: 0.3rem; flex-wrap: wrap;">
+            ${(r.inwardNumber || r.corrDocNumber) ? `
+              <button class="btn btn-sm btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${r.inwardNumber || r.corrDocNumber}')" title="التحقق من صحة القيد في الصادر والوارد" style="font-size: 0.78rem; padding: 2px 6px;">🔍 قيد الوارد</button>
+            ` : ''}
             ${isHRorMgr && r.status === 'PENDING' ? `
               <button class="btn btn-sm btn-success" onclick="window.app.approveAdministrativeRequest('${r.id}')">موافقة وتحديث</button>
               <button class="btn btn-sm btn-danger" onclick="window.app.rejectAdministrativeRequest('${r.id}')">رفض</button>

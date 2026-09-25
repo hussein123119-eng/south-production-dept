@@ -1561,6 +1561,11 @@ class StoreManager {
     if (modified) {
       localStorage.setItem(this.key, JSON.stringify(db));
     }
+
+    try {
+      this.syncAllModulesToCorrespondence();
+    } catch (e) {}
+
     return db;
   }
 
@@ -4295,6 +4300,27 @@ class StoreManager {
       createdByName: actorUser.fullName
     };
 
+    // ربط تلقائي فوري بنظام الصادر والوارد بالثلاثي المعتمد
+    try {
+      const corr = this.registerSystemCorrespondence({
+        type: 'OUTWARD',
+        sourceModule: 'DEPT_NOTIFICATION',
+        sourceId: newNotif.id,
+        date: newNotif.publishDate ? newNotif.publishDate.split('T')[0] : null,
+        subject: newNotif.title,
+        content: newNotif.content,
+        senderDept: 'إدارة قسم الإنتاج الجنوبي / رئاسة القسم',
+        recipientDept: newNotif.targetSectionName || 'كافة شعب ووحدات القسم',
+        senderSigner: actorUser ? `${actorUser.fullName} - ${actorUser.jobTitle || 'مدير القسم'}` : 'علاء حسن عبادان - رئيس مهندسين أقدم / مدير القسم',
+        priority: newNotif.priority || 'NORMAL',
+        category: 'CIRCULAR'
+      }, actorUser);
+
+      newNotif.docNumber = corr.docNumber;
+      newNotif.barcodeValue = corr.barcodeValue;
+      newNotif.verificationHash = corr.verificationHash;
+    } catch (e) {}
+
     db.officialNotifications.unshift(newNotif);
     this.saveDb(db);
 
@@ -4304,7 +4330,7 @@ class StoreManager {
       actorUser.employeeId,
       'CREATE_OFFICIAL_NOTIFICATION',
       'DEPARTMENT_MANAGEMENT',
-      `تم إصدار تبليغ رسمي جديد بعنوان [${newNotif.title}].`
+      `تم إصدار تبليغ رسمي جديد بالعدد [${newNotif.docNumber || newNotif.id}] بعنوان [${newNotif.title}].`
     );
 
     return newNotif;
@@ -4423,6 +4449,30 @@ class StoreManager {
       createdByRole: actorUser ? actorUser.role : 'SECTION_MANAGER'
     };
 
+    // ربط تلقائي فوري بنظام الصادر والوارد بالثلاثي المعتمد
+    try {
+      const sec = this.getSectionById ? this.getSectionById(newNotif.sectionId) : null;
+      const corr = this.registerSystemCorrespondence({
+        type: 'OUTWARD',
+        sourceModule: 'SECTION_NOTIFICATION',
+        sourceId: newNotif.id,
+        date: newNotif.publishDate ? newNotif.publishDate.split('T')[0] : null,
+        subject: newNotif.title,
+        content: newNotif.content,
+        senderDept: `قسم الإنتاج الجنوبي / ${sec ? sec.name : 'الشعبة'}`,
+        recipientDept: newNotif.targetStationName || 'محطات الشعبة وإدارة القسم',
+        senderSigner: actorUser ? `${actorUser.fullName} - ${actorUser.jobTitle || 'مسؤول الشعبة'}` : 'مسؤول الشعبة',
+        priority: newNotif.priority || 'NORMAL',
+        category: 'MEMORANDUM',
+        fromLevel: 'section',
+        sectionCode: `ش.${(newNotif.sectionId || '').replace('sec-', '')}`
+      }, actorUser);
+
+      newNotif.docNumber = corr.docNumber;
+      newNotif.barcodeValue = corr.barcodeValue;
+      newNotif.verificationHash = corr.verificationHash;
+    } catch (e) {}
+
     db.sectionNotifications.unshift(newNotif);
     this.saveDb(db);
 
@@ -4433,7 +4483,7 @@ class StoreManager {
         actorUser.employeeId,
         'CREATE_SECTION_NOTIFICATION',
         'SECTION_WORKSPACE',
-        `أصدر مسؤول الشعبة تبليغاً لمحطاته بعنوان [${newNotif.title}].`
+        `أصدر مسؤول الشعبة تبليغاً بالعدد [${newNotif.docNumber || newNotif.id}] بعنوان [${newNotif.title}].`
       );
     }
 
@@ -4564,6 +4614,29 @@ class StoreManager {
       createdByRole: actorUser ? actorUser.role : 'STATION_MANAGER'
     };
 
+    // ربط تلقائي فوري بنظام الصادر والوارد بالثلاثي المعتمد
+    try {
+      const corr = this.registerSystemCorrespondence({
+        type: 'OUTWARD',
+        sourceModule: 'STATION_NOTIFICATION',
+        sourceId: newNotif.id,
+        date: newNotif.publishDate ? newNotif.publishDate.split('T')[0] : null,
+        subject: newNotif.title,
+        content: newNotif.content,
+        senderDept: `قسم الإنتاج الجنوبي / ${newNotif.stationName || 'المحطة'}`,
+        recipientDept: 'شعبة العمليات / إدارة القسم',
+        senderSigner: actorUser ? `${actorUser.fullName} - ${actorUser.jobTitle || 'مسؤول المحطة'}` : 'مسؤول المحطة',
+        priority: newNotif.priority || 'NORMAL',
+        category: 'MEMORANDUM',
+        fromLevel: 'station',
+        stationCode: newNotif.stationName || 'محطة'
+      }, actorUser);
+
+      newNotif.docNumber = corr.docNumber;
+      newNotif.barcodeValue = corr.barcodeValue;
+      newNotif.verificationHash = corr.verificationHash;
+    } catch (e) {}
+
     db.stationNotifications.unshift(newNotif);
     this.saveDb(db);
 
@@ -4574,7 +4647,7 @@ class StoreManager {
         actorUser.employeeId,
         'CREATE_STATION_NOTIFICATION',
         'STATION_WORKSPACE',
-        `أصدر مسؤول المحطة تبليغاً لكادره بعنوان [${newNotif.title}].`
+        `أصدر مسؤول المحطة تبليغاً بالعدد [${newNotif.docNumber || newNotif.id}] بعنوان [${newNotif.title}].`
       );
     }
 
@@ -4876,6 +4949,221 @@ class StoreManager {
     };
   }
 
+  // --- المحرك المركزي لربط كافة الاستمارات والأقسام بنظام الصادر والوارد الموحد ---
+  registerSystemCorrespondence(options, actorUser = null) {
+    const db = this.getDb();
+    if (!db.correspondenceRegistry) db.correspondenceRegistry = [];
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const dateStr = options.date || now.toISOString().split('T')[0];
+    const randCode = Math.floor(1000 + Math.random() * 9000);
+
+    const type = options.type || 'OUTWARD'; // 'OUTWARD' or 'INWARD'
+    
+    // التوليد التسلسلي الذكي وفق نوع المحرر والجهة المصدرة
+    let docNumber = options.docNumber;
+    if (!docNumber) {
+      if (options.sourceModule === 'SECTION_NOTIFICATION' || options.fromLevel === 'section') {
+        const secCode = options.sectionCode || 'ش.ع';
+        docNumber = `ق.ج/${secCode}/ص/${year}/${Math.floor(100 + Math.random() * 900)}`;
+      } else if (options.sourceModule === 'STATION_NOTIFICATION' || options.fromLevel === 'station') {
+        const stCode = options.stationCode || 'محطة';
+        docNumber = `ق.ج/${stCode}/ص/${year}/${Math.floor(100 + Math.random() * 900)}`;
+      } else if (options.sourceModule === 'ADMINISTRATIVE_REQUEST' || type === 'INWARD') {
+        docNumber = this.getNextCorrespondenceNumber('INWARD', year);
+      } else {
+        docNumber = this.getNextCorrespondenceNumber('OUTWARD', year);
+      }
+    }
+
+    const barcodeValue = options.barcodeValue || (type === 'INWARD' ? `SPD-IN-${year}-${randCode}` : `SPD-OUT-${year}-${randCode}`);
+    const verificationHash = options.verificationHash || `VFY-${randCode}-BOC-${year}`;
+
+    const newRecord = {
+      id: `CORR-${type === 'INWARD' ? 'IN' : 'OUT'}-${year}-${Date.now().toString().slice(-4)}-${randCode}`,
+      departmentId: options.departmentId || (actorUser && actorUser.departmentId) || 'dept-south-prod',
+      type: type,
+      docNumber: docNumber,
+      docDate: dateStr,
+      subject: options.subject || options.title || 'معاملة رسمية موحدة',
+      senderDept: options.senderDept || (actorUser ? `${actorUser.fullName} (${actorUser.jobTitle || 'موظف'})` : 'قسم الإنتاج الجنوبي'),
+      recipientDept: options.recipientDept || 'كافة التشكيلات المعنية',
+      senderSigner: options.senderSigner || (actorUser ? `${actorUser.fullName} - ${actorUser.jobTitle || ''}` : 'إدارة قسم الإنتاج الجنوبي'),
+      priority: options.priority || 'NORMAL',
+      securityClassification: options.securityClassification || 'OFFICIAL',
+      status: options.status || (type === 'INWARD' ? 'REGISTERED' : 'ISSUED'),
+      category: options.category || 'OFFICIAL_LETTER',
+      content: options.content || options.body || '',
+      externalDocNumber: options.externalDocNumber || '',
+      externalDocDate: options.externalDocDate || '',
+      executiveRouting: options.executiveRouting || '',
+      attachmentsCount: parseInt(options.attachmentsCount, 10) || 0,
+      tags: Array.isArray(options.tags) ? options.tags : [options.sourceModule || 'SYSTEM'],
+      sourceModule: options.sourceModule || 'GENERAL',
+      sourceId: options.sourceId || null,
+      barcodeValue: barcodeValue,
+      verificationHash: verificationHash,
+      createdAt: now.toISOString(),
+      createdBy: actorUser ? actorUser.id : 'SYSTEM'
+    };
+
+    // منع التكرار إذا كان القيد مسجلاً لنفس المعرف والمصدر
+    const existingIdx = newRecord.sourceId ? db.correspondenceRegistry.findIndex(c => c.sourceId === newRecord.sourceId && c.sourceModule === newRecord.sourceModule && c.type === newRecord.type) : -1;
+    if (existingIdx !== -1) {
+      db.correspondenceRegistry[existingIdx] = { ...db.correspondenceRegistry[existingIdx], ...newRecord, id: db.correspondenceRegistry[existingIdx].id };
+      this.saveDb(db);
+      return db.correspondenceRegistry[existingIdx];
+    } else {
+      db.correspondenceRegistry.unshift(newRecord);
+      this.saveDb(db);
+      return newRecord;
+    }
+  }
+
+  syncAllModulesToCorrespondence() {
+    const db = this.getDb();
+    if (!db.correspondenceRegistry) db.correspondenceRegistry = [];
+
+    // 1. مزامنة البريد الداخلي (Internal Mail)
+    const mails = (db.mailSystem && Array.isArray(db.mailSystem.mails)) ? db.mailSystem.mails : [];
+    mails.forEach(m => {
+      if (!m.id) return;
+      const already = db.correspondenceRegistry.some(c => c.sourceId === m.id && c.sourceModule === 'MAIL_SYSTEM');
+      if (!already) {
+        const corr = this.registerSystemCorrespondence({
+          type: 'OUTWARD',
+          sourceModule: 'MAIL_SYSTEM',
+          sourceId: m.id,
+          date: m.letterDate || (m.timestamp ? m.timestamp.split('T')[0] : null),
+          docNumber: m.refNumber || null,
+          subject: m.subject || 'بريد إداري رسمي',
+          content: m.body || '',
+          senderDept: m.fromUserName ? `${m.fromUserName} (${m.fromUserTitle || 'مسؤول'})` : 'قسم الإنتاج الجنوبي',
+          recipientDept: m.toTargetName || 'الجميع',
+          senderSigner: m.fromUserName ? `${m.fromUserName} - ${m.fromUserTitle || ''}` : 'إدارة قسم الإنتاج الجنوبي',
+          priority: m.priority === 'IMMEDIATE' ? 'URGENT' : (m.priority || 'NORMAL'),
+          category: m.letterType === 'OFFICIAL_LETTER' ? 'OFFICIAL_LETTER' : (m.letterType === 'FIELD_MEMO' ? 'MEMORANDUM' : 'CIRCULAR'),
+          securityClassification: m.classification === 'CONFIDENTIAL' ? 'CONFIDENTIAL' : 'OFFICIAL',
+          attachmentsCount: Array.isArray(m.attachments) ? m.attachments.length : 0,
+          fromLevel: m.fromLevel
+        });
+        m.corrDocNumber = corr.docNumber;
+        m.barcodeValue = corr.barcodeValue;
+        m.verificationHash = corr.verificationHash;
+        m.refNumber = corr.docNumber;
+      }
+    });
+
+    // 2. مزامنة تبليغات وأوامر إدارة القسم (Dept Official Notifications)
+    const deptNotifs = Array.isArray(db.officialNotifications) ? db.officialNotifications : [];
+    deptNotifs.forEach(n => {
+      if (!n.id) return;
+      const already = db.correspondenceRegistry.some(c => c.sourceId === n.id && c.sourceModule === 'DEPT_NOTIFICATION');
+      if (!already) {
+        const corr = this.registerSystemCorrespondence({
+          type: 'OUTWARD',
+          sourceModule: 'DEPT_NOTIFICATION',
+          sourceId: n.id,
+          date: n.publishDate ? n.publishDate.split('T')[0] : null,
+          subject: n.title,
+          content: n.content,
+          senderDept: 'إدارة قسم الإنتاج الجنوبي / رئاسة القسم',
+          recipientDept: n.targetSectionName || 'كافة شعب ووحدات القسم',
+          senderSigner: n.createdByName ? `${n.createdByName} - مدير القسم` : 'علاء حسن عبادان - رئيس مهندسين أقدم / مدير القسم',
+          priority: n.priority || n.importance || 'NORMAL',
+          category: 'CIRCULAR'
+        });
+        n.docNumber = corr.docNumber;
+        n.barcodeValue = corr.barcodeValue;
+        n.verificationHash = corr.verificationHash;
+      }
+    });
+
+    // 3. مزامنة تبليغات ومذكرات الشُعب (Section Notifications)
+    const secNotifs = Array.isArray(db.sectionNotifications) ? db.sectionNotifications : [];
+    secNotifs.forEach(sn => {
+      if (!sn.id) return;
+      const already = db.correspondenceRegistry.some(c => c.sourceId === sn.id && c.sourceModule === 'SECTION_NOTIFICATION');
+      if (!already) {
+        const sec = (db.sections || []).find(s => s.id === sn.sectionId);
+        const corr = this.registerSystemCorrespondence({
+          type: 'OUTWARD',
+          sourceModule: 'SECTION_NOTIFICATION',
+          sourceId: sn.id,
+          date: sn.publishDate ? sn.publishDate.split('T')[0] : null,
+          subject: sn.title,
+          content: sn.content,
+          senderDept: `قسم الإنتاج الجنوبي / ${sec ? sec.name : 'الشعبة'}`,
+          recipientDept: sn.targetStationName || 'محطات الشعبة وإدارة القسم',
+          senderSigner: sn.createdByName ? `${sn.createdByName} - مسؤول الشعبة` : 'مسؤول الشعبة',
+          priority: sn.priority || 'NORMAL',
+          category: 'MEMORANDUM',
+          fromLevel: 'section',
+          sectionCode: `ش.${(sn.sectionId || '').replace('sec-', '')}`
+        });
+        sn.docNumber = corr.docNumber;
+        sn.barcodeValue = corr.barcodeValue;
+        sn.verificationHash = corr.verificationHash;
+      }
+    });
+
+    // 4. مزامنة تبليغات ومذكرات المحطات (Station Notifications)
+    const stNotifs = Array.isArray(db.stationNotifications) ? db.stationNotifications : [];
+    stNotifs.forEach(stn => {
+      if (!stn.id) return;
+      const already = db.correspondenceRegistry.some(c => c.sourceId === stn.id && c.sourceModule === 'STATION_NOTIFICATION');
+      if (!already) {
+        const corr = this.registerSystemCorrespondence({
+          type: 'OUTWARD',
+          sourceModule: 'STATION_NOTIFICATION',
+          sourceId: stn.id,
+          date: stn.publishDate ? stn.publishDate.split('T')[0] : null,
+          subject: stn.title,
+          content: stn.content,
+          senderDept: `قسم الإنتاج الجنوبي / ${stn.stationName || 'المحطة'}`,
+          recipientDept: 'شعبة العمليات / إدارة القسم',
+          senderSigner: stn.createdByName ? `${stn.createdByName} - مسؤول المحطة` : 'مسؤول المحطة',
+          priority: stn.priority || 'NORMAL',
+          category: 'MEMORANDUM',
+          fromLevel: 'station',
+          stationCode: stn.stationName || 'محطة'
+        });
+        stn.docNumber = corr.docNumber;
+        stn.barcodeValue = corr.barcodeValue;
+        stn.verificationHash = corr.verificationHash;
+      }
+    });
+
+    // 5. مزامنة استمارات وطلبات المنتسبين الإدارية (Requests - قيد الوارد)
+    const reqs = Array.isArray(db.requests) ? db.requests : [];
+    reqs.forEach(r => {
+      if (!r.id) return;
+      const already = db.correspondenceRegistry.some(c => c.sourceId === r.id && c.sourceModule === 'ADMINISTRATIVE_REQUEST');
+      if (!already) {
+        const corr = this.registerSystemCorrespondence({
+          type: 'INWARD',
+          sourceModule: 'ADMINISTRATIVE_REQUEST',
+          sourceId: r.id,
+          date: r.createdAt ? r.createdAt.split('T')[0] : null,
+          subject: `طلب إداري (${r.typeTitle || r.typeName || 'معاملة منتسب'}) للمنتسب ${r.userName || r.employeeName || r.userEmployeeId || ''}`,
+          content: r.description || (r.payload ? JSON.stringify(r.payload) : 'استمارة طلب رسمي مقدمة عبر بوابة المنتسبين'),
+          senderDept: `${r.userName || 'منتسب'} (${r.userEmployeeId || '-'})`,
+          recipientDept: 'إدارة قسم الإنتاج الجنوبي / شعبة الإدارة والأفراد',
+          priority: r.priority || 'NORMAL',
+          category: 'OFFICIAL_LETTER',
+          executiveRouting: 'شعبة الإدارة والأفراد / للمتابعة والتدقيق الإداري'
+        });
+        r.corrDocNumber = corr.docNumber;
+        r.inwardNumber = corr.docNumber;
+        r.barcodeValue = corr.barcodeValue;
+        r.verificationHash = corr.verificationHash;
+      }
+    });
+
+    this.saveDb(db);
+  }
+
   getVehicleMovements(deptId) {
     return (this.getDb().vehicleMovements || []).filter(v => v.departmentId === deptId);
   }
@@ -4903,6 +5191,30 @@ class StoreManager {
   addRequest(req) {
     const db = this.getDb();
     if (!db.requests) db.requests = [];
+
+    // قيد استمارة الطلب تلقائياً في سجل الوارد الداخلي مع رقم قيد رسمي وباركود
+    try {
+      const user = (typeof window !== 'undefined' && window.auth) ? window.auth.getCurrentUser() : null;
+      const corr = this.registerSystemCorrespondence({
+        type: 'INWARD',
+        sourceModule: 'ADMINISTRATIVE_REQUEST',
+        sourceId: req.id,
+        date: req.createdAt ? req.createdAt.split('T')[0] : null,
+        subject: `طلب إداري (${req.typeTitle || req.typeName || 'معاملة منتسب'}) للمنتسب ${req.userName || req.employeeName || req.userEmployeeId || ''}`,
+        content: req.description || (req.payload ? JSON.stringify(req.payload) : 'استمارة طلب رسمي مقدمة عبر بوابة المنتسبين'),
+        senderDept: `${req.userName || 'منتسب'} (${req.userEmployeeId || '-'})`,
+        recipientDept: 'إدارة قسم الإنتاج الجنوبي / شعبة الإدارة والأفراد',
+        priority: req.priority || 'NORMAL',
+        category: 'OFFICIAL_LETTER',
+        executiveRouting: 'شعبة الإدارة والأفراد / للمتابعة والتدقيق الإداري'
+      }, user);
+
+      req.corrDocNumber = corr.docNumber;
+      req.inwardNumber = corr.docNumber;
+      req.barcodeValue = corr.barcodeValue;
+      req.verificationHash = corr.verificationHash;
+    } catch (e) {}
+
     db.requests.unshift(req);
     this.saveDb(db);
     return req;
