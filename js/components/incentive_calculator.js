@@ -63,7 +63,7 @@
   ];
 
   const LEADERSHIP_MATRIX = [
-    { id: 'director_general', title: 'مدير عام', points: 30.0, weight: 0.150, score: 4.500, desc: 'إدارة تشكيلات الشركة العليا' },
+    { id: 'director_general', title: 'مدير عام', points: 30.0, weight: 0.150, score: 4.500, desc: 'إدارة تشكيلات الشركة الرئيسية' },
     { id: 'deputy_director_general', title: 'وكيل / معاون مدير عام', points: 25.0, weight: 0.150, score: 3.750, desc: 'معاونو الإدارة العامة' },
     { id: 'authority_director', title: 'مدير هيأة', points: 20.0, weight: 0.150, score: 3.000, desc: 'إدارة هيأة تشغيلية أو إدارية' },
     { id: 'vertical_dept_manager', title: 'مدير قسم رأسي', points: 15.0, weight: 0.150, score: 2.250, desc: 'إدارة الأقسام الإنتاجية والفنية الرأسية' },

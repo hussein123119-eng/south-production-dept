@@ -550,7 +550,7 @@ class AppController {
             <div style="font-size: 3.5rem; margin-bottom: 1rem;">⚠️</div>
             <h2 style="font-size: 1.5rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.8rem;">تنبيه سيادي: المنظومة تحت الصيانة والتدقيق</h2>
             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem;">
-              ${lock.reason || 'تم إيقاف تطبيق العمليات مؤقتاً بأمر المؤسس والإدارة العليا لإجراء عمليات فحص وتدقيق وتحديث المنظومة.'}
+              ${lock.reason || 'تم إيقاف تطبيق العمليات مؤقتاً بأمر المؤسس وإدارة القسم لإجراء عمليات فحص وتدقيق وتحديث المنظومة.'}
             </p>
             <div style="padding: 0.75rem 1rem; background: rgba(245, 158, 11, 0.12); border-radius: 8px; font-size: 0.85rem; color: #fbbf24; margin-bottom: 1.5rem;">
               وقت الإشعار: ${lock.updatedAt ? new Date(lock.updatedAt).toLocaleString('en-GB') : 'الآن'}
@@ -4506,7 +4506,7 @@ class AppController {
               <option value="AUTHORIZED_DRIVER" ${target.role === 'AUTHORIZED_DRIVER' ? 'selected' : ''}>🪪 سائق مخول</option>
               <option value="DRIVER" ${target.role === 'DRIVER' ? 'selected' : ''}>🚗 سائق</option>
             </optgroup>
-            <optgroup label="🏛️ الإدارة والقيادة العليا">
+            <optgroup label="🏛️ الإدارة ورئاسة القسم">
               <option value="DEPT_MANAGER" ${target.role === 'DEPT_MANAGER' ? 'selected' : ''}>مدير قسم</option>
               <option value="DEPUTY_DEPT_MANAGER" ${target.role === 'DEPUTY_DEPT_MANAGER' ? 'selected' : ''}>وكيل مدير قسم</option>
               <option value="ADMIN_MANAGER" ${target.role === 'ADMIN_MANAGER' ? 'selected' : ''}>مدير إدارة</option>
@@ -10143,7 +10143,7 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
               <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">تصفية حسب الدور الوظيفي:</label>
               <select id="customExportRoleFilter" class="form-control" onchange="window.app.handleCustomExportScopeChange()" style="font-size: 0.88rem; font-weight: 700;">
                 <option value="ALL">كافة الأدوار الوظيفية</option>
-                <optgroup label="🏛️ الإدارة العليا والقيادة">
+                <optgroup label="🏛️ إدارة القسم والقيادة">
                   <option value="DEPT_MANAGER">🏛️ مدير قسم</option>
                   <option value="DEPUTY_DEPT_MANAGER">🏛️ وكيل مدير قسم</option>
                   <option value="ADMIN_MANAGER">📁 مدير إدارة</option>
@@ -11308,7 +11308,7 @@ EMP-2026-905,مروة عادل عبد الرضا المالكي,مدقق حسا�
       return;
     }
 
-    if (confirm('تأكيد نهائي: هل أنت متأكد من تسليم منصبك كمدير قسم ونقل كافة الصلاحيات؟ لا يمكن التراجع عن هذه الخطوة إلا من خلال الإدارة العليا.')) {
+    if (confirm('تأكيد نهائي: هل أنت متأكد من تسليم منصبك كمدير قسم ونقل كافة الصلاحيات؟ لا يمكن التراجع عن هذه الخطوة إلا من خلال إدارة القسم.')) {
       const targetUser = window.store.getUserById(targetUserId);
       const currentUser = window.auth.getCurrentUser();
 

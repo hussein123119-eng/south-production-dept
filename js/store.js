@@ -1126,7 +1126,103 @@ const INITIAL_DB = {
   ],
 
   // طلبات المقابلة الرسمية مع إدارة القسم
-  interviewRequests: []
+  interviewRequests: [],
+
+  // سجل الصادر والوارد المعتمد (العدد الصريح + التاريخ الكامل + الباركود ورمز التحقق)
+  correspondenceRegistry: [
+    {
+      id: 'CORR-OUT-2026-101',
+      departmentId: 'dept-south-prod',
+      type: 'OUTWARD',
+      docNumber: 'ق.ج/ص/2026/101',
+      docDate: '2026-09-20',
+      subject: 'خطة صيانة محطة عزل الغاز الثانية وتأمين صمامات الأمان',
+      senderDept: 'قسم الإنتاج الجنوبي / شعبة العمليات',
+      recipientDept: 'هيأة تشغيل الرميلة / قسم الصيانة والتفتيش الهندسي',
+      senderSigner: 'علاء حسن عبادان - رئيس مهندسين أقدم / مدير القسم',
+      priority: 'HIGH',
+      securityClassification: 'CONFIDENTIAL',
+      status: 'ISSUED',
+      category: 'MEMORANDUM',
+      content: 'نرفق لكم طياً خطة الفحص الشامل لصمامات الأمان ومعدات عزل الغاز في محطة عزل الغاز الثانية (DS-2)، للتفضل بالاطلاع والتوجيه بإجراء الفحوصات الدورية اللازمة.',
+      attachmentsCount: 3,
+      tags: ['صيانة', 'عزل الغاز', 'DS-2', 'سلامة'],
+      barcodeValue: 'SPD-OUT-2026-101',
+      verificationHash: 'VFY-9921-BOC-2026',
+      createdAt: '2026-09-20T08:30:00Z',
+      createdBy: 'user-alaa-dept-mgr'
+    },
+    {
+      id: 'CORR-OUT-2026-102',
+      departmentId: 'dept-south-prod',
+      type: 'OUTWARD',
+      docNumber: 'ق.ج/ص/2026/102',
+      docDate: '2026-09-22',
+      subject: 'أمر إداري بتدوير وجبات المناوبة لمحطات الإنتاج للشهر القادم',
+      senderDept: 'قسم الإنتاج الجنوبي / الإدارة',
+      recipientDept: 'كافة الشعب والوحدات والمحطات الإنتاجية',
+      senderSigner: 'علاء حسن عبادان - رئيس مهندسين أقدم / مدير القسم',
+      priority: 'URGENT',
+      securityClassification: 'OFFICIAL',
+      status: 'ISSUED',
+      category: 'ADMINISTRATIVE_ORDER',
+      content: 'استناداً إلى الصلاحيات المخولة إلينا، تقرر تنظيم جداول مناوبة الكوادر التشغيلية لمحطات (DS-1, DS-2, DS-3, DS-4, DS-5) اعتباراً من الأول من الشهر القادم وفق الجداول المرفقة.',
+      attachmentsCount: 1,
+      tags: ['أمر إداري', 'مناوبة', 'تشغيل'],
+      barcodeValue: 'SPD-OUT-2026-102',
+      verificationHash: 'VFY-8812-BOC-2026',
+      createdAt: '2026-09-22T09:15:00Z',
+      createdBy: 'user-alaa-dept-mgr'
+    },
+    {
+      id: 'CORR-IN-2026-088',
+      departmentId: 'dept-south-prod',
+      type: 'INWARD',
+      docNumber: 'ق.ج/و/2026/088',
+      externalDocNumber: 'هـ.ت.ر/م/4491',
+      externalDocDate: '2026-09-18',
+      docDate: '2026-09-19',
+      subject: 'تعليمات وضوابط السلامة والبيئة وإدارة المخلفات الصناعية',
+      senderDept: 'هيأة تشغيل الرميلة / قسم السلامة والبيئة والصحة المهنية (HSE)',
+      recipientDept: 'قسم الإنتاج الجنوبي',
+      executiveRouting: 'شعبة السلامة والعمليات / للمتابعة والالتزام الفوري',
+      priority: 'HIGH',
+      securityClassification: 'OFFICIAL',
+      status: 'PROCESSED',
+      category: 'CIRCULAR',
+      content: 'يرجى الالتزام الصارم بتحديث سجلات الفحص الميداني لمعدات إطفاء الحرائق والامتثال لاشتراطات السلامة والبيئة في كافة المحطات والآبار النفطية.',
+      attachmentsCount: 5,
+      tags: ['HSE', 'سلامة', 'إعمام', 'بيئة'],
+      barcodeValue: 'SPD-IN-2026-088',
+      verificationHash: 'VFY-7743-BOC-2026',
+      createdAt: '2026-09-19T10:00:00Z',
+      createdBy: 'user-alaa-dept-mgr'
+    },
+    {
+      id: 'CORR-IN-2026-089',
+      departmentId: 'dept-south-prod',
+      type: 'INWARD',
+      docNumber: 'ق.ج/و/2026/089',
+      externalDocNumber: 'ش.ن.ب/ت/8920',
+      externalDocDate: '2026-09-21',
+      docDate: '2026-09-23',
+      subject: 'الموافقة على تجهيز مضخات حقن الماء الاحتياطية لمحطة جنوب الرميلة',
+      senderDept: 'شركة نفط البصرة / هيأة المواد والمشتريات',
+      recipientDept: 'قسم الإنتاج الجنوبي / وحدة الصيانة الميكانيكية',
+      executiveRouting: 'وحدة الصيانة والمخازن / للاستلام والفحص الهندسي',
+      priority: 'NORMAL',
+      securityClassification: 'OFFICIAL',
+      status: 'UNDER_PROCESS',
+      category: 'OFFICIAL_LETTER',
+      content: 'إشارة إلى كتابكم ذي العدد (ق.ج/ص/2026/89)، نود إعلامكم بالموافقة على صرف وتجهيز مضختي حقن مياه الطرد المركزي ذات الضغط العالي من مخازن البرجسية.',
+      attachmentsCount: 2,
+      tags: ['مشتريات', 'حقن ماء', 'مضخات', 'مخازن'],
+      barcodeValue: 'SPD-IN-2026-089',
+      verificationHash: 'VFY-6629-BOC-2026',
+      createdAt: '2026-09-23T11:20:00Z',
+      createdBy: 'user-alaa-dept-mgr'
+    }
+  ]
 };
 
 // Database Store Manager Class
@@ -1170,6 +1266,10 @@ class StoreManager {
             db[k] = JSON.parse(JSON.stringify(v));
             modified = true;
           }
+        }
+        if (!db.correspondenceRegistry || !Array.isArray(db.correspondenceRegistry) || db.correspondenceRegistry.length === 0) {
+          db.correspondenceRegistry = JSON.parse(JSON.stringify(INITIAL_DB.correspondenceRegistry || []));
+          modified = true;
         }
       } catch (e) {
         db = JSON.parse(JSON.stringify(INITIAL_DB));
@@ -4611,6 +4711,169 @@ class StoreManager {
     const db = this.getDb();
     db.documents = (db.documents || []).filter(d => d.id !== docId);
     this.saveDb(db);
+  }
+
+  // --- نظام الصادر والوارد (Correspondence Tracking System) ---
+  getCorrespondence(deptId, options = {}) {
+    const db = this.getDb();
+    let list = (db.correspondenceRegistry || []);
+    if (deptId) {
+      list = list.filter(item => !item.departmentId || item.departmentId === deptId);
+    }
+    if (options.type && options.type !== 'ALL') {
+      list = list.filter(item => item.type === options.type);
+    }
+    if (options.priority && options.priority !== 'ALL') {
+      list = list.filter(item => item.priority === options.priority);
+    }
+    if (options.status && options.status !== 'ALL') {
+      list = list.filter(item => item.status === options.status);
+    }
+    if (options.search && typeof options.search === 'string') {
+      const q = options.search.trim().toLowerCase();
+      if (q) {
+        list = list.filter(item => {
+          return (item.docNumber && item.docNumber.toLowerCase().includes(q)) ||
+                 (item.externalDocNumber && item.externalDocNumber.toLowerCase().includes(q)) ||
+                 (item.subject && item.subject.toLowerCase().includes(q)) ||
+                 (item.recipientDept && item.recipientDept.toLowerCase().includes(q)) ||
+                 (item.senderDept && item.senderDept.toLowerCase().includes(q)) ||
+                 (item.barcodeValue && item.barcodeValue.toLowerCase().includes(q)) ||
+                 (item.verificationHash && item.verificationHash.toLowerCase().includes(q));
+        });
+      }
+    }
+    return list;
+  }
+
+  getCorrespondenceById(id) {
+    const db = this.getDb();
+    return (db.correspondenceRegistry || []).find(item => item.id === id) || null;
+  }
+
+  getNextCorrespondenceNumber(type = 'OUTWARD', year = new Date().getFullYear()) {
+    const db = this.getDb();
+    const list = (db.correspondenceRegistry || []).filter(item => item.type === type);
+    const prefix = type === 'OUTWARD' ? `ق.ج/ص/${year}/` : `ق.ج/و/${year}/`;
+    
+    let maxSeq = 100;
+    list.forEach(item => {
+      if (item.docNumber && item.docNumber.startsWith(prefix)) {
+        const numPart = parseInt(item.docNumber.replace(prefix, ''), 10);
+        if (!isNaN(numPart) && numPart > maxSeq) {
+          maxSeq = numPart;
+        }
+      }
+    });
+    return `${prefix}${maxSeq + 1}`;
+  }
+
+  addCorrespondence(item, actorUser = null) {
+    const db = this.getDb();
+    if (!db.correspondenceRegistry) db.correspondenceRegistry = [];
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const randCode = Math.floor(1000 + Math.random() * 9000);
+    const id = item.id || `CORR-${item.type === 'INWARD' ? 'IN' : 'OUT'}-${year}-${Date.now().toString().slice(-4)}`;
+    
+    // ضمان توليد العدد الصريح المقروء إذا لم يتم تزويده
+    const docNumber = item.docNumber || this.getNextCorrespondenceNumber(item.type || 'OUTWARD', year);
+    const docDate = item.docDate || now.toISOString().split('T')[0];
+    const barcodeValue = item.barcodeValue || (item.type === 'INWARD' ? `SPD-IN-${year}-${randCode}` : `SPD-OUT-${year}-${randCode}`);
+    const verificationHash = item.verificationHash || `VFY-${randCode}-BOC-${year}`;
+
+    const newRecord = {
+      id,
+      departmentId: item.departmentId || (actorUser && actorUser.departmentId) || 'dept-south-prod',
+      type: item.type || 'OUTWARD',
+      docNumber,
+      docDate,
+      subject: item.subject || 'بدون موضوع',
+      senderDept: item.senderDept || 'قسم الإنتاج الجنوبي',
+      recipientDept: item.recipientDept || '',
+      senderSigner: item.senderSigner || (actorUser ? `${actorUser.fullName} - ${actorUser.jobTitle || ''}` : 'إدارة قسم الإنتاج الجنوبي'),
+      priority: item.priority || 'NORMAL',
+      securityClassification: item.securityClassification || 'OFFICIAL',
+      status: item.status || (item.type === 'INWARD' ? 'REGISTERED' : 'ISSUED'),
+      category: item.category || 'OFFICIAL_LETTER',
+      content: item.content || '',
+      externalDocNumber: item.externalDocNumber || '',
+      externalDocDate: item.externalDocDate || '',
+      executiveRouting: item.executiveRouting || '',
+      attachmentsCount: parseInt(item.attachmentsCount, 10) || 0,
+      tags: Array.isArray(item.tags) ? item.tags : (item.tags ? item.tags.split(',').map(t => t.trim()) : []),
+      barcodeValue,
+      verificationHash,
+      createdAt: now.toISOString(),
+      createdBy: actorUser ? actorUser.id : 'SYSTEM'
+    };
+
+    db.correspondenceRegistry.unshift(newRecord);
+    this.saveDb(db);
+
+    if (typeof this.addAuditLog === 'function') {
+      this.addAuditLog(
+        actorUser ? actorUser.id : 'SYSTEM',
+        'CREATE_CORRESPONDENCE',
+        'CORRESPONDENCE',
+        `قيد معاملة ${newRecord.type === 'OUTWARD' ? 'صادرة' : 'واردة'} جديدة برقم (${newRecord.docNumber}) - موضوع: ${newRecord.subject.substring(0, 40)}`
+      );
+    }
+
+    return newRecord;
+  }
+
+  updateCorrespondence(id, patch, actorUser = null) {
+    const db = this.getDb();
+    const idx = (db.correspondenceRegistry || []).findIndex(item => item.id === id);
+    if (idx !== -1) {
+      db.correspondenceRegistry[idx] = {
+        ...db.correspondenceRegistry[idx],
+        ...patch,
+        updatedAt: new Date().toISOString(),
+        updatedBy: actorUser ? actorUser.id : 'SYSTEM'
+      };
+      this.saveDb(db);
+
+      if (typeof this.addAuditLog === 'function') {
+        this.addAuditLog(
+          actorUser ? actorUser.id : 'SYSTEM',
+          'UPDATE_CORRESPONDENCE',
+          'CORRESPONDENCE',
+          `تحديث بيانات المعاملة (${db.correspondenceRegistry[idx].docNumber})`
+        );
+      }
+      return db.correspondenceRegistry[idx];
+    }
+    return null;
+  }
+
+  verifyCorrespondence(query) {
+    if (!query) return { verified: false, message: 'يرجى إدخال العدد أو رمز الباركود للتحقق' };
+    const q = query.trim().toLowerCase();
+    const db = this.getDb();
+    const match = (db.correspondenceRegistry || []).find(item => {
+      return (item.docNumber && item.docNumber.toLowerCase() === q) ||
+             (item.externalDocNumber && item.externalDocNumber.toLowerCase() === q) ||
+             (item.barcodeValue && item.barcodeValue.toLowerCase() === q) ||
+             (item.verificationHash && item.verificationHash.toLowerCase() === q) ||
+             (item.id && item.id.toLowerCase() === q);
+    });
+
+    if (match) {
+      return {
+        verified: true,
+        item: match,
+        message: 'تم التحقق من صحة صدور الوثيقة الرسمية بنجاح وهي معتمدة ومسجلة في المنظومة.'
+      };
+    }
+
+    return {
+      verified: false,
+      item: null,
+      message: 'لم يتم العثور على وثيقة رسمية مسجلة بهذا العدد أو الرمز. يرجى التأكد من الرمز المدخل.'
+    };
   }
 
   getVehicleMovements(deptId) {

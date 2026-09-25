@@ -705,7 +705,7 @@ const server = http.createServer(async (req, res) => {
         const body = await parseJsonBody(req);
         memoryDb.emergencyMaintenance = {
           active: !!body.active,
-          reason: body.reason || 'المنظومة تخضع للصيانة والتدقيق بأمر المؤسس والإدارة العليا',
+          reason: body.reason || 'المنظومة تخضع للصيانة والتدقيق بأمر المؤسس وإدارة القسم',
           updatedAt: new Date().toISOString(),
           updatedBy: body.updatedBy || 'المؤسس العام'
         };

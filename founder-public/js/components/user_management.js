@@ -1262,7 +1262,7 @@ function renderAuthorityHandoverTab(usersWithAccounts, actorUser) {
       <div style="padding: 1rem; background: rgba(217, 48, 37, 0.06); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
         <div style="font-weight: 700; color: #d93025; margin-bottom: 0.5rem;">⚠️ تنبيه أمني حاسم:</div>
         <div style="font-size: 0.85rem; color: var(--md-sys-color-on-surface); line-height: 1.6;">
-          بمجرد تنفيذ هذا الإجراء، سيتم ترقية الموظف المختار إلى <strong>مدير قسم (DEPT_MANAGER)</strong>، وسيتم سحب صلاحيات الإدارة العليا من حسابك الحالي فوراً.
+          بمجرد تنفيذ هذا الإجراء، سيتم ترقية الموظف المختار إلى <strong>مدير قسم (DEPT_MANAGER)</strong>، وسيتم سحب صلاحيات إدارة القسم من حسابك الحالي فوراً.
         </div>
       </div>
 

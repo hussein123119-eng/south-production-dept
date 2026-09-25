@@ -99,6 +99,19 @@ function renderSidebar(activeNav = 'dashboard') {
           </div>
         </a>
 
+        <a class="nav-item ${activeNav === 'correspondence' ? 'active' : ''}" onclick="window.app.navigate('correspondence')" title="نظام الصادر والوارد وتتبع المعاملات والكتب الرسمية">
+          <div class="nav-item-content">
+            <span class="nav-icon-box icon-cyan">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+              </svg>
+            </span>
+            <span class="nav-item-label">الصادر والوارد</span>
+          </div>
+        </a>
+
         <!-- Category 2: Administrative Structure -->
         <div class="nav-section-title">
           <span class="nav-section-dot"></span>
@@ -306,10 +319,10 @@ function renderSidebar(activeNav = 'dashboard') {
         ` : ''}
 
         ${user.role === 'SUPER_ADMIN' ? `
-          <!-- Category: Sovereign Leadership -->
+          <!-- Category: Founder Management -->
           <div class="nav-section-title">
             <span class="nav-section-dot" style="background: var(--gold-primary, #f59e0b);"></span>
-            <span style="color: #f59e0b; font-weight: 800;">القيادة السيادية</span>
+            <span style="color: #f59e0b; font-weight: 800;">إدارة المؤسس</span>
           </div>
 
           <a class="nav-item ${activeNav === 'super_admin' ? 'active' : ''}" onclick="window.app.navigate('super_admin')" title="لوحة المؤسس والتحكم الداخلي بالنظام (المدمجة)">
@@ -321,12 +334,12 @@ function renderSidebar(activeNav = 'dashboard') {
             </div>
           </a>
 
-          <a class="nav-item" href="founder.html" target="_blank" title="الانتقال المباشر إلى بوابة المؤسس السيادية المستقلة">
+          <a class="nav-item" href="founder.html" target="_blank" title="الانتقال المباشر إلى بوابة المؤسس / لوحة التحكم">
             <div class="nav-item-content">
               <span class="nav-icon-box" style="background: rgba(0, 223, 216, 0.15); color: #00dfd8;">
                 👑
               </span>
-              <span class="nav-item-label" style="color: #00dfd8; font-weight: 700;">بوابة المؤسس السيادية ↗</span>
+              <span class="nav-item-label" style="color: #00dfd8; font-weight: 700;">بوابة المؤسس / لوحة التحكم ↗</span>
             </div>
           </a>
         ` : ''}

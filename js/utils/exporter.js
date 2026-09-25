@@ -15,30 +15,120 @@ class ExporterUtility {
     return parts.join(' ➔ ');
   }
 
+  generateBarcodeSvg(text, width = 160, height = 40) {
+    if (!text) text = 'SPD-REF-000';
+    let pattern = [1, 0, 1, 1, 0, 0, 1];
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      pattern.push(1, 0);
+      pattern.push((code % 2 === 0) ? 1 : 0);
+      pattern.push(1);
+      pattern.push(((code >> 1) % 2 === 0) ? 1 : 0);
+      pattern.push(0);
+      pattern.push(((code >> 2) % 2 === 0) ? 1 : 0);
+      pattern.push(1);
+    }
+    pattern.push(1, 1, 0, 0, 1, 0, 1, 1, 1);
+
+    const barWidth = (width / pattern.length).toFixed(2);
+    let rects = '';
+    let x = 0;
+    for (let i = 0; i < pattern.length; i++) {
+      if (pattern[i] === 1) {
+        rects += `<rect x="${x.toFixed(2)}" y="0" width="${barWidth}" height="${height - 12}" fill="#000000" />`;
+      }
+      x += parseFloat(barWidth);
+    }
+
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="display: block; margin: 0 auto;">
+        ${rects}
+        <text x="${width / 2}" y="${height - 2}" font-family="monospace" font-size="8" font-weight="bold" text-anchor="middle" fill="#1e293b">${text}</text>
+      </svg>
+    `;
+  }
+
+  generateQrCodeSvg(text, size = 52) {
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 25 25" style="display: block; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px;">
+        <rect x="1" y="1" width="7" height="7" fill="#003366" />
+        <rect x="2" y="2" width="5" height="5" fill="#ffffff" />
+        <rect x="3" y="3" width="3" height="3" fill="#003366" />
+        <rect x="17" y="1" width="7" height="7" fill="#003366" />
+        <rect x="18" y="2" width="5" height="5" fill="#ffffff" />
+        <rect x="19" y="3" width="3" height="3" fill="#003366" />
+        <rect x="1" y="17" width="7" height="7" fill="#003366" />
+        <rect x="2" y="18" width="5" height="5" fill="#ffffff" />
+        <rect x="3" y="19" width="3" height="3" fill="#003366" />
+        <rect x="9" y="3" width="1" height="1" fill="#003366" />
+        <rect x="11" y="3" width="1" height="1" fill="#003366" />
+        <rect x="13" y="3" width="1" height="1" fill="#003366" />
+        <rect x="15" y="3" width="1" height="1" fill="#003366" />
+        <rect x="3" y="9" width="1" height="1" fill="#003366" />
+        <rect x="3" y="11" width="1" height="1" fill="#003366" />
+        <rect x="3" y="13" width="1" height="1" fill="#003366" />
+        <rect x="3" y="15" width="1" height="1" fill="#003366" />
+        <rect x="10" y="10" width="5" height="5" fill="#003366" />
+        <rect x="11" y="11" width="3" height="3" fill="#ffffff" />
+        <rect x="12" y="12" width="1" height="1" fill="#003366" />
+        <rect x="17" y="10" width="2" height="2" fill="#003366" />
+        <rect x="21" y="12" width="2" height="2" fill="#003366" />
+        <rect x="10" y="17" width="2" height="2" fill="#003366" />
+        <rect x="14" y="19" width="2" height="2" fill="#003366" />
+        <rect x="18" y="17" width="3" height="3" fill="#003366" />
+        <rect x="17" y="21" width="2" height="2" fill="#003366" />
+        <rect x="21" y="19" width="2" height="2" fill="#003366" />
+      </svg>
+    `;
+  }
+
   renderOfficialHeader(options = {}) {
     const sectionName = options.sectionName || '';
     const stationName = options.stationName || options.unitName || '';
-    const docNumber = options.docNumber || options.docCode || '';
-    const docDate = options.docDate || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const docNumber = options.docNumber || options.docCode || 'ق.ج/ص/2026/01';
+    const docDate = options.docDate || new Date().toLocaleDateString('ar-IQ', { day: 'numeric', month: 'long', year: 'numeric' });
     const docTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const barcodeSvg = this.generateBarcodeSvg(docNumber, 175, 42);
+    const qrSvg = this.generateQrCodeSvg(docNumber, 54);
 
     return `
       <div style="border-bottom: 2.5px solid #003366; padding-bottom: 12px; margin-bottom: 18px; direction: rtl; font-family: 'Cairo', 'Segoe UI', sans-serif;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <div style="font-size: 1.15rem; font-weight: 900; color: #003366; margin-bottom: 2px;">جمهورية العراق - وزارة النفط</div>
-            <div style="font-size: 1.05rem; font-weight: 800; color: #004d40; margin-bottom: 2px;">شركة نفط البصرة</div>
-            <div style="font-size: 1rem; font-weight: 800; color: #b45309; margin-bottom: 2px;">هيأة تشغيل الرميلة</div>
-            <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">
-              قسم الإنتاج الجنوبي
-              ${sectionName ? `<span style="color: #0284c7;"> | ${sectionName}</span>` : ''}
-              ${stationName ? `<span style="color: #16a34a;"> | ${stationName}</span>` : ''}
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <!-- الجهة اليمنى: الشعار والترويسة الوزارية الرسمية -->
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 58px; height: 58px; border-radius: 12px; background: linear-gradient(135deg, #003366 0%, #006a6a 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900; font-size: 1.3rem; border: 2px solid #c5a059; box-shadow: 0 3px 8px rgba(0,0,0,0.15);">
+              🇮🇶
+            </div>
+            <div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #003366; margin-bottom: 2px;">جمهورية العراق - وزارة النفط</div>
+              <div style="font-size: 1.02rem; font-weight: 800; color: #004d40; margin-bottom: 2px;">شركة نفط البصرة · هيأة تشغيل الرميلة</div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #b45309;">
+                قسم الإنتاج الجنوبي
+                ${sectionName ? `<span style="color: #0284c7;"> | ${sectionName}</span>` : ''}
+                ${stationName ? `<span style="color: #16a34a;"> | ${stationName}</span>` : ''}
+              </div>
             </div>
           </div>
-          <div style="text-align: left; font-size: 0.84rem; color: #334155; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; background: #f8fafc; min-width: 170px;">
-            ${docNumber ? `<div><strong>العدد:</strong> <code style="font-weight: 800;">${docNumber}</code></div>` : ''}
-            <div><strong>التاريخ:</strong> <span style="font-family: monospace;">${docDate}</span></div>
-            <div><strong>الوقت:</strong> <span style="font-family: monospace;">${docTime}</span></div>
+
+          <!-- الجهة اليسرى: الثلاثي القانوني المعتمد (العدد الصريح + التاريخ + الباركود ورمز التحقق) -->
+          <div style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="text-align: right;">
+              <div style="font-size: 0.88rem; color: #0f172a; margin-bottom: 2px;">
+                <strong style="color: #b45309;">العدد:</strong> 
+                <span style="font-family: monospace; font-weight: 900; font-size: 0.95rem; direction: ltr; display: inline-block;">${docNumber}</span>
+              </div>
+              <div style="font-size: 0.84rem; color: #334155; margin-bottom: 2px;">
+                <strong style="color: #047857;">التاريخ:</strong> 
+                <span style="font-weight: 700;">${docDate}</span>
+              </div>
+              <div style="margin-top: 4px;">
+                ${barcodeSvg}
+              </div>
+            </div>
+            <div style="border-right: 1px dashed #cbd5e1; padding-right: 8px; display: flex; flex-direction: column; align-items: center; gap: 2px;">
+              ${qrSvg}
+              <span style="font-size: 0.62rem; color: #64748b; font-weight: 800; text-align: center;">رمز التحقق</span>
+            </div>
           </div>
         </div>
       </div>

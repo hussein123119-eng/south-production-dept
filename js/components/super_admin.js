@@ -25,7 +25,7 @@ function renderSuperAdminView() {
 
   return `
     <div style="display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 2rem;">
-      <!-- شريط الهوية السيادية والتحكم الاحتياطي المدمج -->
+      <!-- شريط هوية المؤسس والتحكم المدمج -->
       <div class="card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 16px; padding: 1.5rem; color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 1rem;">
@@ -43,10 +43,10 @@ function renderSuperAdminView() {
             </div>
           </div>
 
-          <!-- أزرار الإجراءات السيادية السريعة -->
+          <!-- أزرار إجراءات المؤسس السريعة -->
           <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
             <a href="founder.html" target="_blank" class="btn" style="background: rgba(0, 223, 216, 0.15); border: 1.5px solid #00dfd8; color: #00dfd8; font-weight: 800; white-space: nowrap;">
-              👑 فتح بوابة المؤسس السيادية (المستقلة) ↗
+              👑 فتح بوابة المؤسس / لوحة التحكم ↗
             </a>
             <button class="btn btn-outline" onclick="window.app.exportDatabaseBackup()" style="white-space: nowrap; border-color: rgba(255,255,255,0.25); color: #ffffff;">
               💾 نسخة احتياطية (JSON)

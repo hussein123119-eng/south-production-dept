@@ -384,6 +384,9 @@ class AppController {
       case 'documents':
         viewHtml = typeof window.renderDocumentsView === 'function' ? window.renderDocumentsView() : '';
         break;
+      case 'correspondence':
+        viewHtml = typeof window.renderCorrespondenceView === 'function' ? window.renderCorrespondenceView() : '';
+        break;
       case 'announcements':
         viewHtml = typeof window.renderAnnouncementsView === 'function' ? window.renderAnnouncementsView() : '';
         break;
@@ -15887,6 +15890,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // تسجيل وظائف نظام البريد الداخلي
   if (typeof window.registerMailAppMethods === 'function') {
     window.registerMailAppMethods(app);
+  }
+
+  // تسجيل وظائف نظام الصادر والوارد (CTS)
+  if (typeof window.registerCorrespondenceAppMethods === 'function') {
+    window.registerCorrespondenceAppMethods(app);
   }
 
   window.addEventListener('beforeinstallprompt', (e) => {

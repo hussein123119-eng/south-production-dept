@@ -309,7 +309,7 @@ function renderSidebar(activeNav = 'dashboard') {
           <!-- Category: Sovereign Leadership -->
           <div class="nav-section-title">
             <span class="nav-section-dot" style="background: var(--gold-primary, #f59e0b);"></span>
-            <span style="color: #f59e0b; font-weight: 800;">القيادة السيادية</span>
+            <span style="color: #f59e0b; font-weight: 800;">إدارة المؤسس</span>
           </div>
 
           <a class="nav-item ${activeNav === 'super_admin' ? 'active' : ''}" onclick="window.app.navigate('super_admin')" title="لوحة المؤسس والتحكم الداخلي بالنظام (المدمجة)">
@@ -321,12 +321,12 @@ function renderSidebar(activeNav = 'dashboard') {
             </div>
           </a>
 
-          <a class="nav-item" href="founder.html" target="_blank" title="الانتقال المباشر إلى بوابة المؤسس السيادية المستقلة">
+          <a class="nav-item" href="founder.html" target="_blank" title="الانتقال المباشر إلى بوابة المؤسس / لوحة التحكم">
             <div class="nav-item-content">
               <span class="nav-icon-box" style="background: rgba(0, 223, 216, 0.15); color: #00dfd8;">
                 👑
               </span>
-              <span class="nav-item-label" style="color: #00dfd8; font-weight: 700;">بوابة المؤسس السيادية ↗</span>
+              <span class="nav-item-label" style="color: #00dfd8; font-weight: 700;">بوابة المؤسس / لوحة التحكم ↗</span>
             </div>
           </a>
         ` : ''}
