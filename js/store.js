@@ -657,7 +657,7 @@ const INITIAL_DB = {
     }
   ],
 
-  // المستخدمون والملفات الوظيفية السيادية (القاعدة الحية المعتمدة)
+  // المستخدمون والملفات الوظيفية المعتمدة (القاعدة الحية المعتمدة)
   users: [
     {
       id: 'user-founder',
@@ -1477,10 +1477,10 @@ class StoreManager {
     return { active: false, reason: '', updatedAt: null };
   }
 
-  setMaintenanceLock(active, reason = 'المنظومة تحت الصيانة والتدقيق بأمر المؤسس والإدارة العليا') {
+  setMaintenanceLock(active, reason = 'المنظومة تحت الصيانة والتدقيق بأمر المؤسس وإدارة القسم') {
     const lockData = {
       active: !!active,
-      reason: reason || 'المنظومة تحت الصيانة والتدقيق بأمر المؤسس والإدارة العليا',
+      reason: reason || 'المنظومة تحت الصيانة والتدقيق بأمر المؤسس وإدارة القسم',
       updatedAt: new Date().toISOString(),
       updatedBy: 'المؤسس العام'
     };

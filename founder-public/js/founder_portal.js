@@ -60,7 +60,7 @@ const FounderPortal = {
       empId: 'EMP-0000',
       fullName: 'المؤسس العام للمنظومة',
       jobTitle: 'رئيس مهندسين أقدم',
-      department: 'الإدارة العليا والقيادة المركزية',
+      department: 'إدارة القسم والقيادة المركزية',
       grade: '1',
       step: '10',
       yearsOfService: '25',
@@ -346,7 +346,7 @@ const FounderPortal = {
     
     const reasonInput = document.getElementById('emergencyReasonInput');
     const newActive = !lock.active;
-    const reason = (reasonInput && reasonInput.value.trim()) || 'المنظومة تخضع للصيانة والتدقيق بأمر المؤسس والإدارة العليا';
+    const reason = (reasonInput && reasonInput.value.trim()) || 'المنظومة تخضع للصيانة والتدقيق بأمر المؤسس وإدارة القسم';
 
     if (window.store && typeof window.store.setMaintenanceLock === 'function') {
       window.store.setMaintenanceLock(newActive, reason);
@@ -523,7 +523,7 @@ const FounderPortal = {
     }
   },
 
-  // تحديث المؤشرات القيادية العليا (القسم 1)
+  // تحديث المؤشرات القيادية (القسم 1)
   renderMetrics: function() {
     const totalStaff = (window.deptEmployees && Array.isArray(window.deptEmployees) ? window.deptEmployees.length : (this.dossiers.length || 11));
     const activeStaff = (window.deptEmployees && Array.isArray(window.deptEmployees) ? window.deptEmployees.filter(e => e.status !== 'معلق').length : (this.dossiers.length || 10));
@@ -588,7 +588,7 @@ const FounderPortal = {
     return this.createInstantBackup();
   },
 
-  // إصدار وتوثيق أمر إداري سيادي
+  // إصدار وتوثيق أمر إداري معتمد
   issueDecree: function() {
     const subjectEl = document.getElementById('decreeSubjectInput');
     const refEl = document.getElementById('decreeRefInput');
@@ -615,7 +615,7 @@ const FounderPortal = {
     decrees.unshift(decree);
     localStorage.setItem('spd_founder_decrees_v98', JSON.stringify(decrees));
 
-    this.logAudit(`إصدار أمر إداري سيادي: ${subject} (${decree.ref})`);
+    this.logAudit(`إصدار أمر إداري: ${subject} (${decree.ref})`);
     this.showToast(`تم بنجاح إصدار وتوثيق الأمر الإداري برقم إشارة: ${decree.ref}`, 'success');
   },
 
@@ -624,7 +624,7 @@ const FounderPortal = {
     const subjectEl = document.getElementById('decreeSubjectInput');
     const refEl = document.getElementById('decreeRefInput');
     const contentEl = document.getElementById('decreeContentInput');
-    const subject = subjectEl ? subjectEl.value.trim() : 'أمر إداري سيادي';
+    const subject = subjectEl ? subjectEl.value.trim() : 'أمر إداري معتمد';
     const ref = refEl ? refEl.value.trim() : `ق.ج/${new Date().getFullYear()}/108`;
     const content = contentEl ? contentEl.value.trim() : 'بناءً على الصلاحيات المخولة لنا ولحسن سير العمل وانتظامه في قسم الإنتاج الجنوبي، تقرر إصدار التوجيهات الإدارية المعتمدة.';
 
@@ -1967,7 +1967,7 @@ const FounderPortal = {
       </table>
 
       <div style="border: 1px solid #94a3b8; min-height: 100px; padding: 0.8rem; margin-bottom: 1.5rem; background: #fafafa; font-size: 0.9rem;">
-        الملاحظات الإدارية وتوجيه الإدارة العليا:
+        الملاحظات الإدارية وتوجيه إدارة القسم:
       </div>
 
       ${this.getOfficialSignaturesHtml()}

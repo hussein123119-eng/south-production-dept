@@ -166,7 +166,7 @@ assert(html.includes('نطاق الشعبة'), 'تحديد نطاق البحث �
 // ج. مدير القسم والمشرف العام
 window.auth.getCurrentUser = () => ({ id: 'usr-admin', role: 'SUPER_ADMIN' });
 html = window.renderIncentiveCalculatorView();
-assert(html.includes('صلاحية شاملة'), 'منح صلاحية البحث الشاملة للإدارة العليا');
+assert(html.includes('صلاحية شاملة'), 'منح صلاحية البحث الشاملة لإدارة القسم');
 assert(html.includes('incEmployeeSearchInput'), 'توفر حقل البحث الفوري الشامل');
 
 // --- 7. التحقق من حاسبة سعر النقطة المركزية ---
