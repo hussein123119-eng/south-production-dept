@@ -273,16 +273,10 @@
                 <th style="text-align: center; width: 60px;">
                   <span>#</span>
                 </th>
-                <th style="min-width: 200px;">
+                <th style="min-width: 180px;">
                   <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    <span>العدد والباركود</span>
-                  </div>
-                </th>
-                <th style="min-width: 140px;">
-                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span>التاريخ الرسمي</span>
+                    <span>العدد والتاريخ</span>
                   </div>
                 </th>
                 <th style="min-width: 260px;">
@@ -322,7 +316,6 @@
                 const priorityBadge = getPriorityBadge(item.priority);
                 const categoryBadge = getCategoryBadge(item.category);
                 const statusBadge = getStatusBadge(item.status);
-                const barcodeThumb = window.exporter ? window.exporter.generateBarcodeSvg(item.docNumber, 130, 30) : '';
 
                 return `
                   <tr>
@@ -331,7 +324,7 @@
                       <div class="cts-index-badge">${idx + 1}</div>
                     </td>
 
-                    <!-- العدد الصريح المقروء + الباركود المتجهي -->
+                    <!-- العدد الصريح المقروء + التاريخ المدمج -->
                     <td>
                       <div class="cts-doc-num-badge">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; opacity: 0.85;">
@@ -343,47 +336,24 @@
                         <span>${item.docNumber}</span>
                       </div>
                       ${item.externalDocNumber ? `
-                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: #b45309; margin-top: 0.35rem; font-weight: 700;">
-                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; color: #b45309; margin-top: 0.3rem; font-weight: 700;">
+                          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 14 20 9 15 4"></polyline>
                             <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
                           </svg>
-                          <span>كتابهم ذي العدد:</span>
+                          <span>كتابهم:</span>
                           <span style="font-family: inherit; font-weight: 800;">${item.externalDocNumber}</span>
                         </div>
                       ` : ''}
-                      <div>
-                        <div class="cts-barcode-thumb" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="انقر لعرض وتكبير الباركود والتحقق الرقمي">
-                          ${barcodeThumb}
-                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;">
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <polyline points="9 21 3 21 3 15"></polyline>
-                            <line x1="21" y1="3" x2="14" y2="10"></line>
-                            <line x1="3" y1="21" x2="10" y2="14"></line>
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-
-                    <!-- التاريخ الرسمي الكامل -->
-                    <td>
-                      <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(0, 51, 102, 0.06); display: flex; align-items: center; justify-content: center; color: var(--color-primary-navy, #003366); flex-shrink: 0; margin-top: 2px;">
-                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                          </svg>
-                        </div>
-                        <div>
-                          <div style="font-weight: 800; color: var(--md-sys-color-on-surface); font-size: 0.88rem; line-height: 1.35;">
-                            ${formatDateArabic(item.docDate)}
-                          </div>
-                          <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); font-family: monospace; direction: ltr; text-align: right; margin-top: 0.2rem;">
-                            ${item.docDate || '-'}
-                          </div>
-                        </div>
+                      <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.4rem; font-size: 0.8rem; color: var(--md-sys-color-outline, #64748b);">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--color-primary-navy, #003366)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span style="font-weight: 800; color: var(--md-sys-color-on-surface); font-size: 0.83rem;">${formatDateArabic(item.docDate)}</span>
+                        <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); font-family: monospace; margin-inline-start: 2px;">(${item.docDate || '-'})</span>
                       </div>
                     </td>
 
