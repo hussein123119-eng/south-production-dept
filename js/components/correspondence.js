@@ -273,7 +273,7 @@
                 <th style="text-align: center; width: 60px;">
                   <span>#</span>
                 </th>
-                <th style="min-width: 180px;">
+                <th style="min-width: 150px; width: 160px;">
                   <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     <span>العدد والتاريخ</span>
@@ -303,10 +303,10 @@
                     <span>الحالة</span>
                   </div>
                 </th>
-                <th style="text-align: center; min-width: 220px;">
-                  <div style="display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    <span>الإجراءات الإدارية</span>
+                <th style="text-align: center; width: 105px; min-width: 100px;">
+                  <div style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>الإجراءات</span>
                   </div>
                 </th>
               </tr>
@@ -316,6 +316,7 @@
                 const priorityBadge = getPriorityBadge(item.priority);
                 const categoryBadge = getCategoryBadge(item.category);
                 const statusBadge = getStatusBadge(item.status);
+                const displayDocNum = formatDisplayDocNumber(item.docNumber);
 
                 return `
                   <tr>
@@ -324,20 +325,20 @@
                       <div class="cts-index-badge">${idx + 1}</div>
                     </td>
 
-                    <!-- العدد الصريح المقروء + التاريخ المدمج -->
+                    <!-- العدد الصريح المقروء المنسق برمز المحطة + التاريخ بالإنكليزية فقط -->
                     <td>
-                      <div class="cts-doc-num-badge">
+                      <div class="cts-doc-num-badge" title="${item.docNumber}">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; opacity: 0.85;">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                           <polyline points="14 2 14 8 20 8"></polyline>
                           <line x1="16" y1="13" x2="8" y2="13"></line>
                           <line x1="16" y1="17" x2="8" y2="17"></line>
                         </svg>
-                        <span>${item.docNumber}</span>
+                        <span>${displayDocNum}</span>
                       </div>
                       ${item.externalDocNumber ? `
-                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; color: #b45309; margin-top: 0.3rem; font-weight: 700;">
-                          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; color: #b45309; margin-top: 0.25rem; font-weight: 700; white-space: nowrap;">
+                          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                             <polyline points="15 14 20 9 15 4"></polyline>
                             <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
                           </svg>
@@ -345,15 +346,14 @@
                           <span style="font-family: inherit; font-weight: 800;">${item.externalDocNumber}</span>
                         </div>
                       ` : ''}
-                      <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.4rem; font-size: 0.8rem; color: var(--md-sys-color-outline, #64748b);">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.35rem; color: var(--md-sys-color-outline, #64748b); white-space: nowrap;">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--color-primary-navy, #003366)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                           <line x1="16" y1="2" x2="16" y2="6"></line>
                           <line x1="8" y1="2" x2="8" y2="6"></line>
                           <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
-                        <span style="font-weight: 800; color: var(--md-sys-color-on-surface); font-size: 0.83rem;">${formatDateArabic(item.docDate)}</span>
-                        <span style="font-size: 0.72rem; color: var(--md-sys-color-outline); font-family: monospace; margin-inline-start: 2px;">(${item.docDate || '-'})</span>
+                        <span style="direction: ltr; unicode-bidi: isolate; font-family: 'Segoe UI', system-ui, sans-serif; font-weight: 700; color: var(--md-sys-color-on-surface); font-size: 0.82rem; letter-spacing: 0.3px;">${item.docDate || '-'}</span>
                       </div>
                     </td>
 
@@ -427,32 +427,29 @@
                       ${statusBadge}
                     </td>
 
-                    <!-- أزرار الإجراءات المتطورة -->
-                    <td style="text-align: center; white-space: nowrap;">
-                      <div style="display: inline-flex; gap: 0.4rem; align-items: center; justify-content: center;">
-                        <button type="button" class="btn-action-view" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="عرض تفاصيل المعاملة والسجل">
+                    <!-- أزرار الإجراءات المتطورة المقتصرة على الرموز -->
+                    <td style="text-align: center; white-space: nowrap; width: 105px;">
+                      <div style="display: inline-flex; gap: 0.35rem; align-items: center; justify-content: center; flex-wrap: nowrap;">
+                        <button type="button" class="btn-action-view btn-action-icon-only" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="معاينة وتفاصيل المعاملة" aria-label="معاينة">
                           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                           </svg>
-                          <span>معاينة</span>
                         </button>
 
-                        <button type="button" class="btn-action-print" onclick="window.app.printCorrespondenceDocument('${item.id}')" title="طباعة الوثيقة الرسمية بالترويسة المعتمدة والباركود">
+                        <button type="button" class="btn-action-print btn-action-icon-only" onclick="window.app.printCorrespondenceDocument('${item.id}')" title="طباعة رسمية بالترويسة المعتمدة والباركود" aria-label="طباعة">
                           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 6 2 18 2 18 9"></polyline>
                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                             <rect x="6" y="14" width="12" height="8"></rect>
                           </svg>
-                          <span>طباعة</span>
                         </button>
 
-                        <button type="button" class="btn-action-verify" onclick="window.app.openVerifyCorrespondenceModal('${item.docNumber}')" title="فحص صحة الصدور والباركود الرقمي">
+                        <button type="button" class="btn-action-verify btn-action-icon-only" onclick="window.app.openVerifyCorrespondenceModal('${displayDocNum}')" title="فحص وتدقيق صحة الصدور والباركود الرقمي" aria-label="صحة الصدور">
                           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             <path d="m9 12 2 2 4-4"></path>
                           </svg>
-                          <span>صحة الصدور</span>
                         </button>
                       </div>
                     </td>
@@ -681,6 +678,19 @@
     } catch (e) {
       return dateStr;
     }
+  }
+
+  function formatDisplayDocNumber(docNum) {
+    if (!docNum) return '-';
+    return String(docNum)
+      .replace(/محطة الرميلة الشمالية/g, 'DS-1')
+      .replace(/محطة الرميلة الجنوبية/g, 'DS-2')
+      .replace(/المحطة المركزية|محطة المركزية/g, 'ST-CTR')
+      .replace(/محطة الرطكة/g, 'ST-RTK')
+      .replace(/محطة الشامية/g, 'ST-SHM')
+      .replace(/محطة القرينات/g, 'ST-QRN')
+      .replace(/محطة مشرف شامية/g, 'ST-MSH-SHM')
+      .replace(/محطة مشرف قرينات/g, 'ST-MSH-QRN');
   }
 
   // تصدير دالة العرض
@@ -1278,11 +1288,11 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
               <div>
                 <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">العدد الصريح المقروء:</div>
-                <div style="font-size: 1.1rem; font-weight: 900; color: #003366; font-family: monospace; direction: ltr; display: inline-block;">${item.docNumber}</div>
+                <div style="font-size: 1.1rem; font-weight: 900; color: #003366; font-family: monospace; direction: ltr; display: inline-block;">${formatDisplayDocNumber(item.docNumber)}</div>
               </div>
               <div>
                 <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">التاريخ الرسمي المسجل:</div>
-                <div style="font-size: 1rem; font-weight: 800; color: #047857;">${formatDateArabic(item.docDate)} (${item.docDate})</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #047857; direction: ltr; display: inline-block; font-family: 'Segoe UI', system-ui, sans-serif;">${item.docDate || '-'}</div>
               </div>
               <div>
                 <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">نوع المعاملة والقيد:</div>

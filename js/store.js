@@ -4075,6 +4075,39 @@ class StoreManager {
     return (this.getDb().stations || []).find(s => s.id === stId);
   }
 
+  getStationCode(stId, stName = '') {
+    const name = String(stName || stId || '').trim();
+    if (!name) return 'DS-1';
+    if (/^[A-Z0-9\-]+$/i.test(name)) return name.toUpperCase();
+
+    // فحص مباشر لرموز المحطات الميدانية القياسية (DS-1, ST-CTR ...)
+    const dsMatch = name.match(/(?:DS|ST|LAB|MTR)[\s\-_]*\d+/i);
+    if (dsMatch) return dsMatch[0].replace(/\s+/g, '-').toUpperCase();
+
+    const db = this.getDb ? this.getDb() : null;
+    const stations = db ? (db.stations || []) : [];
+    let st = null;
+    if (stId) {
+      st = stations.find(s => s.id === stId || s.code === stId);
+    }
+    if (!st && stName) {
+      st = stations.find(s => s.name === stName || (s.name && stName.includes(s.name)));
+    }
+    if (st && st.code) return st.code;
+
+    // قاموس رموز محطات ومواقع حقول الإنتاج الجنوبي المعتمدة
+    if (name.includes('الرميلة الشمالية') || name.includes('شمالية') || name.includes('الشمالية')) return 'DS-1';
+    if (name.includes('الرميلة الجنوبية') || name.includes('جنوبية') || name.includes('الجنوبية')) return 'DS-2';
+    if (name.includes('المركزية')) return 'ST-CTR';
+    if (name.includes('الرطكة')) return 'ST-RTK';
+    if (name.includes('الشامية')) return 'ST-SHM';
+    if (name.includes('القرينات')) return 'ST-QRN';
+    if (name.includes('مشرف شامية')) return 'ST-MSH-SHM';
+    if (name.includes('مشرف قرينات')) return 'ST-MSH-QRN';
+
+    return 'DS-1';
+  }
+
   addStation(st) {
     const db = this.getDb();
     if (!db.stations) db.stations = [];
@@ -4629,7 +4662,7 @@ class StoreManager {
         priority: newNotif.priority || 'NORMAL',
         category: 'MEMORANDUM',
         fromLevel: 'station',
-        stationCode: newNotif.stationName || 'محطة'
+        stationCode: this.getStationCode(newNotif.stationId, newNotif.stationName)
       }, actorUser);
 
       newNotif.docNumber = corr.docNumber;
@@ -4925,9 +4958,22 @@ class StoreManager {
   verifyCorrespondence(query) {
     if (!query) return { verified: false, message: 'يرجى إدخال العدد أو رمز الباركود للتحقق' };
     const q = query.trim().toLowerCase();
+    const normalizeStationInDocNum = (s) => (s || '').toLowerCase()
+      .replace(/محطة الرميلة الشمالية/g, 'ds-1')
+      .replace(/محطة الرميلة الجنوبية/g, 'ds-2')
+      .replace(/المحطة المركزية|محطة المركزية/g, 'st-ctr')
+      .replace(/محطة الرطكة/g, 'st-rtk')
+      .replace(/محطة الشامية/g, 'st-shm')
+      .replace(/محطة القرينات/g, 'st-qrn')
+      .replace(/محطة مشرف شامية/g, 'st-msh-shm')
+      .replace(/محطة مشرف قرينات/g, 'st-msh-qrn');
+
+    const normQ = normalizeStationInDocNum(q);
     const db = this.getDb();
     const match = (db.correspondenceRegistry || []).find(item => {
-      return (item.docNumber && item.docNumber.toLowerCase() === q) ||
+      const dNum = (item.docNumber || '').toLowerCase();
+      const normDNum = normalizeStationInDocNum(dNum);
+      return (dNum === q || normDNum === normQ || normDNum === q || dNum === normQ) ||
              (item.externalDocNumber && item.externalDocNumber.toLowerCase() === q) ||
              (item.barcodeValue && item.barcodeValue.toLowerCase() === q) ||
              (item.verificationHash && item.verificationHash.toLowerCase() === q) ||
@@ -4968,7 +5014,8 @@ class StoreManager {
         const secCode = options.sectionCode || 'ش.ع';
         docNumber = `ق.ج/${secCode}/ص/${year}/${Math.floor(100 + Math.random() * 900)}`;
       } else if (options.sourceModule === 'STATION_NOTIFICATION' || options.fromLevel === 'station') {
-        const stCode = options.stationCode || 'محطة';
+        const rawCode = options.stationCode || options.stationName || 'DS-1';
+        const stCode = this.getStationCode ? this.getStationCode(options.stationId, rawCode) : rawCode;
         docNumber = `ق.ج/${stCode}/ص/${year}/${Math.floor(100 + Math.random() * 900)}`;
       } else if (options.sourceModule === 'ADMINISTRATIVE_REQUEST' || type === 'INWARD') {
         docNumber = this.getNextCorrespondenceNumber('INWARD', year);
@@ -5108,6 +5155,28 @@ class StoreManager {
       }
     });
 
+    // تنظيف وتحديث أي أرقام مسجلة مسبقاً بأسماء المحطات المطولة إلى رموزها الميدانية القياسية
+    if (Array.isArray(db.correspondenceRegistry)) {
+      db.correspondenceRegistry.forEach(c => {
+        if (c.docNumber && c.docNumber.includes('محطة الرميلة الشمالية')) {
+          c.docNumber = c.docNumber.replace('محطة الرميلة الشمالية', 'DS-1');
+        }
+        if (c.docNumber && c.docNumber.includes('محطة الرميلة الجنوبية')) {
+          c.docNumber = c.docNumber.replace('محطة الرميلة الجنوبية', 'DS-2');
+        }
+      });
+    }
+    if (Array.isArray(db.stationNotifications)) {
+      db.stationNotifications.forEach(stn => {
+        if (stn.docNumber && stn.docNumber.includes('محطة الرميلة الشمالية')) {
+          stn.docNumber = stn.docNumber.replace('محطة الرميلة الشمالية', 'DS-1');
+        }
+        if (stn.docNumber && stn.docNumber.includes('محطة الرميلة الجنوبية')) {
+          stn.docNumber = stn.docNumber.replace('محطة الرميلة الجنوبية', 'DS-2');
+        }
+      });
+    }
+
     // 4. مزامنة تبليغات ومذكرات المحطات (Station Notifications)
     const stNotifs = Array.isArray(db.stationNotifications) ? db.stationNotifications : [];
     stNotifs.forEach(stn => {
@@ -5127,7 +5196,7 @@ class StoreManager {
           priority: stn.priority || 'NORMAL',
           category: 'MEMORANDUM',
           fromLevel: 'station',
-          stationCode: stn.stationName || 'محطة'
+          stationCode: this.getStationCode(stn.stationId, stn.stationName || stn.stationCode)
         });
         stn.docNumber = corr.docNumber;
         stn.barcodeValue = corr.barcodeValue;

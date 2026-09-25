@@ -10885,26 +10885,46 @@ body[data-theme="dark"],
 /* 3. شارة العدد الصريح المقروء (Explicit Doc Number Badge) */
 .cts-doc-num-badge {
   font-weight: 800;
-  font-family: inherit;
-  font-size: 0.92rem;
+  font-family: 'Segoe UI', 'Cairo', system-ui, sans-serif;
+  font-size: 0.84rem;
   color: #003366;
   direction: rtl;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, rgba(0, 51, 102, 0.07) 0%, rgba(0, 51, 102, 0.03) 100%);
-  padding: 0.28rem 0.7rem;
-  border-radius: 8px;
+  gap: 0.35rem;
+  white-space: nowrap;
+  background: linear-gradient(135deg, rgba(0, 51, 102, 0.08) 0%, rgba(0, 51, 102, 0.03) 100%);
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
   border: 1.2px solid rgba(0, 51, 102, 0.22);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  letter-spacing: -0.15px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  letter-spacing: 0.1px;
 }
 
 [data-theme="dark"] .cts-doc-num-badge {
   color: #7dd3fc;
-  background: rgba(14, 165, 233, 0.12);
+  background: rgba(14, 165, 233, 0.14);
   border-color: rgba(56, 189, 248, 0.35);
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* أزرار الإجراءات المدمجة المقتصرة على الأيقونات (Compact Icon-Only Action Buttons) */
+.btn-action-icon-only {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 7px !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-action-icon-only svg {
+  margin: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 /* 4. كارت الباركود المتجهي المصغر (Barcode Thumbnail Container) */
