@@ -95,6 +95,7 @@ const FounderPortal = {
       quickFillBox.style.display = isLocalEnv ? 'block' : 'none';
     }
 
+    this.populateDynamicHierarchyFilters();
     this.renderMetrics();
     this.renderAuditLogs();
     this.renderEnterprisePanel();
@@ -1130,6 +1131,145 @@ const FounderPortal = {
   // التبويب 3: مركز الإضابير والملاكات
   // =========================================================================
 
+  // التحديث الديناميكي الشامل لقوائم وفلاتر الهيكل الإداري (الشعب والوحدات والمحطات)
+  populateDynamicHierarchyFilters: function() {
+    const hier = (window.store && typeof window.store.getHierarchy === 'function') 
+      ? window.store.getHierarchy('dept-south-prod') 
+      : null;
+    if (!hier) return;
+
+    const secList = [...(hier.sections || [])];
+    const unitList = [...(hier.units || [])];
+    const staList = [...(hier.stations || [])];
+
+    // استكشاف تلقائي لأي تشكيلات مضافة من الإضابير والسجلات
+    const secMap = new Set(secList.map(s => s.id));
+    const unitMap = new Set(unitList.map(u => u.id));
+    const staMap = new Set(staList.map(st => st.id));
+
+    (this.dossiers || []).forEach(emp => {
+      if (emp.sectionId && !secMap.has(emp.sectionId)) {
+        secList.push({ id: emp.sectionId, name: emp.sectionName || emp.sectionId });
+        secMap.add(emp.sectionId);
+      }
+      if (emp.unitId && !unitMap.has(emp.unitId)) {
+        unitList.push({ id: emp.unitId, name: emp.unitName || emp.unitId });
+        unitMap.add(emp.unitId);
+      }
+      if (emp.stationId && !staMap.has(emp.stationId)) {
+        staList.push({ id: emp.stationId, name: emp.stationName || emp.stationId });
+        staMap.add(emp.stationId);
+      }
+    });
+
+    // 1. تغذية فلتر جدول الإضابير (dossierSectionFilter)
+    const secFilter = document.getElementById('dossierSectionFilter');
+    if (secFilter) {
+      const currentVal = secFilter.value || 'ALL';
+      let html = `
+        <option value="ALL">كافة التشكيلات الإدارية والميدانية</option>
+        <option value="DEPT">🏢 إدارة القسم المركزية</option>
+      `;
+
+      if (secList.length > 0) {
+        html += `<optgroup label="📁 الشعب الإنتاجية والرأسية">`;
+        secList.forEach(s => {
+          html += `<option value="${s.id}">📁 ${s.name}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      if (unitList.length > 0) {
+        html += `<optgroup label="⚙️ الوحدات التابعة لإدارة القسم">`;
+        unitList.forEach(u => {
+          const uLabel = (u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : ('وحدة ' + u.name);
+          html += `<option value="${u.id}">⚙️ ${uLabel}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      if (staList.length > 0) {
+        html += `<optgroup label="⛽ محطات الإنتاج الميدانية (DS)">`;
+        staList.forEach(st => {
+          const codeStr = st.code ? ` (${st.code})` : '';
+          html += `<option value="${st.code || st.id}">⛽ ${st.name}${codeStr}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      secFilter.innerHTML = html;
+      if (currentVal && Array.from(secFilter.options).some(o => o.value === currentVal)) {
+        secFilter.value = currentVal;
+      }
+    }
+
+    // 2. تغذية قائمة اختيار الشعبة/الوحدة في نافذة تعديل الإضبارة
+    const editSec = document.getElementById('editEmpSection');
+    if (editSec) {
+      const currentVal = editSec.value || 'DEPT';
+      let html = `<option value="DEPT">🏢 إدارة القسم المركزية</option>`;
+      if (secList.length > 0) {
+        html += `<optgroup label="📁 الشعب الإنتاجية">`;
+        secList.forEach(s => {
+          html += `<option value="${s.id}">${s.name}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      if (unitList.length > 0) {
+        html += `<optgroup label="⚙️ الوحدات التابعة للإدارة">`;
+        unitList.forEach(u => {
+          const uLabel = (u.name.startsWith('وحدة') || u.name.startsWith('الوحدة')) ? u.name : ('وحدة ' + u.name);
+          html += `<option value="${u.id}">${uLabel}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      editSec.innerHTML = html;
+      if (currentVal && Array.from(editSec.options).some(o => o.value === currentVal)) {
+        editSec.value = currentVal;
+      }
+    }
+
+    // 3. تغذية قائمة اختيار المحطة في نافذة تعديل الإضبارة
+    const editSta = document.getElementById('editEmpStation');
+    if (editSta) {
+      const currentVal = editSta.value || '';
+      let html = `<option value="">-- بدون محطة / موقع مكتبي --</option>`;
+      
+      const sec1Stations = staList.filter(st => st.sectionId === 'sec-1' || ['st-101','st-102','st-103','ST-CTR','ST-STH','ST-RTK'].includes(st.id) || ['st-101','st-102','st-103','ST-CTR','ST-STH','ST-RTK'].includes(st.code));
+      const sec2Stations = staList.filter(st => st.sectionId === 'sec-2' || ['st-201','st-202','st-203','st-204','ST-SHM','ST-QRN','ST-MSH-SHM','ST-MSH-QRN'].includes(st.id) || ['st-201','st-202','st-203','st-204','ST-SHM','ST-QRN','ST-MSH-SHM','ST-MSH-QRN'].includes(st.code));
+      const otherStations = staList.filter(st => !sec1Stations.includes(st) && !sec2Stations.includes(st));
+
+      if (sec1Stations.length > 0) {
+        html += `<optgroup label="محطات الشعبة الأولى">`;
+        sec1Stations.forEach(st => {
+          const codeStr = st.code ? ` (${st.code})` : '';
+          html += `<option value="${st.id}">${st.name}${codeStr}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      if (sec2Stations.length > 0) {
+        html += `<optgroup label="محطات الشعبة الثانية">`;
+        sec2Stations.forEach(st => {
+          const codeStr = st.code ? ` (${st.code})` : '';
+          html += `<option value="${st.id}">${st.name}${codeStr}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      if (otherStations.length > 0) {
+        html += `<optgroup label="محطات إنتاجية أخرى">`;
+        otherStations.forEach(st => {
+          const codeStr = st.code ? ` (${st.code})` : '';
+          html += `<option value="${st.id}">${st.name}${codeStr}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      editSta.innerHTML = html;
+      if (currentVal && Array.from(editSta.options).some(o => o.value === currentVal)) {
+        editSta.value = currentVal;
+      }
+    }
+  },
+
   // رسم وتصفية جدول الإضابير
   renderDossiersTable: function() {
     const tbody = document.getElementById('dossiersTableBody');
@@ -1159,6 +1299,12 @@ const FounderPortal = {
 
       if (filterVal === 'DEPT') {
         return deptStr.includes('إدارة القسم') || deptStr.includes('مقر') || (!secId && !unitId && !staId && !deptStr.includes('شعبة') && !deptStr.includes('وحدة') && !deptStr.includes('محطة'));
+      }
+      if (secId === filterVal || unitId === filterVal || staId === filterVal) {
+        return true;
+      }
+      if (emp.stationCode && emp.stationCode.toLowerCase() === filterVal.toLowerCase()) {
+        return true;
       }
       if (filterVal === 'sec-1') {
         return secId === 'sec-1' || deptStr.includes('الأولى') || deptStr.includes('الاولى') || deptStr.includes('المركزية') || deptStr.includes('الجنوبية') || deptStr.includes('الرطكة') || deptStr.includes('st-ctr') || deptStr.includes('st-sth') || deptStr.includes('st-rtk') || deptStr.includes('ds-1') || deptStr.includes('ds-2') || deptStr.includes('ds-3');
@@ -1249,6 +1395,7 @@ const FounderPortal = {
 
   // فتح نافذة تعديل الإضبارة
   openDossierModal: function(empId) {
+    this.populateDynamicHierarchyFilters();
     const emp = this.dossiers.find(e => e.empId === empId) || (window.deptEmployees && window.deptEmployees.find(e => (e.empId === empId || e.id === empId)));
     if (!emp) return;
 
