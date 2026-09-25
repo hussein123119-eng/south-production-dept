@@ -342,8 +342,78 @@ class AppController {
     this.render();
   }
 
-  render() {
+  updateActiveNavState(viewName) {
+    if (typeof document === 'undefined') return;
+    
+    // 1. Update Desktop/Tablet Sidebar links
+    const sidebar = document.getElementById('appSidebar') || (document.querySelector && document.querySelector('.sidebar'));
+    if (sidebar && sidebar.querySelectorAll) {
+      const navItems = sidebar.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        const onclickAttr = item.getAttribute('onclick') || '';
+        let isMatch = false;
+        if (viewName === 'sections' || viewName === 'section_workspace') {
+          isMatch = onclickAttr.includes('toggleSidebarSectionsDropdown') || onclickAttr.includes("navigate('sections')");
+        } else if (viewName === 'units' || viewName === 'unit_workspace') {
+          isMatch = onclickAttr.includes('toggleSidebarUnitsDropdown') || onclickAttr.includes("navigate('units')");
+        } else {
+          isMatch = onclickAttr.includes(`navigate('${viewName}')`) || onclickAttr.includes(`navigate("${viewName}")`);
+        }
+        
+        if (isMatch) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // Update Sub-items in Sections
+      const secSubItems = sidebar.querySelectorAll('#sectionsDropdownMenu .nav-sub-item');
+      secSubItems.forEach(item => {
+        const onclickAttr = item.getAttribute('onclick') || '';
+        if (viewName === 'section_workspace' && this.currentSectionId && onclickAttr.includes(this.currentSectionId)) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // Update Sub-items in Units
+      const unitSubItems = sidebar.querySelectorAll('#unitsDropdownMenu .nav-sub-item');
+      unitSubItems.forEach(item => {
+        const onclickAttr = item.getAttribute('onclick') || '';
+        if (viewName === 'unit_workspace' && this.currentUnitId && onclickAttr.includes(this.currentUnitId)) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // 2. Update Mobile Bottom Nav buttons
+    const mobileNav = document.getElementById('mobileBottomNav');
+    if (mobileNav && mobileNav.querySelectorAll) {
+      const isHome = viewName === 'dashboard';
+      const isForms = viewName === 'dept_management' || viewName === 'documents';
+      const isIncentive = viewName === 'incentive_calculator';
+      const isPromotion = viewName === 'promotion_calculator';
+      const isMore = !isHome && !isForms && !isIncentive && !isPromotion;
+
+      const btns = mobileNav.querySelectorAll('.bottom-nav-btn');
+      btns.forEach((btn, idx) => {
+        btn.classList.remove('active');
+        if (idx === 0 && isHome) btn.classList.add('active');
+        else if (idx === 1 && isForms) btn.classList.add('active');
+        else if (idx === 2 && isIncentive) btn.classList.add('active');
+        else if (idx === 3 && isPromotion) btn.classList.add('active');
+        else if (idx === 4 && isMore) btn.classList.add('active');
+      });
+    }
+  }
+
+  render(forceFull = false) {
     const appEl = document.getElementById('app');
+    if (!appEl) return;
     const user = window.auth.getCurrentUser();
 
     if (!user) {
@@ -441,8 +511,26 @@ class AppController {
 
     // --- Block non-super-admins from accessing super_admin view ---
     if (this.currentView === 'super_admin' && user.role !== 'SUPER_ADMIN') {
-       appEl.innerHTML = `<div style="padding:2rem; text-align:center; color:var(--md-sys-color-error);"><h2>⛔ ليس لديك صلاحية الوصول</h2><p>هذه اللوحة مخصصة للمؤسس فقط.</p><button class="btn btn-primary" style="margin-top:1rem;" onclick="window.app.navigate('dashboard')">العودة للرئيسية</button></div>`;
+       const unauthHtml = `<div style="padding:2rem; text-align:center; color:var(--md-sys-color-error);"><h2>⛔ ليس لديك صلاحية الوصول</h2><p>هذه اللوحة مخصصة للمؤسس فقط.</p><button class="btn btn-primary" style="margin-top:1rem;" onclick="window.app.navigate('dashboard')">العودة للرئيسية</button></div>`;
+       const contentArea = (typeof document !== 'undefined' && document.querySelector) ? document.querySelector('.content-area') : null;
+       if (contentArea && !forceFull) {
+         contentArea.innerHTML = unauthHtml;
+       } else {
+         appEl.innerHTML = unauthHtml;
+       }
        return;
+    }
+
+    const layoutWrapper = (typeof document !== 'undefined' && document.querySelector) ? document.querySelector('.layout-wrapper') : null;
+    const contentArea = (typeof document !== 'undefined' && document.querySelector) ? document.querySelector('.content-area') : null;
+
+    if (layoutWrapper && contentArea && !forceFull) {
+      contentArea.innerHTML = viewHtml;
+      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+        window.scrollTo(0, 0);
+      }
+      this.updateActiveNavState(this.currentView);
+      return;
     }
 
     appEl.innerHTML = `
@@ -462,7 +550,9 @@ class AppController {
         ${typeof window.renderMobileBottomNav === 'function' ? window.renderMobileBottomNav(this.currentView) : ''}
         ${typeof window.renderMobileBottomSheet === 'function' ? window.renderMobileBottomSheet() : ''}
       </div>
-    `;}
+    `;
+    this.updateActiveNavState(this.currentView);
+  }
 
   navigateWithHaptic(viewName, paramId = null) {
     this.triggerHaptic(10);

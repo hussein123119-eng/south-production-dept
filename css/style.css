@@ -1397,6 +1397,7 @@ body.sidebar-collapsed .main-content {
   z-index: 1040;
   opacity: 0;
   transition: opacity var(--transition-normal);
+  will-change: opacity;
 }
 
 body.sidebar-mobile-open .sidebar-overlay {
@@ -1418,6 +1419,9 @@ body.sidebar-mobile-open .sidebar-overlay {
   overflow-y: auto;
   transition: transform var(--transition-normal), width var(--transition-normal);
   box-shadow: var(--shadow-1);
+  will-change: transform, width;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 body.sidebar-collapsed .sidebar {
@@ -4633,6 +4637,9 @@ body.theme-dark select optgroup,
     -webkit-overflow-scrolling: touch !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
   }
 
   body.sidebar-mobile-open .sidebar {
@@ -4650,6 +4657,7 @@ body.theme-dark select optgroup,
     opacity: 0 !important;
     pointer-events: none !important;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: opacity !important;
   }
 
   body.sidebar-mobile-open .sidebar-overlay {

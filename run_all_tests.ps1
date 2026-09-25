@@ -41,7 +41,8 @@ $tests = @(
   "js/test_universal_luxury_dropdowns.js",
   "js/test_correspondence_system.js",
   "js/test_canonical_hierarchy_unification.js",
-  "js/test_dynamic_hierarchy_filter_propagation.js"
+  "js/test_dynamic_hierarchy_filter_propagation.js",
+  "js/test_navigation_performance_and_fast_rendering.js"
 )
 
 $failed = 0
