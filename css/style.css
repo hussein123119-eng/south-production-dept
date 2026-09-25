@@ -10753,4 +10753,212 @@ body[data-theme="dark"],
   display: none !important;
 }
 
+/* ==============================================================================
+   🌟 Correspondence Tracking System (CTS) - Luxury Table & Action Buttons 🌟
+   ============================================================================== */
+
+/* 1. زر فحص صحة الصدور والتحقق (Verify Action Button) */
+.btn-action-verify {
+  background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+  border: 1.5px solid #67e8f9;
+  color: #0e7490 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.28rem 0.75rem;
+  border-radius: var(--radius-full, 9999px);
+  transition: all var(--transition-fast, 0.2s ease);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(14, 116, 144, 0.12);
+}
+
+.btn-action-verify:hover {
+  background: #0891b2 !important;
+  color: #ffffff !important;
+  border-color: #0e7490;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(8, 145, 178, 0.35);
+}
+
+.btn-action-verify:active {
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .btn-action-verify {
+  background: rgba(6, 182, 212, 0.16) !important;
+  border: 1.2px solid rgba(34, 211, 238, 0.45) !important;
+  color: #67e8f9 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-action-verify:hover {
+  background: rgba(6, 182, 212, 0.35) !important;
+  border-color: #22d3ee !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+/* 2. حاوية وجدول الصادر والوارد الفاخر (CTS Table) */
+.cts-table-card {
+  border-radius: 16px;
+  background: var(--md-sys-color-surface, #ffffff);
+  border: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  box-shadow: 0 6px 20px rgba(0, 51, 102, 0.05);
+  overflow: hidden;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .cts-table-card {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.cts-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: right;
+  margin: 0;
+  font-family: inherit;
+}
+
+.cts-table thead tr {
+  background: linear-gradient(180deg, rgba(0, 51, 102, 0.06) 0%, rgba(0, 51, 102, 0.02) 100%);
+  border-bottom: 2px solid rgba(0, 51, 102, 0.12);
+}
+
+[data-theme="dark"] .cts-table thead tr {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-bottom: 2px solid rgba(56, 189, 248, 0.25);
+}
+
+.cts-table th {
+  padding: 1rem 1.1rem;
+  font-weight: 800;
+  font-size: 0.86rem;
+  color: var(--md-sys-color-primary, #003366);
+  letter-spacing: -0.1px;
+  border-bottom: 2px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .cts-table th {
+  color: #38bdf8;
+  border-bottom-color: rgba(56, 189, 248, 0.25);
+}
+
+.cts-table tbody tr {
+  border-bottom: 1px solid var(--md-sys-color-outline-variant, #f1f5f9);
+  transition: all 0.18s ease-in-out;
+}
+
+.cts-table tbody tr:hover {
+  background: rgba(0, 51, 102, 0.025);
+  box-shadow: inset 3px 0 0 #c5a059;
+}
+
+[data-theme="dark"] .cts-table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .cts-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.05);
+  box-shadow: inset 3px 0 0 #38bdf8;
+}
+
+.cts-table td {
+  padding: 1rem 1.1rem;
+  vertical-align: middle;
+  font-size: 0.88rem;
+}
+
+/* 3. شارة العدد الصريح المقروء (Explicit Doc Number Badge) */
+.cts-doc-num-badge {
+  font-weight: 800;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: #003366;
+  direction: rtl;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(0, 51, 102, 0.07) 0%, rgba(0, 51, 102, 0.03) 100%);
+  padding: 0.28rem 0.7rem;
+  border-radius: 8px;
+  border: 1.2px solid rgba(0, 51, 102, 0.22);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  letter-spacing: -0.15px;
+}
+
+[data-theme="dark"] .cts-doc-num-badge {
+  color: #7dd3fc;
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 4. كارت الباركود المتجهي المصغر (Barcode Thumbnail Container) */
+.cts-barcode-thumb {
+  margin-top: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.55rem;
+  background: #ffffff;
+  border: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.cts-barcode-thumb:hover {
+  transform: translateY(-1px);
+  border-color: #003366;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
+}
+
+[data-theme="dark"] .cts-barcode-thumb {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .cts-barcode-thumb:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+
+/* 5. شارة رقم الصف (# Index Badge) */
+.cts-index-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(0, 51, 102, 0.05);
+  border: 1px solid var(--md-sys-color-outline-variant, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--md-sys-color-primary, #003366);
+  margin: 0 auto;
+}
+
+[data-theme="dark"] .cts-index-badge {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+
 

@@ -48,8 +48,14 @@
         <div class="card" style="background: linear-gradient(135deg, rgba(0, 51, 102, 0.95) 0%, rgba(2, 44, 76, 0.98) 100%); color: #ffffff; border: 1.5px solid rgba(197, 160, 89, 0.4); border-radius: 16px; padding: 1.5rem 1.8rem; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.2rem;">
             <div style="display: flex; align-items: center; gap: 1.2rem;">
-              <div style="width: 58px; height: 58px; border-radius: 14px; background: linear-gradient(135deg, #c5a059 0%, #9a782a 100%); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 14px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.3);">
-                📋
+              <div style="width: 58px; height: 58px; border-radius: 14px; background: linear-gradient(135deg, #c5a059 0%, #9a782a 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.3); color: #ffffff;">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
               </div>
               <div>
                 <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
@@ -67,17 +73,27 @@
             <!-- أزرار الإجراءات الإدارية السريعة -->
             <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
               <button type="button" class="btn btn-primary" onclick="window.app.openCreateOutwardModal()" style="background: linear-gradient(135deg, #c5a059 0%, #b45309 100%); border-color: #fde68a; color: #ffffff; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem;">
-                <span>➕</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
                 <span>قيد كتاب صادر جديد</span>
               </button>
 
               <button type="button" class="btn" onclick="window.app.openCreateInwardModal()" style="background: rgba(255, 255, 255, 0.12); border: 1.5px solid rgba(255, 255, 255, 0.3); color: #ffffff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem;">
-                <span>📥</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                </svg>
                 <span>تسجيل كتاب وارد</span>
               </button>
 
               <button type="button" class="btn" onclick="window.app.setCorrespondenceTab('VERIFIER')" style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; color: #7dd3fc; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem;">
-                <span>🔍</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
                 <span>محقق صحة الصدور</span>
               </button>
             </div>
@@ -86,24 +102,50 @@
           <!-- البطاقات الإحصائية الأربع -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 1.2rem;">
             <div style="background: rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 10px; border-right: 4px solid #38bdf8;">
-              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">سجل الكتب الصادرة</div>
+              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>سجل الكتب الصادرة</span>
+              </div>
               <div style="font-size: 1.6rem; font-weight: 900; color: #ffffff; margin-top: 0.2rem;">${outwardCount} <span style="font-size: 0.8rem; font-weight: 600; color: #38bdf8;">كتاب رسمي</span></div>
             </div>
 
             <div style="background: rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 10px; border-right: 4px solid #34d399;">
-              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">سجل المعاملات الواردة</div>
+              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                  <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                </svg>
+                <span>سجل المعاملات الواردة</span>
+              </div>
               <div style="font-size: 1.6rem; font-weight: 900; color: #ffffff; margin-top: 0.2rem;">${inwardCount} <span style="font-size: 0.8rem; font-weight: 600; color: #34d399;">معاملة مقيدة</span></div>
             </div>
 
             <div style="background: rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 10px; border-right: 4px solid #f87171;">
-              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">معاملات هامة وعاجلة</div>
+              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>معاملات هامة وعاجلة</span>
+              </div>
               <div style="font-size: 1.6rem; font-weight: 900; color: #ffffff; margin-top: 0.2rem;">${urgentCount} <span style="font-size: 0.8rem; font-weight: 600; color: #f87171;">قيد عاجل</span></div>
             </div>
 
             <div style="background: rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 10px; border-right: 4px solid #fbbf24;">
-              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">توليد الباركود والرقم</div>
-              <div style="font-size: 1.1rem; font-weight: 800; color: #fde68a; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-                <span>⚡ تسلسلي مؤمّن</span>
+              <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <circle cx="12" cy="11" r="3"></circle>
+                </svg>
+                <span>توليد الباركود والرقم</span>
+              </div>
+              <div style="font-size: 1.05rem; font-weight: 800; color: #fde68a; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fde68a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>تسلسلي رسمي مؤمّن</span>
               </div>
             </div>
           </div>
@@ -116,17 +158,26 @@
             <!-- أزرار التبويبات -->
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button type="button" class="btn ${currentTab === 'OUTWARD' ? 'btn-primary' : 'btn-outline'}" onclick="window.app.setCorrespondenceTab('OUTWARD')" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800;">
-                <span>📤</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
                 <span>سجل الصادر (${outwardCount})</span>
               </button>
 
               <button type="button" class="btn ${currentTab === 'INWARD' ? 'btn-primary' : 'btn-outline'}" onclick="window.app.setCorrespondenceTab('INWARD')" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800;">
-                <span>📥</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                  <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                </svg>
                 <span>سجل الوارد (${inwardCount})</span>
               </button>
 
               <button type="button" class="btn ${currentTab === 'VERIFIER' ? 'btn-primary' : 'btn-outline'}" onclick="window.app.setCorrespondenceTab('VERIFIER')" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800;">
-                <span>🔍</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
                 <span>محقق صحة الصدور والباركود</span>
               </button>
             </div>
@@ -134,7 +185,11 @@
             <!-- زر تصدير وطباعة السجل -->
             <div>
               <button type="button" class="btn btn-outline" onclick="window.app.printCorrespondenceRegister('${currentTab}')" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700;">
-                <span>🖨️</span>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
                 <span>طباعة السجل الحالي</span>
               </button>
             </div>
@@ -185,133 +240,249 @@
   function renderRegisterTable(records, tabType) {
     if (!records || records.length === 0) {
       return `
-        <div class="card" style="padding: 3rem 1.5rem; text-align: center; background: var(--md-sys-color-surface); border: 1px dashed var(--md-sys-color-outline-variant); border-radius: 14px;">
-          <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">📭</div>
-          <h4 style="font-weight: 800; color: var(--md-sys-color-on-surface); margin-bottom: 0.4rem;">لا توجد معاملات مسجلة تطابق معايير البحث</h4>
-          <p style="color: var(--md-sys-color-outline); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.2rem auto;">
+        <div class="card" style="padding: 3.5rem 1.5rem; text-align: center; background: var(--md-sys-color-surface); border: 1.5px dashed var(--md-sys-color-outline-variant); border-radius: 16px;">
+          <div style="width: 68px; height: 68px; margin: 0 auto 1.2rem auto; border-radius: 18px; background: rgba(0, 51, 102, 0.06); display: flex; align-items: center; justify-content: center; color: var(--color-primary-navy, #003366);">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+          </div>
+          <h4 style="font-weight: 800; color: var(--md-sys-color-on-surface); margin-bottom: 0.5rem; font-size: 1.15rem;">لا توجد معاملات مسجلة تطابق معايير البحث</h4>
+          <p style="color: var(--md-sys-color-outline); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.4rem auto; line-height: 1.6;">
             ${tabType === 'OUTWARD' ? 'يمكنك قيد كتاب صادر جديد بالضغط على زر "قيد كتاب صادر جديد" أعلاه وتوليد العدد الرسمي والباركود تلقائياً.' : 'يمكنك قيد المعاملات والكتب الواردة بالضغط على زر "تسجيل كتاب وارد".'}
           </p>
-          <button type="button" class="btn btn-primary" onclick="${tabType === 'OUTWARD' ? 'window.app.openCreateOutwardModal()' : 'window.app.openCreateInwardModal()'}">
-            ${tabType === 'OUTWARD' ? '➕ قيد كتاب صادر جديد' : '📥 تسجيل كتاب وارد'}
+          <button type="button" class="btn btn-primary" onclick="${tabType === 'OUTWARD' ? 'window.app.openCreateOutwardModal()' : 'window.app.openCreateInwardModal()'}" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800; padding: 0.6rem 1.4rem;">
+            ${tabType === 'OUTWARD' ? `
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>قيد كتاب صادر جديد</span>
+            ` : `
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>
+              <span>تسجيل كتاب وارد</span>
+            `}
           </button>
         </div>
       `;
     }
 
     return `
-      <div class="card" style="padding: 0; overflow: hidden; border-radius: 14px; background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); box-shadow: 0 4px 14px rgba(0,0,0,0.04);">
+      <div class="cts-table-card">
         <div style="overflow-x: auto;">
-          <table class="table" style="width: 100%; border-collapse: collapse; text-align: right; margin: 0;">
-            <thead style="background: rgba(0, 51, 102, 0.05); border-bottom: 2px solid var(--md-sys-color-outline-variant);">
+          <table class="cts-table">
+            <thead>
               <tr>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); width: 60px;">#</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 180px;">العدد والباركود</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 120px;">التاريخ الرسمي</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 240px;">الموضوع والنوع</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 180px;">${tabType === 'OUTWARD' ? 'الجهة المستلمة' : 'الجهة الصادر منها'}</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 110px;">الأسبقية والسرية</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); min-width: 100px;">الحالة</th>
-                <th style="padding: 0.9rem 1rem; font-weight: 800; font-size: 0.85rem; color: var(--md-sys-color-primary); text-align: center; min-width: 150px;">الإجراءات</th>
+                <th style="text-align: center; width: 60px;">
+                  <span>#</span>
+                </th>
+                <th style="min-width: 200px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <span>العدد والباركود</span>
+                  </div>
+                </th>
+                <th style="min-width: 140px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>التاريخ الرسمي</span>
+                  </div>
+                </th>
+                <th style="min-width: 260px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <span>الموضوع والنوع</span>
+                  </div>
+                </th>
+                <th style="min-width: 190px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="22.01"></line><line x1="15" y1="22" x2="15" y2="22.01"></line></svg>
+                    <span>${tabType === 'OUTWARD' ? 'الجهة المستلمة' : 'الجهة الصادر منها'}</span>
+                  </div>
+                </th>
+                <th style="min-width: 130px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>الأسبقية والسرية</span>
+                  </div>
+                </th>
+                <th style="min-width: 130px;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                    <span>الحالة</span>
+                  </div>
+                </th>
+                <th style="text-align: center; min-width: 220px;">
+                  <div style="display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>الإجراءات الإدارية</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
               ${records.map((item, idx) => {
                 const priorityBadge = getPriorityBadge(item.priority);
-                const categoryLabel = getCategoryLabel(item.category);
+                const categoryBadge = getCategoryBadge(item.category);
                 const statusBadge = getStatusBadge(item.status);
-                const barcodeThumb = window.exporter ? window.exporter.generateBarcodeSvg(item.docNumber, 125, 28) : '';
+                const barcodeThumb = window.exporter ? window.exporter.generateBarcodeSvg(item.docNumber, 130, 30) : '';
 
                 return `
-                  <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant); transition: background 0.15s ease;" onmouseover="this.style.background='rgba(0,0,0,0.015)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 0.85rem 1rem; font-weight: 700; color: var(--md-sys-color-outline); font-size: 0.85rem;">
-                      ${idx + 1}
+                  <tr>
+                    <!-- رقم الصف -->
+                    <td style="text-align: center;">
+                      <div class="cts-index-badge">${idx + 1}</div>
                     </td>
 
                     <!-- العدد الصريح المقروء + الباركود المتجهي -->
-                    <td style="padding: 0.85rem 1rem;">
-                      <div style="font-weight: 900; font-family: monospace; font-size: 0.96rem; color: #003366; direction: ltr; display: inline-block; background: rgba(0,51,102,0.06); padding: 0.15rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0,51,102,0.2);">
-                        ${item.docNumber}
+                    <td>
+                      <div class="cts-doc-num-badge">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; opacity: 0.85;">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <span>${item.docNumber}</span>
                       </div>
                       ${item.externalDocNumber ? `
-                        <div style="font-size: 0.76rem; color: #b45309; margin-top: 0.25rem;">
-                          <span>كتابهم ذي العدد:</span> <strong style="font-family: monospace;">${item.externalDocNumber}</strong>
+                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: #b45309; margin-top: 0.35rem; font-weight: 700;">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 14 20 9 15 4"></polyline>
+                            <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
+                          </svg>
+                          <span>كتابهم ذي العدد:</span>
+                          <span style="font-family: inherit; font-weight: 800;">${item.externalDocNumber}</span>
                         </div>
                       ` : ''}
-                      <div style="margin-top: 0.35rem; cursor: pointer;" title="انقر لعرض وتكبير الباركود" onclick="window.app.viewCorrespondenceDetails('${item.id}')">
-                        ${barcodeThumb}
+                      <div>
+                        <div class="cts-barcode-thumb" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="انقر لعرض وتكبير الباركود والتحقق الرقمي">
+                          ${barcodeThumb}
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                          </svg>
+                        </div>
                       </div>
                     </td>
 
                     <!-- التاريخ الرسمي الكامل -->
-                    <td style="padding: 0.85rem 1rem;">
-                      <div style="font-weight: 800; color: var(--md-sys-color-on-surface); font-size: 0.88rem;">
-                        ${formatDateArabic(item.docDate)}
-                      </div>
-                      <div style="font-size: 0.74rem; color: var(--md-sys-color-outline); font-family: monospace;">
-                        ${item.docDate}
+                    <td>
+                      <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(0, 51, 102, 0.06); display: flex; align-items: center; justify-content: center; color: var(--color-primary-navy, #003366); flex-shrink: 0; margin-top: 2px;">
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                          </svg>
+                        </div>
+                        <div>
+                          <div style="font-weight: 800; color: var(--md-sys-color-on-surface); font-size: 0.88rem; line-height: 1.35;">
+                            ${formatDateArabic(item.docDate)}
+                          </div>
+                          <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); font-family: monospace; direction: ltr; text-align: right; margin-top: 0.2rem;">
+                            ${item.docDate || '-'}
+                          </div>
+                        </div>
                       </div>
                     </td>
 
                     <!-- الموضوع ونوع المحرر -->
-                    <td style="padding: 0.85rem 1rem;">
-                      <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
-                        <span style="font-size: 0.72rem; padding: 0.1rem 0.45rem; border-radius: 4px; background: rgba(0,51,102,0.08); color: #003366; font-weight: 800;">
-                          ${categoryLabel}
-                        </span>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                        ${categoryBadge}
                         ${item.attachmentsCount > 0 ? `
-                          <span style="font-size: 0.7rem; color: #047857; font-weight: 700; background: rgba(4,120,87,0.1); padding: 0.1rem 0.4rem; border-radius: 4px;">
-                            📎 ${item.attachmentsCount} مرفق
+                          <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; color: #047857; font-weight: 700; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 0.12rem 0.5rem; border-radius: 9999px;">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                            </svg>
+                            <span>${item.attachmentsCount} مرفق</span>
                           </span>
                         ` : ''}
                       </div>
-                      <div style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface); line-height: 1.4;">
+                      <div style="font-weight: 800; font-size: 0.92rem; color: var(--md-sys-color-on-surface); line-height: 1.45;">
                         ${item.subject}
                       </div>
                       ${item.executiveRouting ? `
-                        <div style="font-size: 0.75rem; color: #0284c7; margin-top: 0.3rem;">
-                          <strong>التوجيه:</strong> ${item.executiveRouting}
+                        <div style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: #0284c7; background: rgba(2, 132, 199, 0.08); padding: 0.18rem 0.55rem; border-radius: 6px; margin-top: 0.35rem; border-right: 2.5px solid #0284c7;">
+                          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                          <strong>التوجيه:</strong> <span>${item.executiveRouting}</span>
                         </div>
                       ` : ''}
                     </td>
 
                     <!-- الجهة المعنية -->
-                    <td style="padding: 0.85rem 1rem;">
-                      <div style="font-size: 0.86rem; font-weight: 700; color: var(--md-sys-color-on-surface);">
-                        ${tabType === 'OUTWARD' ? (item.recipientDept || 'كافة التشكيلات') : (item.senderDept || '-')}
-                      </div>
-                      ${tabType === 'OUTWARD' && item.senderSigner ? `
-                        <div style="font-size: 0.74rem; color: var(--md-sys-color-outline); margin-top: 0.2rem;">
-                          بإمضاء: ${item.senderSigner.split('-')[0]}
+                    <td>
+                      <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(14, 165, 233, 0.08); display: flex; align-items: center; justify-content: center; color: #0284c7; flex-shrink: 0; margin-top: 2px;">
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                            <line x1="9" y1="22" x2="9" y2="22.01"></line>
+                            <line x1="15" y1="22" x2="15" y2="22.01"></line>
+                            <line x1="9" y1="6" x2="9" y2="6.01"></line>
+                            <line x1="15" y1="6" x2="15" y2="6.01"></line>
+                          </svg>
                         </div>
-                      ` : ''}
+                        <div>
+                          <div style="font-size: 0.88rem; font-weight: 800; color: var(--md-sys-color-on-surface);">
+                            ${tabType === 'OUTWARD' ? (item.recipientDept || 'كافة التشكيلات') : (item.senderDept || '-')}
+                          </div>
+                          ${tabType === 'OUTWARD' && item.senderSigner ? `
+                            <div style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--md-sys-color-outline); margin-top: 0.25rem;">
+                              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                              </svg>
+                              <span>بإمضاء: <strong>${item.senderSigner.split('-')[0]}</strong></span>
+                            </div>
+                          ` : ''}
+                        </div>
+                      </div>
                     </td>
 
                     <!-- الأسبقية والسرية -->
-                    <td style="padding: 0.85rem 1rem;">
-                      <div style="margin-bottom: 0.25rem;">
+                    <td>
+                      <div style="margin-bottom: 0.35rem;">
                         ${priorityBadge}
                       </div>
-                      <div style="font-size: 0.72rem; color: var(--md-sys-color-outline); font-weight: 700;">
+                      <div>
                         ${getSecurityLabel(item.securityClassification)}
                       </div>
                     </td>
 
                     <!-- الحالة -->
-                    <td style="padding: 0.85rem 1rem;">
+                    <td>
                       ${statusBadge}
                     </td>
 
-                    <!-- أزرار الإجراءات -->
-                    <td style="padding: 0.85rem 1rem; text-align: center;">
-                      <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
-                        <button type="button" class="btn btn-sm btn-outline" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="عرض التفاصيل الكاملة" style="padding: 0.35rem 0.55rem; font-size: 0.8rem;">
-                          👁️
+                    <!-- أزرار الإجراءات المتطورة -->
+                    <td style="text-align: center; white-space: nowrap;">
+                      <div style="display: inline-flex; gap: 0.4rem; align-items: center; justify-content: center;">
+                        <button type="button" class="btn-action-view" onclick="window.app.viewCorrespondenceDetails('${item.id}')" title="عرض تفاصيل المعاملة والسجل">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span>معاينة</span>
                         </button>
-                        <button type="button" class="btn btn-sm btn-primary" onclick="window.app.printCorrespondenceDocument('${item.id}')" title="طباعة الوثيقة الرسمية بالترويسة المعتمدة" style="padding: 0.35rem 0.55rem; font-size: 0.8rem;">
-                          🖨️
+
+                        <button type="button" class="btn-action-print" onclick="window.app.printCorrespondenceDocument('${item.id}')" title="طباعة الوثيقة الرسمية بالترويسة المعتمدة والباركود">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                          </svg>
+                          <span>طباعة</span>
                         </button>
-                        <button type="button" class="btn btn-sm" onclick="window.app.openVerifyCorrespondenceModal('${item.docNumber}')" title="فحص صحة الصدور والباركود" style="padding: 0.35rem 0.55rem; font-size: 0.8rem; background: rgba(56, 189, 248, 0.12); color: #0284c7; border: 1px solid rgba(56, 189, 248, 0.3);">
-                          🔍
+
+                        <button type="button" class="btn-action-verify" onclick="window.app.openVerifyCorrespondenceModal('${item.docNumber}')" title="فحص صحة الصدور والباركود الرقمي">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                          <span>صحة الصدور</span>
                         </button>
                       </div>
                     </td>
@@ -328,10 +499,13 @@
   // تبويب محقق صحة الصدور والباركود
   function renderVerifierTab() {
     return `
-      <div class="card" style="padding: 2rem; border-radius: 16px; background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-outline-variant); max-width: 860px; margin: 0 auto; box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+      <div class="card" style="padding: 2.2rem 2rem; border-radius: 16px; background: var(--md-sys-color-surface); border: 1.5px solid var(--md-sys-color-outline-variant); max-width: 860px; margin: 0 auto; box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
         <div style="text-align: center; margin-bottom: 2rem;">
-          <div style="width: 64px; height: 64px; margin: 0 auto 1rem auto; border-radius: 16px; background: linear-gradient(135deg, #003366 0%, #0284c7 100%); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #ffffff; box-shadow: 0 6px 18px rgba(0, 51, 102, 0.25);">
-            🔍
+          <div style="width: 68px; height: 68px; margin: 0 auto 1.2rem auto; border-radius: 18px; background: linear-gradient(135deg, #003366 0%, #0284c7 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 6px 20px rgba(0, 51, 102, 0.28);">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
           </div>
           <h3 style="font-weight: 900; color: var(--md-sys-color-on-surface); margin-bottom: 0.5rem; font-size: 1.35rem;">
             محقق صحة الصدور والتحقق الرقمي من الوثائق
@@ -343,14 +517,22 @@
 
         <div style="display: flex; gap: 0.6rem; max-width: 620px; margin: 0 auto 2rem auto; flex-wrap: wrap;">
           <input type="text" id="verifierInputQuery" class="form-control" placeholder="مثال: ق.ج/ص/2026/101 أو رمز الباركود SPD-OUT-2026-101" style="flex: 1; min-width: 260px; font-size: 0.95rem; font-family: monospace; font-weight: 700;" onkeypress="if(event.key==='Enter') window.app.executeCorrespondenceVerification()">
-          <button type="button" class="btn btn-primary" onclick="window.app.executeCorrespondenceVerification()" style="padding: 0.6rem 1.4rem; font-weight: 800; font-size: 0.95rem; background: linear-gradient(135deg, #003366 0%, #004d40 100%);">
-            فحص وتحقق
+          <button type="button" class="btn btn-primary" onclick="window.app.executeCorrespondenceVerification()" style="padding: 0.6rem 1.4rem; font-weight: 800; font-size: 0.95rem; background: linear-gradient(135deg, #003366 0%, #004d40 100%); display: inline-flex; align-items: center; gap: 0.45rem;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>فحص وتحقق</span>
           </button>
         </div>
 
         <!-- منطقة نتيجة التحقق التفاعلية -->
         <div id="verifierResultArea">
-          <div style="border: 1.5px dashed var(--md-sys-color-outline-variant); border-radius: 12px; padding: 2rem; text-align: center; color: var(--md-sys-color-outline); font-size: 0.88rem;">
+          <div style="border: 1.5px dashed var(--md-sys-color-outline-variant); border-radius: 12px; padding: 2.2rem; text-align: center; color: var(--md-sys-color-outline); font-size: 0.88rem;">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 0.8rem auto; display: block; opacity: 0.6;">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             أدخل رمز أو عدد أي وثيقة أعلاه للبدء بالفحص الرقمي الفوري...
           </div>
         </div>
@@ -362,25 +544,114 @@
   function getPriorityBadge(priority) {
     switch (priority) {
       case 'URGENT':
-        return '<span style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3);">⚡ عاجل وفوري</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.14) 0%, rgba(220, 38, 38, 0.08) 100%); color: #dc2626; border: 1.2px solid rgba(239, 68, 68, 0.35); box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>عاجل وفوري</span>
+          </span>
+        `;
       case 'HIGH':
-        return '<span style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">🔥 هام</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.08) 100%); color: #d97706; border: 1.2px solid rgba(245, 158, 11, 0.35); box-shadow: 0 1px 3px rgba(217, 119, 6, 0.1);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+              <path d="M12 2c1 3 4 4.5 4 8a6 6 0 1 1-12 0c0-3.5 3-5 4-8 1 2 2 3 4 0z"></path>
+            </svg>
+            <span>هام</span>
+          </span>
+        `;
       default:
-        return '<span style="font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(100, 116, 139, 0.1); color: #475569; border: 1px solid rgba(100, 116, 139, 0.2);">عادي</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 9999px; background: rgba(100, 116, 139, 0.09); color: #475569; border: 1.2px solid rgba(100, 116, 139, 0.22);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 14 14"></polyline>
+            </svg>
+            <span>اعتيادي</span>
+          </span>
+        `;
     }
   }
 
   function getStatusBadge(status) {
     switch (status) {
       case 'ISSUED':
-        return '<span style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✓ صادر معتمد</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%); color: #059669; border: 1.2px solid rgba(16, 185, 129, 0.35); box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>صادر معتمد</span>
+          </span>
+        `;
       case 'PROCESSED':
-        return '<span style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✓ منجز ومحفوظ</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%); color: #059669; border: 1.2px solid rgba(16, 185, 129, 0.35); box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>منجز ومحفوظ</span>
+          </span>
+        `;
       case 'UNDER_PROCESS':
-        return '<span style="font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3);">قيد الإجراء</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(14, 165, 233, 0.14) 0%, rgba(2, 132, 199, 0.08) 100%); color: #0284c7; border: 1.2px solid rgba(14, 165, 233, 0.35); box-shadow: 0 1px 3px rgba(2, 132, 199, 0.1);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>قيد الإجراء</span>
+          </span>
+        `;
       default:
-        return '<span style="font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(100, 116, 139, 0.1); color: #475569; border: 1px solid rgba(100, 116, 139, 0.2);">مقيد في السجل</span>';
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 9999px; background: rgba(100, 116, 139, 0.09); color: #475569; border: 1.2px solid rgba(100, 116, 139, 0.22);">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 14 14"></polyline>
+            </svg>
+            <span>مقيد في السجل</span>
+          </span>
+        `;
     }
+  }
+
+  function getCategoryBadge(cat) {
+    const label = getCategoryLabel(cat);
+    let iconSvg = '';
+    let colorStyle = 'background: rgba(0, 51, 102, 0.07); color: #003366; border: 1px solid rgba(0, 51, 102, 0.2);';
+
+    switch (cat) {
+      case 'ADMINISTRATIVE_ORDER':
+        iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+        colorStyle = 'background: rgba(197, 160, 89, 0.15); color: #9a782a; border: 1px solid rgba(197, 160, 89, 0.35);';
+        break;
+      case 'OFFICIAL_LETTER':
+        iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+        colorStyle = 'background: rgba(0, 51, 102, 0.08); color: #003366; border: 1px solid rgba(0, 51, 102, 0.22);';
+        break;
+      case 'MEMORANDUM':
+        iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+        colorStyle = 'background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);';
+        break;
+      case 'CIRCULAR':
+        iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+        colorStyle = 'background: rgba(147, 51, 234, 0.1); color: #7e22ce; border: 1px solid rgba(147, 51, 234, 0.25);';
+        break;
+      default:
+        iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        colorStyle = 'background: rgba(100, 116, 139, 0.08); color: #475569; border: 1px solid rgba(100, 116, 139, 0.2);';
+    }
+
+    return `
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; padding: 0.16rem 0.55rem; border-radius: 6px; font-weight: 800; ${colorStyle}">
+        ${iconSvg}
+        <span>${label}</span>
+      </span>
+    `;
   }
 
   function getCategoryLabel(cat) {
@@ -395,11 +666,42 @@
 
   function getSecurityLabel(sec) {
     switch (sec) {
-      case 'CONFIDENTIAL': return '🔒 سري';
-      case 'STRICTLY_CONFIDENTIAL': return '⛔ سري للغاية';
-      default: return '📄 رسمي اعتيادي';
+      case 'CONFIDENTIAL':
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: #b45309; font-weight: 800; background: rgba(245, 158, 11, 0.08); padding: 0.15rem 0.5rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.25);">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>سري</span>
+          </span>
+        `;
+      case 'STRICTLY_CONFIDENTIAL':
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: #dc2626; font-weight: 800; background: rgba(220, 38, 38, 0.08); padding: 0.15rem 0.5rem; border-radius: 6px; border: 1px solid rgba(220, 38, 38, 0.25);">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>سري للغاية</span>
+          </span>
+        `;
+      default:
+        return `
+          <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: var(--md-sys-color-outline, #64748b); font-weight: 700; background: rgba(100, 116, 139, 0.06); padding: 0.15rem 0.5rem; border-radius: 6px; border: 1px solid rgba(100, 116, 139, 0.15);">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>رسمي اعتيادي</span>
+          </span>
+        `;
     }
   }
+
 
   function formatDateArabic(dateStr) {
     if (!dateStr) return '-';
@@ -461,13 +763,23 @@
           
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(197, 160, 89, 0.3); padding-bottom: 1rem; margin-bottom: 1.2rem;">
             <div style="display: flex; align-items: center; gap: 0.8rem;">
-              <span style="font-size: 1.6rem;">📤</span>
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(197, 160, 89, 0.2); border: 1.2px solid #c5a059; display: flex; align-items: center; justify-content: center; color: #fde68a;">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </div>
               <div>
                 <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0;">قيد وتصدير كتاب صادر جديد</h3>
                 <span style="font-size: 0.78rem; color: #fde68a;">الثلاثي القانوني: العدد الصريح المقروء + التاريخ الرسمي + الباركود</span>
               </div>
             </div>
-            <button type="button" onclick="document.getElementById('correspondenceModal').remove()" style="background: none; border: none; color: #cbd5e1; font-size: 1.4rem; cursor: pointer;">✕</button>
+            <button type="button" onclick="document.getElementById('correspondenceModal').remove()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); width: 34px; height: 34px; border-radius: 9px; color: #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
           <form onsubmit="event.preventDefault(); window.app.handleSaveCorrespondence('OUTWARD');">
@@ -591,13 +903,23 @@
           
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(52, 211, 153, 0.3); padding-bottom: 1rem; margin-bottom: 1.2rem;">
             <div style="display: flex; align-items: center; gap: 0.8rem;">
-              <span style="font-size: 1.6rem;">📥</span>
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(52, 211, 153, 0.2); border: 1.2px solid #34d399; display: flex; align-items: center; justify-content: center; color: #a7f3d0;">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                  <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                </svg>
+              </div>
               <div>
                 <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0;">تسجيل وقيد كتاب وارد جديد</h3>
                 <span style="font-size: 0.78rem; color: #a7f3d0;">توثيق رقم الوارد الداخلي ومطابقة كتاب الجهة الأصلية</span>
               </div>
             </div>
-            <button type="button" onclick="document.getElementById('correspondenceModal').remove()" style="background: none; border: none; color: #cbd5e1; font-size: 1.4rem; cursor: pointer;">✕</button>
+            <button type="button" onclick="document.getElementById('correspondenceModal').remove()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); width: 34px; height: 34px; border-radius: 9px; color: #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
           <form onsubmit="event.preventDefault(); window.app.handleSaveCorrespondence('INWARD');">
@@ -801,12 +1123,21 @@
               رمز التحقق الرقمي: <code style="font-weight: 800;">${item.verificationHash}</code>
             </div>
 
-            <div style="display: flex; gap: 0.6rem;">
-              <button type="button" class="btn btn-primary" onclick="window.app.printCorrespondenceDocument('${item.id}')" style="background: #003366; color: #ffffff; font-weight: 800;">
-                🖨️ طباعة الوثيقة
+            <div style="display: flex; gap: 0.6rem; align-items: center;">
+              <button type="button" class="btn btn-primary" onclick="window.app.printCorrespondenceDocument('${item.id}')" style="background: #003366; color: #ffffff; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>طباعة الوثيقة</span>
               </button>
-              <button type="button" class="btn btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${item.docNumber}')" style="border-color: #0284c7; color: #0284c7; font-weight: 700;">
-                🔍 فحص صحة الصدور
+              <button type="button" class="btn btn-outline" onclick="window.app.openVerifyCorrespondenceModal('${item.docNumber}')" style="border-color: #0284c7; color: #0284c7; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+                <span>فحص صحة الصدور</span>
               </button>
               <button type="button" class="btn btn-outline" onclick="document.getElementById('correspondenceDetailsModal').remove()">
                 إغلاق
@@ -1017,8 +1348,13 @@
             </div>
 
             <div style="margin-top: 1rem; text-align: left;">
-              <button type="button" class="btn btn-sm btn-primary" onclick="window.app.printCorrespondenceDocument('${item.id}')" style="font-weight: 800;">
-                🖨️ طباعة نسخة طبق الأصل
+              <button type="button" class="btn btn-sm btn-primary" onclick="window.app.printCorrespondenceDocument('${item.id}')" style="font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>طباعة نسخة طبق الأصل</span>
               </button>
             </div>
           </div>
@@ -1026,7 +1362,13 @@
       } else {
         resultArea.innerHTML = `
           <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.04) 100%); border: 2px solid #ef4444; border-radius: 14px; padding: 1.8rem; text-align: center;">
-            <div style="font-size: 2.2rem; color: #ef4444; margin-bottom: 0.5rem;">⚠️</div>
+            <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem auto; color: #ef4444;">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
             <h4 style="font-size: 1.2rem; font-weight: 900; color: #b91c1c; margin-bottom: 0.4rem;">لم يتم العثور على وثيقة رسمية مسجلة بهذا الرمز</h4>
             <p style="color: #7f1d1d; font-size: 0.88rem; max-width: 520px; margin: 0 auto 1.2rem auto; line-height: 1.6;">
               العدد أو رمز الباركود المدخل غير مقيد في سجلات الصادر والوارد المعتمدة لقسم الإنتاج الجنوبي. يرجى التأكد من كتابة العدد بدقة بما في ذلك الفواصل (مثل: <code>ق.ج/ص/2026/101</code>).

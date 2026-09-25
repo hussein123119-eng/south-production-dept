@@ -40,10 +40,12 @@ class ExporterUtility {
       x += parseFloat(barWidth);
     }
 
+    const fontSize = text.length > 28 ? 6 : (text.length > 20 ? 7 : 8);
+
     return `
       <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="display: block; margin: 0 auto;">
         ${rects}
-        <text x="${width / 2}" y="${height - 2}" font-family="monospace" font-size="8" font-weight="bold" text-anchor="middle" fill="#1e293b">${text}</text>
+        <text x="${width / 2}" y="${height - 2}" font-family="'Cairo', 'Segoe UI', system-ui, sans-serif" font-size="${fontSize}" font-weight="bold" text-anchor="middle" fill="#1e293b">${text}</text>
       </svg>
     `;
   }
